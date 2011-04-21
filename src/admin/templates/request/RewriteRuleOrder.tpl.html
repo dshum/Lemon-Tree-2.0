@@ -1,0 +1,20 @@
+<?php
+	$json = array();
+	$error = array();
+
+	if(isset($form) && $form->getErrors()) {
+
+		$form->
+		addMissingLabel('orderList', 'Отсутствует список порядковых номеров объектов.')->
+		addWrongLabel('orderList', 'Некорректный список порядковых номеров объектов.');
+
+		foreach($form->getTextualErrors() as $label) {
+			$error[] = $label;
+		}
+
+	}
+
+	$json['error'] = $error;
+
+	echo JsUtils::php2js($json);
+?>

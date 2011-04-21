@@ -1,0 +1,5 @@
+<span switch="true" name="<?=$propertyName?>" class="dashed hand"><?=$propertyDescription?></span>:<br>
+<div id="<?=$propertyName?>_block" style="display: <?=$from !== null || $to !== null ? 'block' : 'none'?>">
+от <input type="text" class="prop-mini" name="<?=$propertyName?>_from" value="<?=$from?>"<?=$from === null && $to === null ? ' disabled="true"' : ''?> style="width: 75px;">
+до <input type="text" class="prop-mini" name="<?=$propertyName?>_to" value="<?=$to?>"<?=$from === null && $to === null ? ' disabled="true"' : ''?> style="width: 75px;">
+</div>

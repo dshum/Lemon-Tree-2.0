@@ -1,0 +1,36 @@
+<?php
+	$json = array();
+	$error = array();
+
+	if(isset($form0) && $form0->getErrors()) {
+
+		$form->
+		addMissingLabel('elementId', 'Отсутствует идентификатор родительского элемента.')->
+		addMissingLabel('itemId', 'Отсутствует идентификатор класса списка элементов.')->
+		addWrongLabel('elementId', 'Некорректный идентификатор родительского элемента.')->
+		addWrongLabel('itemId', 'Некорректный идентификатор класса списка элементов.');
+
+		foreach($form->getTextualErrors() as $label) {
+			$error[] = $label;
+		}
+
+	} elseif(isset($form) && $form->getErrors()) {
+
+		$form->
+		addMissingLabel('orderList', 'Отсутствует список порядковых номеров элементов.')->
+		addMissingLabel('orderField', 'Отсутствует название поля сортировки.')->
+		addMissingLabel('orderDirection', 'Отсутствует направление сортировки.')->
+		addWrongLabel('orderList', 'Некорректный список порядковых номеров элементов.')->
+		addWrongLabel('orderField', 'Некорректное название поля сортировки.')->
+		addWrongLabel('orderDirection', 'Некорректное направление сортировки.');
+
+		foreach($form->getTextualErrors() as $label) {
+			$error[] = $label;
+		}
+
+	}
+
+	$json['error'] = $error;
+
+	echo JsUtils::php2js($json);
+?>

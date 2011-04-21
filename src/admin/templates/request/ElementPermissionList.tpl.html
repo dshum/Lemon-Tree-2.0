@@ -1,0 +1,20 @@
+<?php
+	$json = array();
+	$error = array();
+
+	if(isset($form) && $form->getErrors()) {
+		$form->
+		addMissingLabel('groupId', 'Отсутствует идентификатор группы.')->
+		addMissingLabel('elementId', 'Отсутствует идентификатор элемента.')->
+		addWrongLabel('groupId', 'Некорректный идентификатор группы.')->
+		addWrongLabel('elementId', 'Некорректный идентификатор элемента.');
+
+		foreach($form->getTextualErrors() as $label) {
+			$error[] = $label;
+		}
+	}
+
+	$json['error'] = $error;
+
+	echo JsUtils::php2js($json);
+?>

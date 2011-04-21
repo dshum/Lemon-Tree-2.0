@@ -1,0 +1,68 @@
+<?php
+	$json = array();
+	$error = array();
+
+	if(isset($form) && $form->getErrors()) {
+		if($form->primitiveExists('groupId')) {
+			$form->
+			addMissingLabel('groupId', 'Отсутствует идентификатор группы.')->
+			addWrongLabel('groupId', 'Некорректный идентификатор группы.');
+		}
+
+		if($form->primitiveExists('parentId')) {
+			$form->
+			addMissingLabel('parentId', 'Отсутствует идентификатор родительской группы.')->
+			addWrongLabel('parentId', 'Некорректный идентификатор родительской группы.');
+		}
+
+		$form->
+		addMissingLabel('groupDescription', 'Отсутствует описание группы.')->
+		addMissingLabel('ownerPermission', 'Не указан доступ по умолчанию к своим разделам.')->
+		addMissingLabel('groupPermission', 'Не указан доступ по умолчанию к разделам группы.')->
+		addMissingLabel('worldPermission', 'Не указан доступ по умолчанию к разделам прочих.')->
+		addWrongLabel('groupDescription', 'Длина описания должна быть не более 255 символов.')->
+		addWrongLabel('ownerPermission', 'Некорректный идентификатор доступа по умолчанию к своим разделам.')->
+		addWrongLabel('groupPermission', 'ННекорректный идентификатор доступа по умолчанию к разделам группы.')->
+		addWrongLabel('worldPermission', 'Некорректный идентификатор доступа по умолчанию к разделам прочих.');
+
+		foreach($form->getTextualErrors() as $label) {
+			$error[] = $label;
+		}
+	}
+
+	if(isset($deniedDropGroupError)) {
+		$error[] = 'Недостаточно прав для удаления данной группы.';
+	}
+
+	if(isset($notEmptyGroupError)) {
+		$error[] = 'Данная группа содержит группы или пользователей и не может быть удалена.';
+	}
+
+	if(isset($dropGroupError)) {
+		$error[] = 'При удалении группы произошла ошибка.';
+	}
+
+	if(isset($deniedAddGroupError)) {
+		$error[] = 'Недостаточно прав для создания данной группы.';
+	}
+
+	if(isset($addGroupError)) {
+		$error[] = 'Произошла ошибка при добавлении группы.';
+	}
+
+	if(isset($deniedSaveGroupError)) {
+		$error[] = 'Недостаточно прав для изменения данной группы.';
+	}
+
+	if(isset($saveGroupError)) {
+		$error[] = 'Произошла ошибка при изменении группы.';
+	}
+
+	$json['error'] = $error;
+
+	if(isset($parentId)) {
+		$json['parentId'] = $parentId;
+	}
+
+	echo JsUtils::php2js($json);
+?>

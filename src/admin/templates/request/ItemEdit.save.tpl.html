@@ -1,0 +1,78 @@
+<?php
+	$json = array();
+	$error = array();
+
+	if(isset($form0) && $form0->getErrors()) {
+
+		$form0->
+		addMissingLabel('itemId', 'Отсутствует идентификатор класса.')->
+		addWrongLabel('itemId', 'Некорректный идентификатор класса.');
+
+		foreach($form0->getTextualErrors() as $label) {
+			$error[] = $label;
+		}
+
+	} elseif(isset($form) && $form->getErrors()) {
+
+		$form->addMissingLabel('itemDescription', 'Не заполнено название объекта.');
+
+		$form->addWrongLabel('itemDescription', 'Длина описания объекта должна быть не более 255 символов.');
+		$form->addWrongLabel('parentClass', 'Некорректный наследуемый класс.');
+
+		switch ($currentItem->getClassType()) {
+
+			case 'abstract':
+				break;
+
+			case 'virtual':
+				$form->addWrongLabel('parentProperty', 'Некорректный идентификатор родительского поля.');
+				break;
+
+			case 'default': default:
+				$form->addMissingLabel('mainPropertyDescription', 'Не заполнено название главного поля.');
+				$form->addMissingLabel('pathPrefix', 'Не заполнен префикс названия элементов в адресной строке.');
+				$form->addWrongLabel('mainPropertyDescription', 'Длина названия главного поля должна быть не более 255 символов.');
+				$form->addWrongLabel('parentProperty', 'Некорректный идентификатор родительского поля.');
+				$form->addWrongLabel('pathPrefix', 'Некорректное название префикса.');
+				$form->addWrongLabel('orderField', 'Некорректное значение поля сортировки по умолчанию.');
+				$form->addWrongLabel('orderDirection', 'Некорректное значение направления сортировки по умолчанию.');
+				$form->addWrongLabel('perPage', 'Количество элементов на страницу должно быть целым числом от 0 до 500.');
+				break;
+		}
+
+		foreach($propertyList as $property) {
+			$form->addMissingLabel('propertyDescription_'.$property->getId().'', 'Не заполнено описание поля.');
+			$form->addMissingLabel('propertyName_'.$property->getId().'', 'Не заполнено название поля.');
+			$form->addMissingLabel('propertyClass_'.$property->getId().'', 'Не выбран тип поля.');
+			$form->addWrongLabel('propertyDescription_'.$property->getId().'', 'Длина описания поля должна быть не более 50 символов.');
+			$form->addWrongLabel('propertyName_'.$property->getId().'', 'Некорректное название поля "'.$form->getValue('propertyDescription_'.$property->getId().'').'".');
+			$form->addWrongLabel('propertyClass_'.$property->getId().'', 'Некорректный тип поля "'.$form->getValue('propertyDescription_'.$property->getId().'').'".');
+
+		}
+
+		$form->addWrongLabel('propertyName_add_field', 'Некорректное название добавляемого поля.');
+		$form->addWrongLabel('propertyName_add_onetoone', 'Некорректное название добавляемого поля.');
+		$form->addWrongLabel('propertyName_add_onetomany', 'Некорректное название добавляемого поля.');
+
+		foreach($form->getTextualErrors() as $label) {
+			$error[] = $label;
+		}
+
+	}
+
+	if(isset($autoGeneration) && $autoGeneration == 'error') {
+		$error[] = 'Произошла ошибка при генерации классов.';
+	}
+
+	if(isset($saveItem) && $saveItem == 'error') {
+		$error[] = 'Произошла ошибка при сохранении объекта.';
+	}
+
+	$json['error'] = $error;
+
+	$json['dropped'] = isset($dropped) ? $dropped : array();
+	$json['added'] = isset($added) ? $added : array();
+	$json['tree'] = isset($tree) ? $tree : array();
+
+	echo JsUtils::php2js($json);
+?>

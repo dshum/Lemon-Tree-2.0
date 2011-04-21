@@ -1,0 +1,13 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
+<html>
+<head>
+<title><?=LT_NAME?></title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="Robots" content="noindex">
+<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+</head>
+<frameset cols="20%,80%" framespacing="0" border="2" frameborder="yes">
+	<frame src="<?=PATH_ADMIN_TREE?>" name="tree">
+	<frame src="<?=Session::exist('browseLastUrl') ? Session::get('browseLastUrl') : PATH_ADMIN_BROWSE?>" name="browse">
+</frameset>
+</html>

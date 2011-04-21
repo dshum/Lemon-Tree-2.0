@@ -1,0 +1,106 @@
+<?php $partViewer->view('include/header.small');?>
+
+<script type="text/javascript">
+$(function() {
+	LT.Common.mainForm = $('#ItemPermissionListForm');
+
+	LT.Common.mainForm.submit(function() {
+		LT.Common.ajaxSubmit();
+		return false;
+ 	});
+
+	$('td[radio=true]').click(function(){
+		var permissionType = $(this).attr('permissiontype');
+		var itemId = $(this).attr('itemid');
+		var permissionId = $(this).attr('permissionid');
+
+		$('div[id^='+permissionType+'_'+itemId+'_]').each(function() {
+			$(this).removeClass('radio_on');
+			$(this).addClass('radio_off');
+		});
+
+		$('div[id^='+permissionType+'_'+itemId+'_'+permissionId+']').each(function() {
+			$(this).removeClass('radio_off');
+			$(this).addClass('radio_on');
+		});
+
+		$('input:hidden[name='+permissionType+'['+itemId+']]').each(function() {
+			this.value = permissionId;
+		});
+	});
+});
+</script>
+
+<h2 class="h2_marg">Права доступа к типам разделов для группы <span class="grey"><?=$currentGroup->getGroupDescription()?></span></h2><br>
+
+<form id="ItemPermissionListForm" name="ItemPermissionListForm" action="<?=$selfUrl?>&action=save" method="post">
+<input type="hidden" name="groupId" value="<?=$currentGroup->getId()?>">
+
+<table class="elements-list setrights">
+<tr valign="top">
+<td></td>
+<td colspan="4" align="left">Владелец</td>
+<td></td>
+<td colspan="4" align="left">Группа</td>
+<td></td>
+<td colspan="4" align="left">Прочие</td>
+<td></td>
+</tr>
+<tr valign="top">
+<th class="left" width="58%">Название</th>
+<?php foreach(Permission::getPermissionTitleList() as $id => $title) {?>
+<th width="2%"><?=$title?></th>
+<?php }?>
+<th width="4%"><br></th>
+<?php foreach(Permission::getPermissionTitleList() as $id => $title) {?>
+<th width="2%"><?=$title?></th>
+<?php }?>
+<th width="4%"><br></th>
+<?php foreach(Permission::getPermissionTitleList() as $id => $title) {?>
+<th width="2%"><?=$title?></th>
+<?php }?>
+<th width="10%">Поиск</th>
+</tr>
+<?php
+	foreach($itemList as $item) {
+		$ownerPermission =
+			isset($itemPermissionMap['ownerPermission'][$item->getId()])
+			? $itemPermissionMap['ownerPermission'][$item->getId()]
+			: $currentGroup->getOwnerPermission();
+		$groupPermission =
+			isset($itemPermissionMap['groupPermission'][$item->getId()])
+			? $itemPermissionMap['groupPermission'][$item->getId()]
+			: $currentGroup->getGroupPermission();
+		$worldPermission =
+			isset($itemPermissionMap['worldPermission'][$item->getId()])
+			? $itemPermissionMap['worldPermission'][$item->getId()]
+			: $currentGroup->getWorldPermission();
+?>
+<input type="hidden" name="ownerPermission[<?=$item->getId()?>]" value="<?=$ownerPermission?>">
+<input type="hidden" name="groupPermission[<?=$item->getId()?>]" value="<?=$groupPermission?>">
+<input type="hidden" name="worldPermission[<?=$item->getId()?>]" value="<?=$worldPermission?>">
+<tr>
+<td class="left" nowrap><?=$item->getItemDescription()?> (<?=$item->getItemName()?>)</td>
+<?php foreach(Permission::getPermissionNameList() as $id => $name) {?>
+<td radio="true" permissiontype="ownerPermission" itemid="<?=$item->getId()?>" permissionid="<?=$id?>"><div id="ownerPermission_<?=$item->getId()?>_<?=$id?>" class="<?=$id == $ownerPermission ? 'radio_on' : 'radio_off'?>"><spacer type="block"></div></td>
+<?php }?>
+<td><br></td>
+<?php foreach(Permission::getPermissionNameList() as $id => $name) {?>
+<td radio="true" permissiontype="groupPermission" itemid="<?=$item->getId()?>" permissionid="<?=$id?>"><div id="groupPermission_<?=$item->getId()?>_<?=$id?>" class="<?=$id == $groupPermission ? 'radio_on' : 'radio_off'?>"><spacer type="block"></div></td>
+<?php }?>
+<td><br></td>
+<?php foreach(Permission::getPermissionNameList() as $id => $name) {?>
+<td radio="true" permissiontype="worldPermission" itemid="<?=$item->getId()?>" permissionid="<?=$id?>"><div id="worldPermission_<?=$item->getId()?>_<?=$id?>" class="<?=$id == $worldPermission ? 'radio_on' : 'radio_off'?>"><spacer type="block"></div></td>
+<?php }?>
+<td checkbox="true" permissiontype="searchPermission" itemid="<?=$item->getId()?>" permissionid="1"><div id="searchPermission_<?=$item->getId()?>_<?=$id?>" class="<?=1 ? 'checkbox_on' : 'checkbox_off'?>"><spacer type="block"></div></td>
+</tr>
+<?php
+}
+?>
+</table>
+<br>
+
+<input class="btn" type="submit" id="save_button" value="Ctrl+S Сохранить">
+</form>
+
+<?php $partViewer->view('include/footer');?>

@@ -1,0 +1,19 @@
+<?php
+	$json = array();
+	$error = array();
+
+	if(isset($autoGeneration) && $autoGeneration == 'error') {
+		$error[] = 'Произошла ошибка при генерации классов.';
+	}
+
+	if(isset($dropList) && $dropList == 'error') {
+		$error[] = 'Произошла ошибка при удалении объектов.';
+	}
+
+	$json['error'] = $error;
+
+	$json['dropped'] = isset($dropped) ? $dropped : array();
+	$json['tree'] = isset($tree) ? $tree : array();
+
+	echo JsUtils::php2js($json);
+?>

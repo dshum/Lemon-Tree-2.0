@@ -1,0 +1,489 @@
+<?php $partViewer->view('include/header');?>
+
+<script type="text/javascript">
+$(function() {
+	var countChecked = 0;
+	var countChanged = 0;
+	var stopToggle = false;
+
+	LT.Common.mainForm = $('#ElementListForm');
+
+	LT.Common.mainForm.submit(function() {
+		if(!countChanged) return false;
+
+		this.action = LT.Common.selfUrl+'&elementId=<?=$currentElement->getPolymorphicId()?>&action=save';
+
+		LT.Common.ajaxSubmit(function(data){
+			if(data.changed) {
+				for(var elementId in data.changed) {
+					for(var propertyName in data.changed[elementId]) {
+						$('td[editable=true][elementid='+elementId+'][propertyname='+propertyName+']').each(function(){
+							$(this).html(data.changed[elementId][propertyName]);
+						});
+					}
+				}
+			}
+			countChanged = 0;
+			$('#browse_save').css({backgroundPosition : '0 -162px'});
+
+		});
+		return false;
+	});
+
+	if(top.tree) {
+		top.tree.LT.Tree.showFolder('<?=$activeElement->getPolymorphicId()?>');
+	}
+
+<?php if($currentElement->getParent()) { ?>
+	$('#browse_up').click(function(){
+		document.location.href = '<?=$selfUrl?>&elementId=<?=$currentElement->getParent()->getPolymorphicId()?>';
+	}).mousedown(function(){
+		$(this).css({backgroundPosition: '0 -54px'});
+	}).mouseup(function(){
+		$(this).css({backgroundPosition: '0 0'});
+	}).mouseover(function(){
+		$(this).css({backgroundPosition: '0 0'});
+	}).mouseout(function(){
+		$(this).css({backgroundPosition: '0 -108px'});
+	}).css({backgroundPosition: '0 -108px'});
+
+	$('#browse_edit').click(function(){
+		document.location.href = '<?=$baseUrl?>?module=ElementEdit&elementId=<?=$currentElement->getPolymorphicId()?>';
+	}).mousedown(function(){
+		$(this).css({backgroundPosition: '0 -54px'});
+	}).mouseup(function(){
+		$(this).css({backgroundPosition: '0 0'});
+	}).mouseover(function(){
+		$(this).css({backgroundPosition: '0 0'});
+	}).mouseout(function(){
+		$(this).css({backgroundPosition: '0 -108px'});
+	}).css({backgroundPosition: '0 -108px'});
+<?php }?>
+
+	$('#browse_save').click(function(){
+		LT.Common.mainForm.submit();
+	}).mousedown(function(){
+		if(countChanged > 0) {
+			$(this).css({backgroundPosition: '0 -54px'});
+		}
+	}).mouseup(function(){
+		if(countChanged > 0) {
+			$(this).css({backgroundPosition: '0 0'});
+		}
+	}).mouseover(function(){
+		if(countChanged > 0) {
+			$(this).css({backgroundPosition: '0 0'});
+		}
+	}).mouseout(function(){
+		if(countChanged > 0) {
+			$(this).css({backgroundPosition: '0 -108px'});
+		}
+	});
+
+	$('#browse_drop').click(function(){
+		if(countChecked > 0) {
+			if(!confirm('Удалить выбранные элементы?')) {
+				return false;
+			}
+		} else {
+			return false;
+		}
+
+		LT.Common.mainForm.each(function(){
+			this.action = LT.Common.selfUrl+'&elementId=<?=$currentElement->getPolymorphicId()?>&action=drop';
+		});
+
+		LT.Common.ajaxSubmit(function(data){
+			if(data.dropped && data.dropped.length) {
+				for(var i in data.dropped) {
+					top.tree.LT.Tree.dropNode(data.dropped[i]);
+				}
+				document.location.href = document.location.href;
+			}
+		});
+	}).mousedown(function(){
+		if(countChecked > 0) {
+			$(this).css({backgroundPosition: '0 -54px'});
+		}
+	}).mouseup(function(){
+		if(countChecked > 0) {
+			$(this).css({backgroundPosition: '0 0'});
+		}
+	}).mouseover(function(){
+		if(countChecked > 0) {
+			$(this).css({backgroundPosition: '0 0'});
+		}
+	}).mouseout(function(){
+		if(countChecked > 0) {
+			$(this).css({backgroundPosition: '0 -108px'});
+		}
+	});
+
+	$('#browse_move').click(function(){
+<?php if($currentElement->getStatus() == 'trash') {?>
+		if(countChecked > 0) {
+			if(!confirm('Восстановить выбранные элементы?')) {
+				return false;
+			}
+		} else {
+			return false;
+		}
+
+		LT.Common.mainForm.each(function(){
+			this.action =
+				LT.Common.selfUrl
+				+'&elementId=<?=$currentElement->getPolymorphicId()?>&action=restore';
+		});
+
+		LT.Common.ajaxSubmit(function(data){
+			if(data.tree && data.tree.length) {
+				top.tree.LT.Tree.dropTree();
+				for(var i in data.tree) {
+					top.tree.LT.Tree.addElement(
+						data.tree[i].parentId,
+						data.tree[i].elementId,
+						data.tree[i].elementName,
+						data.tree[i].permissionId,
+						data.tree[i].openFolder
+					);
+				}
+				top.tree.LT.Tree.buildTree();
+			}
+			if(data.restored && data.restored.length) {
+				document.location.href = document.location.href;
+			}
+		});
+<?php } else {?>
+		if(countChecked > 0) {
+			LT.Common.mainForm.each(function(){
+				this.action = LT.Common.baseUrl+'?module=ElementMove';
+				this.submit();
+			});
+		}
+<?php }?>
+	}).mousedown(function(){
+		if(countChecked > 0) {
+			$(this).css({backgroundPosition: '0 -54px'});
+		}
+	}).mouseup(function(){
+		if(countChecked > 0) {
+			$(this).css({backgroundPosition: '0 0'});
+		}
+	}).mouseover(function(){
+		if(countChecked > 0) {
+			$(this).css({backgroundPosition: '0 0'});
+		}
+	}).mouseout(function(){
+		if(countChecked > 0) {
+			$(this).css({backgroundPosition: '0 -108px'});
+		}
+	});
+
+<?php if($loggedUser->getGroup()->getIsDeveloper()) { ?>
+	$('#browse_control_plus').click(function(){
+		LT.Common.windowOpen(
+			'<?=$baseUrl?>?module=Bind2ElementList&elementId=<?=$currentElement->getPolymorphicId()?>',
+			'Bind2ElementList', 500, 600);
+	}).mousedown(function(){
+		$(this).css({backgroundPosition: '0 -54px'});
+	}).mouseup(function(){
+		$(this).css({backgroundPosition: '0 0'});
+	}).mouseover(function(){
+		$(this).css({backgroundPosition: '0 0'});
+	}).mouseout(function(){
+		$(this).css({backgroundPosition: '0 -108px'});
+	}).css({backgroundPosition: '0 -108px'});
+<?php }?>
+
+	$('input[check=item]').livequery('click', function(){
+		if(this.checked) {
+			$('input:checkbox[check=element][itemid='+this.value+']').each(function() {
+				if(!this.checked && !this.disabled) {
+					this.checked = true;
+					$(this).parents('tr').addClass('light');
+					countChecked++;
+				}
+			});
+		} else {
+			$('input:checkbox[check=element][itemid='+this.value+']').each(function() {
+				if(this.checked && !this.disabled) {
+					this.checked = false;
+					$(this).parents('tr').removeClass('light');
+					countChecked--;
+				}
+			});
+		}
+
+		if(countChecked > 0) {
+			$('#browse_drop').css({backgroundPosition: '0 -108px'});
+			$('#browse_move').css({backgroundPosition: '0 -108px'});
+		} else {
+			$('#browse_drop').css({backgroundPosition: '0 -162px'});
+			$('#browse_move').css({backgroundPosition: '0 -162px'});
+		}
+	});
+
+	$('input[check=element]').livequery('click', function() {
+		if(this.checked) {
+			$(this).parents('tr').addClass('light');
+			countChecked++;
+		} else {
+			$(this).parents('tr').removeClass('light');
+			countChecked--;
+		}
+
+		if(countChecked > 0) {
+			$('#browse_drop').css({backgroundPosition: '0 -108px'});
+			$('#browse_move').css({backgroundPosition: '0 -108px'});
+		} else {
+			$('#browse_drop').css({backgroundPosition: '0 -162px'});
+			$('#browse_move').css({backgroundPosition: '0 -162px'});
+		}
+	}).livequery('mouseover', function() {
+		$(this).parents('tr').addClass('light_hover');
+	}).livequery('mouseout', function() {
+		$(this).parents('tr').removeClass('light_hover');
+	});
+
+	$('[id^=edit]').livequery('mousedown', function(){
+		stopToggle = true;
+	});
+
+	$('td[editable=true]').livequery('mouseup', function(){
+		if(stopToggle) {
+			stopToggle = false;
+			return false;
+		}
+
+		var elementId = $(this).attr('elementid').replace(/\./, '\\.');
+		var propertyName = $(this).attr('propertyname');
+
+		$('#show\\['+elementId+'\\]\\['+propertyName+'\\]').toggle();
+		$('#edit\\['+elementId+'\\]\\['+propertyName+'\\]').each(function(){
+			if($(this).css('display') == 'none') {
+				$('#edited\\['+elementId+'\\]\\['+propertyName+'\\]').val(1);
+				countChanged++;
+				$(this).show();
+				this.focus();
+			} else {
+				if(this.type == 'checkbox') {
+					this.checked = $(this).attr('default') == 1;
+				} else {
+					this.value = $(this).attr('default');
+				}
+				$('#edited\\['+elementId+'\\]\\['+propertyName+'\\]').val(0);
+				countChanged--;
+				$(this).hide();
+			}
+		});
+
+		if(countChanged > 0) {
+			$('#browse_save').css({backgroundPosition : '0 -108px'});
+		} else {
+			$('#browse_save').css({backgroundPosition : '0 -162px'});
+		}
+	});
+
+	$('span[showlist=true]').livequery('click', function() {
+		var itemId = $(this).attr('itemid');
+
+		switch($(this).attr('list')) {
+			case 'empty':
+				$.post(
+					'<?=$selfUrl?>&action=show',
+					{
+						elementId: '<?=$currentElement->getPolymorphicId()?>',
+						itemId: itemId,
+						list: 'expand'
+					},
+					function(data) {
+						var itemId = data.itemId;
+						var elementListContent = data.elementListContent;
+						if(itemId && elementListContent) {
+							elementListContent = elementListContent.replace(/\[\[\[/g, '<').replace(/\]\]\]/g, '>');
+							$('#item_'+itemId).html(elementListContent);
+						}
+					},
+					'json'
+				);
+				break;
+			case 'opened':
+				$('#elementListContainer_'+itemId).hide();
+				$(this).attr('list', 'closed');
+				$.post(
+					'<?=$selfUrl?>&action=show',
+					{
+						elementId: '<?=$currentElement->getPolymorphicId()?>',
+						itemId: itemId,
+						list: 'close'
+					},
+					null,
+					'json'
+				);
+				break;
+			case 'closed':
+				$('#elementListContainer_'+itemId).show();
+				$(this).attr('list', 'opened');
+				$.post(
+					'<?=$selfUrl?>&action=show',
+					{
+						elementId: '<?=$currentElement->getPolymorphicId()?>',
+						itemId: itemId,
+						list: 'open'
+					},
+					null,
+					'json'
+				);
+				break;
+			default:
+				break;
+		}
+	});
+
+	$('span[sort=true]').livequery('click', function() {
+		var itemId = $(this).attr('itemid');
+		var fieldName = $(this).attr('field');
+		var direction = $(this).attr('direction');
+
+		LT.Common.showIndicator();
+
+		$.post(
+			'<?=$selfUrl?>&action=show',
+			{
+				elementId: '<?=$currentElement->getPolymorphicId()?>',
+				itemId: itemId,
+				fieldName: fieldName,
+				direction: direction
+			},
+			function(data) {
+				var itemId = data.itemId;
+				var elementListContent = data.elementListContent;
+				if(itemId && elementListContent) {
+					elementListContent = elementListContent.replace(/\[\[\[/g, '<').replace(/\]\]\]/g, '>');
+					$('#item_'+itemId).html(elementListContent);
+				}
+				LT.Common.unlock();
+			},
+			'json'
+		);
+	});
+
+	$('i[pager=true]').livequery('click', function() {
+		var itemId = $(this).attr('itemid');
+		var page = $(this).attr('page');
+
+		LT.Common.showIndicator();
+
+		$.post(
+			'<?=$selfUrl?>&action=show',
+			{
+				elementId: '<?=$currentElement->getPolymorphicId()?>',
+				itemId: itemId,
+				page: page
+			},
+			function(data) {
+				var itemId = data.itemId;
+				var elementListContent = data.elementListContent;
+				if(itemId && elementListContent) {
+					elementListContent = elementListContent.replace(/\[\[\[/g, '<').replace(/\]\]\]/g, '>');
+					$('#item_'+itemId).html(elementListContent);
+				}
+				LT.Common.unlock();
+			},
+			'json'
+		);
+	}).livequery('mouseover', function() {
+		$(this).addClass('pager_over');
+	}).livequery('mouseout', function() {
+		$(this).removeClass('pager_over');
+	});
+});
+</script>
+
+<!-- path block -->
+<div class="path_top"><div><img src="img/path01.gif" width="5" height="8" alt=""></div></div>
+<div class="path">
+<?php
+if(
+	$currentElement->getPolymorphicId() == Root::me()->getPolymorphicId()
+	|| $currentElement->getPolymorphicId() == Root::trash()->getPolymorphicId()
+) {
+?>
+<span><?=$currentElement->getElementName()?></span>
+<?php
+} elseif($currentElement->getStatus() == 'trash') {
+?>
+<a href="<?=$baseUrl?>?module=ViewBrowse&elementId=<?=Root::trash()->getPolymorphicId()?>"><?=Root::trash()->getElementName()?></a> &nbsp;<img src="img/path_arr2.gif" alt="">&nbsp;<span><?=$currentElement->getElementName()?></span>
+<?php
+} else {
+	foreach($parentList as $parent) {
+?>
+<a href="?<?=$selfUrl?>&elementId=<?=$parent->getPolymorphicId()?>"><?=$parent->getElementName()?></a> &nbsp;<img src="img/path_arr2.gif" alt="">
+<?php
+	}
+?>
+&nbsp;<span><?=$currentElement->getElementName()?></span>
+<?php
+}
+?>
+</div>
+<div class="path_bottom"><div><img src="img/path04.gif" width="5" height="8" alt=""></div></div>
+<!-- end of path block -->
+
+<!-- buttons block -->
+<div class="browse-control">
+<div class="fleft">
+<img src="img/0.gif" id="browse_up" class="off" width="45" height="54" alt="Наверх" title="Наверх">
+<img src="img/0.gif" id="browse_edit" class="off" width="78" height="54" alt="Редактировать" title="Редактировать">
+<img src="img/separator.gif" width="1" height="48" alt="" class="separator">
+<img src="img/0.gif" id="browse_save" width="59" height="54" alt="Сохранить" title="Сохранить">
+<img src="img/0.gif" id="browse_drop" width="49" height="54" alt="Удалить" title="Удалить">
+<?php if($currentElement->getStatus() == 'trash') {?><img src="img/0.gif" id="browse_move" width="69" height="54" alt="Восстановить" title="Восстановить"><?php } else {?><img src="img/0.gif" id="browse_move" width="69" height="54" alt="Перенести" title="Перенести"><?php }?>
+</div>
+<div class="fright">
+<?php if($loggedUser->getGroup()->getIsDeveloper()) { ?><img src="img/0.gif" id="browse_control_plus" width="52" height="54" alt="Привязать объекты" title="Привязать объекты"><?php } ?>
+</div>
+<br class="both">
+</div>
+<!-- end of buttons block -->
+
+<!-- binds block -->
+<?php
+$sizeofBinds = sizeof($bindList);
+if($sizeofBinds) {
+	$count = 0;
+?>
+<div class="add-item">
+<b>Добавить:&nbsp;</b>
+<?php foreach($itemList as $item) { if(in_array($item->getId(), $bindList)) {?><?php if($count) echo ', ';?><a href="<?=$baseUrl?>?module=ElementEdit&parentId=<?=$currentElement->getPolymorphicId()?>&itemId=<?=$item->getId()?>&action=create" title="ClassName=<?=$item->getItemName()?>"><?=$item->getItemDescription();?></a><?php $count++; } }?>
+</div>
+<?php
+} else {
+	echo '<br>';
+}
+?>
+<!-- end of binds block -->
+
+<!-- plugin block -->
+<?php
+if(isset($pluginModelAndView) && $pluginModelAndView instanceof ModelAndView) {
+	$pluginModelAndView->getView()->render($pluginModelAndView->getModel());
+}
+?>
+<!-- end of plugin block -->
+
+<form id="ElementListForm" name="ElementListForm" action="<?=$selfUrl?>&elementId=<?=$currentElement->getPolymorphicId()?>" method="post" enctype="multipart/form-data" onsubmit="return false" onctrls="oElement.saveList()">
+<input type="hidden" name="module" value="ViewBrowse">
+<input type="hidden" name="elementId" value="<?=$currentElement->getPolymorphicId()?>">
+<input type="hidden" name="sourceId" value="<?=$currentElement->getPolymorphicId()?>">
+
+<?php foreach($elementListModelAndViewList as $itemId => $elementListModelAndView) {?>
+<div id="item_<?=$itemId?>">
+<?php $elementListModelAndView->getView()->render($elementListModelAndView->getModel());?>
+</div>
+<?php }?>
+
+<?php if($empty) {?><div id="empty_node"><?=($currentElement instanceof Root) ? 'В данном разделе элементы отсутствуют.' : 'В данном разделе элементы отсутствуют.<br>Вы можете <a href="'.$baseUrl.'?module=ElementEdit&elementId='.$currentElement->getPolymorphicId().'">редактировать</a> раздел.'?><div class="line">&nbsp;</div></div><?php }?>
+</form>
+
+<?php $partViewer->view('include/footer');?>

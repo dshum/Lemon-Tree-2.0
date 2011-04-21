@@ -1,0 +1,76 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title><?=LT_NAME?></title>
+<meta name="Robots" content="noindex">
+<link href="css/style.css" type="text/css" rel="stylesheet">
+<script type="text/javascript">
+if(window == top.browse) {
+	top.location.href = window.location.href;
+}
+
+function checkLogin(f)
+{
+	if(!f.UserName.value) {
+		alert("Введите логин.");
+		f.UserName.focus();
+		return false;
+	}
+	if(!f.UserPassword.value) {
+		alert("Введите пароль.");
+		f.UserPassword.focus();
+		return false;
+	}
+	return true;
+}
+</script>
+</head>
+
+<body onload="document.AuthorizeForm['UserName'].focus();">
+<table class="login_tbl" align="center">
+<tr><td>
+<img src="img/logo_index.png" width="172" height="51" alt="<?=LT_NAME?>"><br><br>
+
+<?php
+if($form->getErrors()) {
+	$form->addMissingLabel('UserName', 'Введите логин.');
+	$form->addMissingLabel('UserPassword', 'Введите пароль.');
+	$form->addWrongLabel('UserName', 'Такого пользователя не существует.');
+	$form->addWrongLabel('UserPassword', 'Неверный пароль.');
+	echo '<p class="wrong">';
+	foreach($form->getTextualErrors() as $label) {
+		echo ''.$label.'<br>';
+	}
+	echo '</p>';
+}
+?>
+
+<form name="AuthorizeForm" action="<?=PATH_ADMIN?>" method="post" onsubmit="return checkLogin(this);">
+<input type="hidden" name="action" value="login">
+<table>
+<tr>
+<td><img src="img/login.png" width="54" height="48" alt="Логин" title="Логин"></td>
+<td><input type="text" name="UserName" value="<?=$UserName?>" class="pass"></td>
+</tr>
+<tr>
+<td><img src="img/password.png" width="54" height="48" alt="Пароль" title="Пароль"></td>
+<td><input type="password" name="UserPassword" value="<?=$UserPassword?>" class="pass"></td>
+</tr>
+<tr>
+<td></td>
+<td><div class="relative"><a href="<?=$baseUrl?>?module=Restore">Забыли пароль?</a></div></td>
+</tr>
+<tr>
+<td></td>
+<td><input type="submit" class="btn-sm" value="Войти"></td>
+</tr>
+</table>
+</form>
+
+<br><br>
+<a class="em" href="http://www.lemon-tree.ru"><img src="img/help.png" alt="">&nbsp;&nbsp;Что такое Lemon Tree Site Engine?</a>
+</td></tr>
+</table>
+
+</body>
+</html>

@@ -1,0 +1,7 @@
+2008-01-31
+JsHttpRequest.js
+Added src="blank.html" to dynamical iframe.
+
+2008-01-08
+MySQL.class.php
+Added Site::setQuery($queryString) to queryRaw().

@@ -1,0 +1,124 @@
+<?php $partViewer->view("include/header");?>
+
+<script type="text/javascript">
+$(function() {
+	var countChecked = 0;
+
+	LT.Common.mainForm = $('#ItemListForm');
+
+ 	LT.Common.mainForm.submit(function() {
+		return false;
+	});
+
+	$('input:checkbox[name^=drop_]').click(function() {
+		if(this.checked) {
+			$(this).parents('tr').addClass('light');
+			countChecked++;
+		} else {
+			$(this).parents('tr').removeClass('light');
+			countChecked--;
+		}
+	}).mouseover(function() {
+		$(this).parents('tr').addClass('light_hover');
+	}).mouseout(function() {
+		$(this).parents('tr').removeClass('light_hover');
+	});
+
+	$('#items_create').click(function(){
+		document.location.href = '<?=$baseUrl?>?module=ItemEdit&action=create';
+	}).mousedown(function(){
+		$(this).css({backgroundPosition: '0 -54px'});
+	}).mouseup(function(){
+		$(this).css({backgroundPosition: '0 0'});
+	}).mouseover(function(){
+		$(this).css({backgroundPosition: '0 0'});
+	}).mouseout(function(){
+		$(this).css({backgroundPosition: '0 -108px'});
+	}).css({backgroundPosition: '0 -108px'});
+
+	$('#items_delete').click(function(){
+		if(countChecked) {
+			if(!confirm('Внимание! Все элементы выбранных классов будут удалены. Продолжить?')) {
+				return false;
+			}
+		} else {
+			alert('Не выбрано ни одного объекта.');
+			return false;
+		}
+		LT.Common.ajaxSubmit(function(data){
+			if(data.dropped) {
+				for(var i in data.dropped) {
+					$('#item_row_'+data.dropped[i]).remove();
+				}
+			}
+		});
+		return false;
+	}).mousedown(function(){
+		$(this).css({backgroundPosition: '0 -54px'});
+	}).mouseup(function(){
+		$(this).css({backgroundPosition: '0 0'});
+	}).mouseover(function(){
+		$(this).css({backgroundPosition: '0 0'});
+	}).mouseout(function(){
+		$(this).css({backgroundPosition: '0 -108px'});
+	}).css({backgroundPosition: '0 -108px'});
+
+});
+</script>
+
+<div class="path_top"><div><img src="img/path01.gif" width="5" height="8" alt=""></div></div>
+<div class="path">Управление объектами</div>
+<div class="path_bottom"><div><img src="img/path04.gif" width="5" height="8" alt=""></div></div>
+
+<form id="ItemListForm" name="ItemListForm" action="<?=$selfUrl?>&action=drop" method="post" onsubmit="return false" onctrls="return false">
+
+<div class="browse-control">
+<!-- Кнопки управления -->
+<img src="img/0.gif" id="items_create" width="49" height="54" alt="Создать объект" title="Создать объект">
+<img src="img/0.gif" id="items_delete" width="49" height="54" alt="Удалить" title="Удалить">
+<!-- //Кнопки управления -->
+</div>
+
+<?php if(sizeof($itemList)) {?>
+
+<div class="order_link">
+<a href="<?=$baseUrl?>?module=ItemOrder" onclick="LT.Common.windowOpen(this.href, 'ItemOrder', 500, 450); return false;" title="Сортировать объекты"><img src="img/ico_order_sm.gif" width="15" height="15" alt="Откроется в новом окне" title="Откроется в новом окне">&nbsp;<em>Всего <?=sizeof($itemList)?> <?=RussianTextUtils::selectCaseForNumber(sizeof($itemList), array('объект', 'объекта', 'объектов'))?></em></a>
+</div>
+<h2 class="h2_marg">Список объектов</h2>
+<table id="item_table" class="elements-list items">
+<tr>
+<th class="width-25"><img src="img/ico_browse_default_sorting_inactive.gif" alt=""></th>
+<th width="15%"><a href="<?=$selfUrl?>&orderby=ItemID&how=" title="">Класс</a></th>
+<th width="84%"><a href="<?=$selfUrl?>&orderby=ItemDescription&how=" title="">Название</a></th>
+<th class="width-25"><img src="img/ico_del.png" width="18" height="18" alt="Удалить" title="Удалить"></th>
+</tr>
+<?php foreach($itemList as $item) {?>
+<tr id="item_row_<?=$item->getId()?>">
+<td></td>
+<td><a href="<?=$baseUrl?>?module=ItemEdit&itemId=<?=$item->getId()?>"><?=$item->getItemName()?></a></td>
+<td><?=$item->getItemDescription();?>
+&nbsp;&nbsp;<a href="<?=$baseUrl?>?module=Bind2ItemList&itemId=<?=$item->getId()?>" onclick="LT.Common.windowOpen(this.href, 'Bind2ItemList', 500, 600); return false;" target="_blank" title="Привязать объекты"><img src="img/ico_join.png" width="18" height="18" alt="Привязать объекты"></a>&nbsp;&nbsp;
+<?php
+	if(isset($bindList[$item->getId()]) && sizeof($bindList[$item->getId()])) {
+		echo '<small>';
+		$k = 0;
+		foreach($itemList as $item2) {
+			if(in_array($item2->getId(), $bindList[$item->getId()])) {
+				echo ($k > 0 ? ', ' : '').$item2->getItemDescription();
+				$k++;
+			}
+		}
+		echo '</small>';
+	}
+?>
+</td>
+<td><input type="checkbox" name="drop_<?=$item->getId()?>" value="1" title="Выбрать"></td>
+</tr>
+<?php }?>
+</table>
+</form>
+<br><br>
+
+<?php }?>
+
+<?php $partViewer->view("include/footer");?>

@@ -1,0 +1,22 @@
+<?php
+	$json = array();
+	$error = array();
+
+	if(isset($form) && $form->getErrors()) {
+
+		$form->
+		addMissingLabel('itemId', 'Отсутствует идентификатор класса.')->
+		addWrongLabel('itemId', 'Некорректный идентификатор класса.');
+
+		foreach($form->getTextualErrors() as $label) {
+			$error[] = $label;
+		}
+
+	}
+
+	$json['error'] = $error;
+
+	$json['fieldList'] = isset($fieldList) ? $fieldList : array();
+
+	echo JsUtils::php2js($json);
+?>

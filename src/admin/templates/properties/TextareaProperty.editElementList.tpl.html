@@ -1,0 +1,3 @@
+<input type="hidden" id="edited[<?=$element->getPolymorphicId()?>][<?=$propertyName?>]" name="edited[<?=$element->getPolymorphicId()?>][<?=$propertyName?>]" value="0">
+<div id="show[<?=$element->getPolymorphicId()?>][<?=$propertyName?>]"><span class="dh"><?=nl2br($value)?></span></div>
+<textarea id="edit[<?=$element->getPolymorphicId()?>][<?=$propertyName?>]" name="edit_<?=$element->getClass()?>_<?=$element->getId()?>_<?=$propertyName?>" default="<?=$value?>" class="prop-browse"><?=$value?></textarea>

@@ -1,0 +1,30 @@
+<?php $partViewer->view("include/header.small");?>
+
+<script type="text/javascript">
+$(function() {
+
+});
+</script>
+
+<h2 class="h2_marg">Файловый менеджер</h2>
+
+<p>
+<a href="<?=$selfUrl?>&url=<?=$url?>&type=<?=$type?>&folder=">Корень</a>
+<?php if(sizeof($parentList)) {?>
+<?php foreach($parentList as $parent) {?> / <a href="<?=$selfUrl?>&url=<?=$url?>&type=<?=$type?>&folder=<?=$parent?>"><?=$parent?></a><?php }?>
+<?php }?>
+</p>
+
+<?php if(sizeof($dirList)) {?>
+<?php 	foreach($dirList as $dir) {?>
+<a href="<?=$selfUrl?>&url=<?=$url?>&type=<?=$type?>&folder=<?=$dir?>"><img src="img/folder.png"> <?=$dir?></a><br>
+<?php 	}?>
+<?php }?>
+
+<?php if(sizeof($fileList)) {?>
+<?php 	foreach($fileList as $file) {?>
+<a href=""><img src="img/file.png"> <?=$file?></a><br>
+<?php 	}?>
+<?php }?>
+
+<?php $partViewer->view("include/footer");?>

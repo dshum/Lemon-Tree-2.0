@@ -1,0 +1,47 @@
+<?php $partViewer->view("include/header.small");?>
+
+<script type="text/javascript">
+$(function() {
+	LT.Common.mainForm = $('#Bind2ElementListForm');
+
+	var elementId = '<?=$currentElement->getPolymorphicId()?>';
+
+	LT.Common.mainForm.submit(function() {
+		LT.Common.ajaxSubmit(function() {
+			if(window.opener) {
+				window.opener.document.location.href = LT.Common.baseUrl+'?module=ViewBrowse&elementId='+elementId;
+				window.close();
+			}
+		});
+		return false;
+ 	});
+});
+</script>
+
+<h2 class="h2_marg">Присоединить объекты</h2>
+
+<form id="Bind2ElementListForm" name="Bind2ElementListForm" action="<?=$selfUrl?>&elementId=<?=$currentElement->getPolymorphicId()?>&action=save" method="post">
+
+<table class="elements-list">
+<tr>
+<th class="width-25">&nbsp;</th>
+<th>Класс</th>
+<th>Объект</th>
+</tr>
+<?php foreach($itemList as $item) {?>
+<tr>
+<td>
+<input type="checkbox" class="checkbox" id="check_<?=$item->getId()?>" name="check_<?=$item->getId()?>" value="1"<?=(isset($bind2ItemMap[$item->getId()]) || isset($bind2ElementMap[$item->getId()])) ? ' checked' : ''?> title="Выбрать" <?=(isset($bind2ItemMap[$item->getId()])) ? ' disabled="true"' : ''?>>
+</td>
+<td><label for="check_<?=$item->getId()?>"><?=$item->getItemName()?></label></td>
+<td nowrap><label for="check_<?=$item->getId()?>"><?=$item->getItemDescription()?></label></td>
+</tr>
+<?php }?>
+</table>
+
+<br>
+
+<input class="btn" type="submit" id="save_button"value="Ctrl+S Сохранить">
+</form>
+
+<?php $partViewer->view("include/footer");?>

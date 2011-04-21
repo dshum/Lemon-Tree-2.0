@@ -1,0 +1,130 @@
+<?php $partViewer->view('include/header');?>
+
+<script type="text/javascript">
+$(function() {
+	$('a[drop=group]').click(function(){
+		var url = LT.Common.baseUrl+'?module=GroupEdit&action=drop';
+		var data = {groupId: $(this).attr('groupid')};
+		LT.Common.ajaxPost(url, data, function() {
+			document.location.href = document.location.href;
+		});
+		return false;
+	});
+
+	$('a[drop=user]').click(function(){
+		var url = LT.Common.baseUrl+'?module=UserEdit&action=drop';
+		var data = {userId: $(this).attr('userid')};
+		LT.Common.ajaxPost(url, data, function() {
+			document.location.href = document.location.href;
+		});
+		return false;
+	});
+});
+</script>
+
+<!-- path block -->
+<div class="path_top"><div><img src="img/path01.gif" width="5" height="8" alt=""></div></div>
+<div class="path">
+<a href="<?=$selfUrl?>">Управление пользователями</a> &nbsp;<img src="img/path_arr2.gif" alt="">
+<?php
+if(sizeof($parentList)) {
+	foreach($parentList as $parent) {
+?>
+<a href="<?=$selfUrl?>&groupId=<?=$parent->getId()?>"><?=$parent->getGroupDescription()?></a> &nbsp;<img src="img/path_arr2.gif" alt="">
+<?php
+	}
+}
+?>
+<?=$currentGroup->getGroupDescription()?>
+</div>
+<div class="path_bottom"><div><img src="img/path04.gif" width="5" height="8" alt=""></div></div>
+<!-- end of path block -->
+
+<?php if($loggedUser->getGroup()->getIsAdmin() && $currentGroup->getId() != $loggedUser->getGroup()->getId()) {?>
+<div class="add-item"><b>Добавить:&nbsp;</b> <a href="<?=$baseUrl?>?module=GroupEdit&action=create&parentId=<?=$currentGroup->getId()?>">Группа пользователей</a>, <a href="<?=$baseUrl?>?module=UserEdit&action=create&groupId=<?=$currentGroup->getId()?>">Пользователь</a></div>
+<?php } elseif($loggedUser->getGroup()->getIsAdmin()) {?>
+<div class="add-item"><b>Добавить:&nbsp;</b> <a href="<?=$baseUrl?>?module=GroupEdit&action=create&parentId=<?=$currentGroup->getId()?>">Группа пользователей</a></div>
+<?php } elseif($currentGroup->getId() != $loggedUser->getGroup()->getId()) {?>
+<div class="add-item"><b>Добавить:&nbsp;</b> <a href="<?=$baseUrl?>?module=UserEdit&action=create&groupId=<?=$currentGroup->getId()?>">Пользователь</a></div>
+<?php } else {?>
+<br>
+<?php }?>
+
+<?php
+$sizeofGroupList = sizeof($groupList);
+if($sizeofGroupList > 0) {
+?>
+<div class="order_link">всего <?=$sizeofGroupList.' '.RussianTextUtils::selectCaseForNumber($sizeofGroupList, array('группа', 'группы', 'групп'))?></div>
+<h2>Группа пользователей</h2>
+<table class="elements-list">
+<col class="width-25">
+<tr>
+<th class="center"></th>
+<th>Название</th>
+<?php if($loggedUser->getGroup()->getIsAdmin()) {?>
+<th>Права доступа к типам разделов</th>
+<th>Права доступа к разделам</th>
+<th class="width-25"></th>
+<?php }?>
+</tr>
+<?php foreach($groupList as $group) {?>
+<tr>
+<td class="folder"><a href="<?=$selfUrl?>&groupId=<?=$group->getId()?>"><img src="img/0.gif" width="18" height="18" alt="" title=""></a></td>
+<?php if($loggedUser->getGroup()->getIsAdmin()) {?>
+<td width="30%"><div class="edit"><a href="<?=$baseUrl?>?module=GroupEdit&groupId=<?=$group->getId()?>"><img src="img/0.gif" width="18" height="18" alt="Редактировать" title="Редактировать"><?=$group->getGroupDescription()?></a></div></td>
+<td><a href="<?=$selfUrl?>&groupId=<?=$currentGroup->getId()?>" onclick="LT.Common.windowOpen('<?=$baseUrl?>?module=ItemPermissionList&groupId=<?=$group->getId()?>', 'itemPermissionList', 1000, 600); return false;" target="_blank" class="em"><img src="img/ico_popup.gif" width="14" height="11" alt="Откроется в новом окне" title="Откроется в новом окне">&nbsp;<em>Редактировать</em></a></td>
+<td><a href="<?=$selfUrl?>&groupId=<?=$currentGroup->getId()?>" onclick="LT.Common.windowOpen('<?=$baseUrl?>?module=ElementPermissionList&groupId=<?=$group->getId()?>', 'elementPermissionList', 800, 600); return false;" target="_blank" class="em"><img src="img/ico_popup.gif" width="14" height="11" alt="Откроется в новом окне" title="Откроется в новом окне">&nbsp;<em>Редактировать</em></a></td>
+<td><a href="<?=$selfUrl?>&groupId=<?=$currentGroup->getId()?>" drop="group" groupid="<?=$group->getId()?>" title="Удалить"><img src="img/ico_del.png" width="18" height="18" alt="Удалить" title="Удалить"></a></td>
+<?php } else {?>
+<td><div class="edit"><?=$group->getGroupDescription()?></div></td>
+<?php }?>
+</tr>
+<?php }?>
+</table>
+<br>
+<?php
+}
+?>
+
+<?php
+$sizeofUserList = sizeof($userList);
+if($sizeofUserList > 0) {
+?>
+<div class="order_link">всего <?=$sizeofUserList.' '.RussianTextUtils::selectCaseForNumber($sizeofUserList, array('пользователь', 'пользователя', 'пользователей'))?></div>
+<h2>Пользователь</h2>
+<table class="elements-list">
+<col class="width-25">
+<tr>
+<?php if($loggedUser->getGroup()->getIsAdmin()) {?>
+<th class="center"></th>
+<?php }?>
+<th>Логин</th>
+<th>Имя</th>
+<th>E-mail</th>
+<th>Дата регистрации</th>
+<th class="width-25"></th>
+</tr>
+<?php foreach($userList as $user) {?>
+<?php 	if($currentGroup->getId() == $loggedUser->getGroup()->getId() && $user->getId() != $loggedUser->getId()) continue;?>
+<tr>
+<?php 	if($loggedUser->getGroup()->getIsAdmin()) {?>
+<td class="file"><a href="<?=$baseUrl?>?module=UserActionList&userId=<?=$user->getId()?>" title="Журнал операций пользователя <?=$user->getUserName()?>"><img src="img/file.png" width="18" height="18" alt="" title=""></a></td>
+<?php 	}?>
+<td width="30%"><div class="edit"><a href="<?=$baseUrl?>?module=UserEdit&userId=<?=$user->getId()?>"><img src="img/0.gif" width="18" height="18" alt="Редактировать" title="Редактировать"><?=$user->getUserName()?></a></div></td>
+<td><?=$user->getUserDescription()?></td>
+<td><?=$user->getUserEmail()?></td>
+<td><?=date('d.m.Y H:i', $user->getRegistrationDate()->toStamp())?></td>
+<td><?php if($user->getId() != $loggedUser->getId()) {?><a href="<?=$selfUrl?>&groupId=<?=$currentGroup->getId()?>" drop="user" userid="<?=$user->getId()?>" title="Удалить"><img src="img/ico_del.png" width="18" height="18" alt="Удалить" title="Удалить"></a><?php }?></td>
+</tr>
+<?php }?>
+</table>
+<br>
+<?php
+}
+?>
+
+<?php if($loggedUser->getGroup()->getIsAdmin()) {?><p><a href="<?=$baseUrl?>?module=UserActionList">Журнал операций пользователей</a></p><?php }?>
+
+<?php if(!$sizeofGroupList && !$sizeofUserList) {?><p>Группы и пользователи отсутствуют.</p><?php }?>
+
+<?php $partViewer->view('include/footer');?>

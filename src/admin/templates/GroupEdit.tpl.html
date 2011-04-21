@@ -1,0 +1,95 @@
+<?php $partViewer->view("include/header");?>
+
+<script type="text/javascript">
+$(function() {
+	LT.Common.mainForm = $('#GroupEditForm');
+
+	LT.Common.mainForm.submit(function() {
+<?php if($currentGroup->getId()) {?>
+		LT.Common.ajaxSubmit();
+<?php } else {?>
+		LT.Common.ajaxSubmit(function(data){
+			if(data.parentId) {
+				document.location.href = LT.Common.baseUrl+'?module=GroupList&groupId='+data.parentId;
+			}
+		});
+<?php }?>
+		return false;
+ 	});
+
+ 	$('input[name=groupDescription]').focus();
+});
+</script>
+
+<!-- path block -->
+<div class="path_top"><div><img src="img/path01.gif" width="5" height="8" alt=""></div></div>
+<div class="path">
+<a href="<?=$selfUrl?>">Управление пользователями</a> &nbsp;<img src="img/path_arr2.gif" alt="">
+<?php
+if(sizeof($parentList)) {
+	foreach($parentList as $parent) {
+?>
+<a href="?module=GroupList&groupId=<?=$parent->getId()?>"><?=$parent->getGroupDescription()?></a> &nbsp;<img src="img/path_arr2.gif" alt="">
+<?php
+	}
+}
+?>
+<?php if($currentGroup->getId()) {?><a href="?module=GroupList&groupId=<?=$currentGroup->getId()?>"><?=$currentGroup->getGroupDescription()?></a><?php } else {?>Новая группа<?php }?>
+</div>
+<div class="path_bottom"><div><img src="img/path04.gif" width="5" height="8" alt=""></div></div>
+<!-- end of path block -->
+
+<br>
+
+<form id="GroupEditForm" name="GroupEditForm" action="<?=$selfUrl?>&action=<?=$currentGroup->getId() ? 'save' : 'add'?>" method="post">
+<?php if($currentGroup->getId()) {?>
+<input type="hidden" name="groupId" value="<?=$currentGroup->getId()?>">
+<?php } else {?>
+<input type="hidden" name="parentId" value="<?=$parentGroup->getId()?>">
+<?php }?>
+
+<h2 class="h2_marg" title="<?=$currentGroup->getId() ? 'groupId = '.$currentGroup->getId() : ''?>"><?=$currentGroup->getId() ? 'Редактирование группы' : 'Добавление группы'?></h2>
+
+<div class="record_block_top"><div><img src="img/edit01.gif" width="12" height="12" alt=""></div></div>
+
+<div class="record_block">
+Название:<br>
+<table class="ie"><tr><td><input class="prop ename" type="text" name="groupDescription" value="<?=$currentGroup->getGroupDescription()?>"></td></tr></table><br>
+
+Доступ по умолчанию к своим разделам:<br>
+<select name="ownerPermission">
+<?php foreach(Permission::getPermissionNameList() as $id => $name) {?>
+<option value="<?=$id?>"<?=$id == $currentGroup->getOwnerPermission() ? ' selected' : ''?>><?=$name?></option>
+<?php }?>
+</select><br><br>
+
+Доступ по умолчанию к разделам группы:<br>
+<select name="groupPermission">
+<?php foreach(Permission::getPermissionNameList() as $id => $name) {?>
+<option value="<?=$id?>"<?=$id == $currentGroup->getGroupPermission() ? ' selected' : ''?>><?=$name?></option>
+<?php }?>
+</select><br><br>
+
+Доступ по умолчанию к разделам прочих:<br>
+<select name="worldPermission">
+<?php foreach(Permission::getPermissionNameList() as $id => $name) {?>
+<option value="<?=$id?>"<?=$id == $currentGroup->getWorldPermission() ? ' selected' : ''?>><?=$name?></option>
+<?php }?>
+</select><br><br>
+
+<input type="checkbox" id="isSearch" name="isSearch" value="1"<?=$currentGroup->getIsSearch() ? ' checked' : ''?>> <label for="isSearch">Показывать в поиске</label><br><br>
+
+<input type="checkbox" id="isDeveloper" name="isDeveloper" value="1"<?=$currentGroup->getIsDeveloper() ? ' checked' : ''?>> <label for="isDeveloper">Управление объектами</label><br><br>
+
+<input type="checkbox" id="isAdmin" name="isAdmin" value="1"<?=$currentGroup->getIsAdmin() ? ' checked' : ''?>> <label for="isAdmin">Управление группами пользователей</label><br><br>
+
+</div>
+
+<div class="record_block_bottom"><div><img src="img/edit04.gif" width="12" height="12" alt=""></div></div>
+
+<br>
+
+<input class="btn" type="submit" id="save_button" value="Ctrl+S Сохранить">
+</form>
+
+<?php $partViewer->view("include/footer");?>

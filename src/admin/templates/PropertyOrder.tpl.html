@@ -1,0 +1,61 @@
+<?php $partViewer->view("include/header.small");?>
+
+<h2 class="h2_marg">Список полей объекта <b><?=$item->getItemDescription()?></b></h2>
+
+<?php
+if($form->getErrors()) {
+
+	$form->
+	addMissingLabel('itemId', 'Отсутствует идентификатор класса.')->
+	addWrongLabel('itemId', 'Некорректный идентификатор класса.');
+
+	foreach($form->getTextualErrors() as $label) {
+		echo $label . '<br>';
+	}
+} else {
+?>
+
+<script type="text/javascript" src="<?=PATH_WEB_JS?>order.js"></script>
+<script type="text/javascript">
+$(function() {
+	LT.Common.mainForm = $('#PropertyOrderForm');
+
+	LT.Common.mainForm.submit(function() {
+		LT.Common.ajaxSubmit(function() {
+			if(window.opener) {
+				window.opener.document.location.href = window.opener.document.location.href;
+				window.close();
+			}
+		});
+		return false;
+ 	});
+});
+</script>
+
+<form id="PropertyOrderForm" name="PropertyOrderForm" action="<?=$baseUrl?>?module=PropertyOrder&itemId=<?=$item->getId()?>&action=save" method="post">
+
+<select name="show" size="14" border="0" style="width: 100%;">
+<?php foreach($propertyList as $property) {?>
+<option value="<?=$property->getId()?>"><?=$property->getPropertyDescription()?> (<?=$property->getPropertyName()?>)</option>
+<?php }?>
+</select>
+
+<?php foreach($propertyList as $k => $property) {?>
+<input type="hidden" name="orderList[<?=$property->getId()?>]" value="<?=$k?>">
+<?php }?>
+<div class="m-all">
+<img src="img/0.gif" id="order_first" width="53" height="45" alt="Расположить первым" title="Расположить первым">
+<img src="img/0.gif" id="order_up" width="38" height="45" alt="Передвинуть выше" title="Передвинуть выше">
+<img src="img/0.gif" id="order_down" width="36" height="45" alt="Передвинуть ниже" title="Передвинуть ниже">
+<img src="img/0.gif" id="order_last" width="49" height="45" alt="Расположить последним" title="Расположить последним">
+</div>
+<br>
+
+<input class="btn" type="submit" id="save_button" value="Ctrl+S Сохранить"></div></div>
+</form>
+
+<?php
+}
+?>
+
+<?php $partViewer->view("include/footer");?>

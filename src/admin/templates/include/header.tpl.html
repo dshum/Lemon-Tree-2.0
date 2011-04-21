@@ -1,0 +1,63 @@
+<html>
+<head>
+<title><?=LT_NAME?></title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="Robots" content="noindex">
+<link href="<?=PATH_ADMIN?>css/style.css" type="text/css" rel="stylesheet">
+<script type="text/javascript" src="<?=PATH_WEB_JS?>jquery/jquery-1.3.2.min.js"></script>
+<script type="text/javascript" src="<?=PATH_WEB_JS?>jquery/jquery.form.js"></script>
+<script type="text/javascript" src="<?=PATH_WEB_JS?>jquery/jquery.livequery.js"></script>
+<script type="text/javascript" src="<?=PATH_WEB_JS?>jquery/jquery.mousewheel.min.js"></script>
+<script type="text/javascript" src="<?=PATH_WEB_JS?>common.js"></script>
+<script type="text/javascript" src="<?=PATH_WEB_JS?>alert.js"></script>
+<link href="<?=PATH_WEB_JS?>calendarview/jquery.calendar.css" type="text/css" rel="stylesheet">
+<script type="text/javascript" src="<?=PATH_WEB_JS?>calendarview/jquery.calendar.js"></script>
+<script type="text/javascript">
+$(function() {
+	LT.Common.selfUrl = '<?=$selfUrl?>';
+	LT.Common.baseUrl = '<?=$baseUrl?>';
+	LT.Common.setTimeExpire(3600);
+
+});
+</script>
+</head>
+
+<body onkeypress="return LT.Common.onCtrlS(event)" onkeydown="return LT.Common.onCtrlS(event)">
+
+<table cellpadding="0" cellspacing="0" width="100%">
+<tr>
+
+<td nowrap><a href="<?=$baseUrl?>" title="<?=LT_NAME.' v.'.LT_VERSION?>"><img src="<?=PATH_WEB_IMG?>logo.png" width="154" height="40" class="logo"></a></td>
+
+<td width="99%"></td>
+
+<td align="center"><img src="img/0.gif" width="39" height="39" id="refresh" onmousedown="this.style.backgroundPosition = '0 -39px';" onmouseup="this.style.backgroundPosition = '0 0';" onmouseover="this.style.backgroundPosition = '0 0';" onmouseout="this.style.backgroundPosition = '0 -78px';" onclick="document.location.reload()" alt="Обновить" title="Обновить"></td>
+
+<td><img src="img/separator.gif" width="1" height="32" alt="" class="separator"></td>
+
+<td nowrap>
+<?php if($loggedUser->getGroup()->getIsDeveloper()) {?><img src="img/0.gif" width="39" height="39" id="control" onmousedown="this.style.backgroundPosition = '0 -39px';" onmouseup="this.style.backgroundPosition = '0 0';" onmouseover="this.style.backgroundPosition = '0 0';" onmouseout="this.style.backgroundPosition = '0 -78px';" onclick="document.location.href='<?=$baseUrl?>?module=ItemList';" alt="Управление объектами" title="Управление объектами"><?php }?>
+<img src="img/0.gif" width="39" height="39" id="search" onmousedown="this.style.backgroundPosition = '0 -39px';" onmouseup="this.style.backgroundPosition = '0 0';" onmouseover="this.style.backgroundPosition = '0 0';" onmouseout="this.style.backgroundPosition = '0 -78px';" onclick="document.location.href='<?=$baseUrl?>?module=ElementSearch';" alt="Поиск элементов" title="Поиск элементов">
+<img src="img/0.gif" width="39" height="39" id="trash" onmousedown="this.style.backgroundPosition = '0 -39px';" onmouseup="this.style.backgroundPosition = '0 0';" onmouseover="this.style.backgroundPosition = '0 0';" onmouseout="this.style.backgroundPosition = '0 -78px';" onclick="document.location.href='<?=$baseUrl?>?module=ViewBrowse&elementId=<?=Root::trash()->getPolymorphicId()?>';" alt="Корзина" title="Корзина">
+<?php if($loggedUser->getGroup()->getIsAdmin()) {?><img src="img/0.gif" width="47" height="39" id="browse_users" onmousedown="this.style.backgroundPosition = '0 -39px';" onmouseup="this.style.backgroundPosition = '0 0';" onmouseover="this.style.backgroundPosition = '0 0';" onmouseout="this.style.backgroundPosition = '0 -78px';" onclick="document.location.href = '<?=$baseUrl?>?module=GroupList';" alt="Пользователи" title="Пользователи"></td><?php }?>
+
+<td><img src="img/separator.gif" width="1" height="32" alt="" class="separator"></td>
+
+<td align="right" nowrap><a href="<?=$baseUrl?>?module=UserEdit&userId=<?=$loggedUser->getId()?>" title="Редактировать личные данные" id="user"><img src="img/user.png" width="28" height="32" alt="Редактировать личные данные" title="Редактировать личные данные"><?=$loggedUser->getUserName()?></a></td>
+
+<td width="20" nowrap>&nbsp;</td>
+
+<td width="70" align="center" class="time"><span id="timeExpire" style="color: #bbbbbb; font-size: 11px;">00:60:00</span></td>
+
+<td width="10">&nbsp;</td>
+
+<td><img src="img/separator.gif" width="1" height="32" alt="" class="separator"></td>
+
+<td width="70" align="right">
+<form name="LogoutForm" action="<?=PATH_ADMIN?>?module=Prompt&action=logout" method="post" target="_top">
+<input class="btn-sm" type="submit" value="Выход">
+</form>
+</td>
+
+</tr>
+</table>

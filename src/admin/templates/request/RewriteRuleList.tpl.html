@@ -1,0 +1,40 @@
+<?php
+	$json = array();
+	$error = array();
+
+	if(isset($form) && $form->getErrors()) {
+
+		foreach($rewriteRuleList as $rewriteRule) {
+
+			$form->addMissingLabel('level_'.$rewriteRule->getId(), 'Не указана вложенность.');
+			$form->addMissingLabel('url_'.$rewriteRule->getId(), 'Не указан URL.');
+			$form->addMissingLabel('item_'.$rewriteRule->getId(), 'Не указан класс.');
+
+			$form->addWrongLabel('level_'.$rewriteRule->getId(), 'Вложенность может быть целым числом от 0 до 3.');
+			$form->addWrongLabel('url_'.$rewriteRule->getId(), 'Длина URL должна быть не более 255 символов.');
+			$form->addWrongLabel('item_'.$rewriteRule->getId(), 'Некорректный идентификатор класса.');
+
+		}
+
+		foreach($form->getTextualErrors() as $label) {
+			$error[] = $label;
+		}
+
+	}
+
+	if(isset($saveList) && $saveList == 'error') {
+		$error[] = 'Произошла ошибка при добавлении объекта.';
+	}
+
+	$json['error'] = $error;
+
+	if(isset($dropped)) {
+		$json['dropped'] = $dropped;
+	}
+
+	if(isset($added)) {
+		$json['added'] = $added;
+	}
+
+	echo JsUtils::php2js($json);
+?>

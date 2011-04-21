@@ -1,0 +1,125 @@
+<?php $partViewer->view('include/header.small');?>
+
+<script type="text/javascript">
+$(function() {
+	LT.Common.mainForm = $('#ElementPermissionListForm');
+
+	LT.Common.mainForm.submit(function() {
+		LT.Common.ajaxSubmit();
+		return false;
+ 	});
+
+	$('td[radio=true]').click(function(){
+		var elementId = $(this).attr('elementid');
+		var permissionId = $(this).attr('permissionid');
+
+		$('div[id^=permission_'+elementId+'_]').each(function() {
+			$(this).removeClass('radio_on');
+			$(this).addClass('radio_off');
+		});
+
+		$('div[id^=permission_'+elementId+'_'+permissionId+']').each(function() {
+			$(this).removeClass('radio_off');
+			$(this).addClass('radio_on');
+		});
+
+		$('input:hidden[name=permission['+elementId+']]').each(function() {
+			this.value = permissionId;
+		});
+	});
+});
+</script>
+
+<!-- path block -->
+<div class="path_top"><div><img src="img/path01.gif" width="5" height="8" alt=""></div></div>
+<div class="path">
+<?php
+if(sizeof($parentList)) {
+	foreach($parentList as $parent) {
+?>
+<a href="<?=$selfUrl?>&groupId=<?=$currentGroup->getId()?>&elementId=<?=$parent->getPolymorphicId()?>"><?=$parent->getElementName()?></a> &nbsp;<img src="img/path_arr2.gif" alt="">
+<?php
+	}
+?>
+&nbsp;<span><?=$currentElement->getElementName()?></span>
+<?php
+} else {
+?>
+<span><?=$currentElement->getElementName()?></span>
+<?php
+}
+?>
+</div>
+<div class="path_bottom"><div><img src="img/path04.gif" width="5" height="8" alt=""></div></div>
+<!-- end of path block -->
+
+<h2 class="h2_marg">Права доступа к разделам для группы <span class="grey"><?=$currentGroup->getGroupDescription()?></span></h2><br>
+
+<form id="ElementPermissionListForm" name="ElementPermissionListForm" action="<?=$selfUrl?>&action=save" method="post">
+<input type="hidden" name="groupId" value="<?=$currentGroup->getId()?>">
+<input type="hidden" name="elementId" value="<?=$currentElement->getPolymorphicId()?>">
+
+<?php
+$empty = true;
+foreach($itemList as $item) {
+	if(!isset($elementList[$item->getId()]) || !isset($pagerList[$item->getId()])) continue;
+	if(!$pagerList[$item->getId()]->getTotal()) continue;
+	$pager = $pagerList[$item->getId()];
+	$empty = false;
+?>
+
+<h3><?=$item->getItemDescription()?></h3>
+
+<table class="elements-list setrights">
+<tr valign="top">
+<th width="20"></th>
+<th class="left" width="92%"><?=$item->getMainPropertyDescription()?></th>
+<?php foreach(Permission::getPermissionTitleList() as $id => $title) {?>
+<th width="2%"><?=$title?></th>
+<?php }?>
+</tr>
+<?php
+	foreach($elementList[$item->getId()] as $element) {
+		if(isset($elementPermissionMap[$element->getPolymorphicId()])) {
+			$permission = $elementPermissionMap[$element->getPolymorphicId()];
+		} else {
+			if($element->getGroup() && $element->getGroup()->getId() == $currentGroup->getId()) {
+				$permission	=
+					isset($itemPermissionMap[$item->getId()])
+					? $itemPermissionMap[$item->getId()]->getGroupPermission()
+					: $currentGroup->getGroupPermission();
+			} else {
+				$permission	=
+					isset($itemPermissionMap[$item->getId()])
+					? $itemPermissionMap[$item->getId()]->getWorldPermission()
+					: $currentGroup->getWorldPermission();
+			}
+		}
+?>
+<input type="hidden" name="permission[<?=$element->getPolymorphicId()?>]" value="<?=$permission?>">
+<tr>
+<td><img src="<?=$item->getIsFolder() ? 'img/folder8bit.png' : 'img/file8bit.png'?>" width="18" height="18" alt=""></td>
+<td class="left" nowrap><a href="<?=$selfUrl?>&groupId=<?=$currentGroup->getId()?>&elementId=<?=$element->getPolymorphicId()?>"><?=$element->getElementName()?></a></td>
+<?php foreach(Permission::getPermissionNameList() as $id => $name) {?>
+<td radio="true" elementid="<?=$element->getPolymorphicId()?>" permissionid="<?=$id?>"><div id="permission_<?=$element->getPolymorphicId()?>_<?=$id?>" class="<?=$id == $permission ? 'radio_on' : 'radio_off'?>"><spacer type="block"></div></td>
+<?php }?>
+</tr>
+<?php
+	}
+?>
+</table>
+<br>
+<?php
+}
+if(!$empty) {
+?>
+<input class="btn" type="submit" id="save_button" value="Ctrl+S Сохранить">
+</form>
+
+<?php
+} else {
+	echo 'В данном разделе элементы отсутствуют.';
+}
+?>
+
+<?php $partViewer->view('include/footer');?>

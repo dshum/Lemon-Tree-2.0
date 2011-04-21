@@ -1,0 +1,64 @@
+<?php
+	$json = array();
+	$error = array();
+
+	if(isset($form) && $form->getErrors()) {
+		if($form->primitiveExists('userId')) {
+			$form->
+			addMissingLabel('userId', 'Отсутствует идентификатор пользователя.')->
+			addWrongLabel('userId', 'Некорректный идентификатор пользователя.');
+		}
+
+		if($form->primitiveExists('groupId')) {
+			$form->
+			addMissingLabel('groupId', 'Отсутствует идентификатор группы.')->
+			addWrongLabel('groupId', 'Некорректный идентификатор группы.');
+		}
+
+		$form->
+		addMissingLabel('userName', 'Отсутствует логин.')->
+		addMissingLabel('userPassword', 'Отсутствует пароль.')->
+		addMissingLabel('userDescription', 'Отсутствует имя пользователя.')->
+		addMissingLabel('userEmail', 'Отсутствует электронный адрес.')->
+		addWrongLabel('userName', 'Некорректный логин.')->
+		addWrongLabel('userPassword', 'Некорректный пароль.')->
+		addWrongLabel('userDescription', 'Длина имени должна быть не более 255 символов.')->
+		addWrongLabel('userEmail', 'Некорректный электронный адрес.');
+
+		foreach($form->getTextualErrors() as $label) {
+			$error[] = $label;
+		}
+	}
+
+	if(isset($deniedDropUserError)) {
+		$error[] = 'Недостаточно прав для удаления данного пользователя.';
+	}
+
+	if(isset($dropUserError)) {
+		$error[] = 'Произошла ошибка при удалении пользователя.';
+	}
+
+	if(isset($deniedAddUserError)) {
+		$error[] = 'Недостаточно прав для создания данного пользователя.';
+	}
+
+	if(isset($addUserError)) {
+		$error[] = 'Произошла ошибка при добавлении пользователя.';
+	}
+
+	if(isset($deniedSaveUserError)) {
+		$error[] = 'Недостаточно прав для изменения данного пользователя.';
+	}
+
+	if(isset($saveUserError)) {
+		$error[] = 'Произошла ошибка при изменении пользователя.';
+	}
+
+	$json['error'] = $error;
+
+	if(isset($groupId)) {
+		$json['groupId'] = $groupId;
+	}
+
+	echo JsUtils::php2js($json);
+?>

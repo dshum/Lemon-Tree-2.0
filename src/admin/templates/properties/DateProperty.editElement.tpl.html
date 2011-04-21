@@ -1,0 +1,15 @@
+<script type="text/javascript">
+$(function() {
+	$('#<?=$propertyName?>').calendar({
+		triggerElement: '#<?=$propertyName?>_show',
+		dateFormat: '%Y-%m-%d',
+		selectHandler: function() {
+			$('#<?=$propertyName?>_show').html(this.date.print('%e %G %Y года'));
+			$('#<?=$propertyName?>').val(this.date.print('%Y-%m-%d'));
+		}
+	});
+});
+</script>
+<?php if(!$value) $value = Date::makeToday();?>
+<input type="hidden" id="<?=$propertyName?>" name="<?=$propertyName?>" value="<?=$value->toDate()?>">
+<?=$propertyDescription?>:&nbsp;<span id="<?=$propertyName?>_show" class="dashed hand"><?=sprintf('%d %s %04d года', $value->getDay(), RussianTextUtils::getMonthInGenitiveCase($value->getMonth()), $value->getYear())?></span><br><br>

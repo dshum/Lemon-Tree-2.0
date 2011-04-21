@@ -1,0 +1,82 @@
+<?php $partViewer->view("include/header");?>
+
+<script type="text/javascript">
+$(function() {
+	LT.Common.mainForm = $('#UserEditForm');
+
+	LT.Common.mainForm.submit(function() {
+<?php if($currentUser->getId()) {?>
+		LT.Common.ajaxSubmit();
+<?php } else {?>
+		LT.Common.ajaxSubmit(function(data){
+			if(data.groupId) {
+				document.location.href = LT.Common.baseUrl+'?module=GroupList&groupId='+data.groupId;
+			}
+		});
+<?php }?>
+		return false;
+ 	});
+
+ 	$('input[name=userName]').focus();
+});
+</script>
+
+<!-- path block -->
+<div class="path_top"><div><img src="img/path01.gif" width="5" height="8" alt=""></div></div>
+<div class="path">
+<a href="<?=$selfUrl?>">Управление пользователями</a> &nbsp;<img src="img/path_arr2.gif" alt="">
+<?php
+if(sizeof($parentList)) {
+	foreach($parentList as $parent) {
+?>
+<a href="?module=GroupList&groupId=<?=$parent->getId()?>"><?=$parent->getGroupDescription()?></a> &nbsp;<img src="img/path_arr2.gif" alt="">
+<?php
+	}
+}
+?>
+<a href="?module=GroupList&groupId=<?=$currentGroup->getId()?>"><?=$currentGroup->getGroupDescription()?></a> &nbsp;<img src="img/path_arr2.gif" alt="">
+<?=$currentUser->getId() ? $currentUser->getUserName() : 'Новый пользователь'?>
+</div>
+<div class="path_bottom"><div><img src="img/path04.gif" width="5" height="8" alt=""></div></div>
+<!-- end of path block -->
+
+<br>
+
+<form id="UserEditForm" name="UserEditForm" action="<?=$selfUrl?>&action=<?=$currentUser->getId() ? 'save' : 'add'?>" method="post">
+<?php if($currentUser->getId()) {?>
+<input type="hidden" name="userId" value="<?=$currentUser->getId()?>">
+<?php } else {?>
+<input type="hidden" name="groupId" value="<?=$currentGroup->getId()?>">
+<?php }?>
+
+<h2 class="h2_marg" title="<?=$currentUser->getId() ? 'userId = '.$currentUser->getId() : ''?>"><?=$currentUser->getId() ? 'Редактирование пользователя' : 'Добавление пользователя'?></h2>
+
+<div class="record_block_top"><div><img src="img/edit01.gif" width="12" height="12" alt=""></div></div>
+
+<div class="record_block">
+Логин:<br>
+<table class="ie"><tr><td><input class="prop ename" type="text" name="userName" value="<?=$currentUser->getUserName()?>"></td></tr></table><br>
+
+Пароль:<br>
+<table class="ie"><tr><td><input class="prop" type="password" name="userPassword" value=""></td></tr></table><br>
+
+Имя:<br>
+<table class="ie"><tr><td><input class="prop" type="text" name="userDescription" value="<?=$currentUser->getUserDescription()?>"></td></tr></table><br>
+
+E-mail:<br>
+<table class="ie"><tr><td><input class="prop" type="text" name="userEmail" value="<?=$currentUser->getUserEmail()?>"></td></tr></table><br>
+
+Дата регистрации: <?=date('d.m.Y H:i', $currentUser->getRegistrationDate()->toStamp())?><br><br>
+
+Дата последнего входа: <?=date('d.m.Y H:i', $currentUser->getLoginDate()->toStamp())?><br><br>
+
+</div>
+
+<div class="record_block_bottom"><div><img src="img/edit04.gif" width="12" height="12" alt=""></div></div>
+
+<br>
+
+<input class="btn" type="submit" id="save_button" value="Ctrl+S Сохранить">
+</form>
+
+<?php $partViewer->view("include/footer");?>

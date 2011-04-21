@@ -1,0 +1,27 @@
+<?php
+	$json = array();
+	$error = array();
+
+	if(isset($form) && $form->getErrors()) {
+
+		if($form->primitiveExists('itemId')) {
+			$form->
+			addMissingLabel('itemId', 'Отсутствует идентификатор класса.')->
+			addWrongLabel('itemId', 'Некорректный идентификатор класса.')->
+			addWrongLabel('noRoot', 'Некорректный идентификатор класса.');
+		}
+
+		foreach($form->getTextualErrors() as $label) {
+			$error[] = $label;
+		}
+
+	}
+
+	if(isset($bind) && $bind == 'error') {
+		$error[] = 'Произошла ошибка при сохранении данных.';
+	}
+
+	$json['error'] = $error;
+
+	echo JsUtils::php2js($json);
+?>

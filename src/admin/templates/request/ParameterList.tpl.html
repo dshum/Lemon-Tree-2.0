@@ -1,0 +1,27 @@
+<?php
+	$json = array();
+	$error = array();
+
+	if(isset($form) && $form->getErrors()) {
+
+		$form->
+		addMissingLabel('propertyId', 'Отсутствует идентификатор поля.')->
+		addWrongLabel('propertyId', 'Некорректный идентификатор поля.');
+
+		if(isset($parameterList)) {
+			foreach($parameterList as $name => $parameter) {
+				$form->
+				addWrongLabel($name, 'Некорректно заполнен параметр "'.$parameter['description'].'".');
+			}
+		}
+
+		foreach($form->getTextualErrors() as $label) {
+			$error[] = $label;
+		}
+
+	}
+
+	$json['error'] = $error;
+
+	echo JsUtils::php2js($json);
+?>

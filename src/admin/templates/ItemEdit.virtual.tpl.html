@@ -1,0 +1,27 @@
+<table cellpadding="0" cellspacing="0" width="98%" class="forms">
+<tr>
+	<td width="33%">Название:</td>
+	<td width="33%">Класс объекта:</td>
+	<td width="33%">Наследовать класс:</td>
+</tr>
+<tr>
+	<td><input type="text" name="itemDescription" value="<?=$currentItem->getItemDescription()?>"></td>
+	<td><input type="text" name="itemName" value="<?=$currentItem->getItemName()?>"<?=$mode == 'edit' ? ' disabled="true"' : ''?>></td>
+	<td><input type="text" name="parentClass" value="<?=$currentItem->getParentClass()?>"></td>
+</tr>
+</table>
+<br>
+
+<table cellpadding="0" cellspacing="0" width="98%" class="forms">
+<tr>
+	<td width="33%">Родительское поле:</td>
+	<td width="33%"></td>
+	<td width="33%"></td>
+</tr>
+<tr>
+	<td><select name="parentProperty" style="width: 90%;"><option value="">- Выберите поле-</option><?php foreach($propertyList as $property) { ?><?php if($property->getPropertyClass() != 'OneToOneProperty') continue;?><option value="<?=$property->getId()?>"<?=$property->getIsParent() ? ' selected' : ''?>><?=$property->getPropertyDescription()?> (<?=$property->getPropertyName()?>)</option><?php }?></select></td>
+	<td></td>
+	<td></td>
+</tr>
+</table>
+<br>

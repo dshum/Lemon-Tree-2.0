@@ -1,0 +1,3 @@
+<input type="hidden" id="edited[<?=$element->getPolymorphicId()?>][<?=$propertyName?>]" name="edited[<?=$element->getPolymorphicId()?>][<?=$propertyName?>]" value="0">
+<div id="show[<?=$element->getPolymorphicId()?>][<?=$propertyName?>]"><span class="dh"><?=($value ? 'Да' : 'Нет')?></span></div>
+<input type="checkbox" id="edit[<?=$element->getPolymorphicId()?>][<?=$propertyName?>]" name="edit_<?=$element->getClass()?>_<?=$element->getId()?>_<?=$propertyName?>" default="<?=($value ? '1' : '0')?>" value="1"<?=($value ? ' checked' : '')?> style="display: none;">

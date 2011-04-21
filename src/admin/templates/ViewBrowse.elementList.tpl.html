@@ -1,0 +1,101 @@
+<?php if($pager->getTotal() || isset($filterModelAndView)) {?>
+
+<?php if($currentElement) {?>
+<table class="element-list-header">
+<tr>
+<td><h2><span showlist="true" itemid="<?=$currentItem->getId()?>" list="<?=$openItem ? 'opened' : 'empty'?>" class="hand dashed"><?=$currentItem->getItemDescription()?></span></h2></td>
+<td><div class="order_link"><a href="<?=$baseUrl?>?module=ElementOrder&elementId=<?=$currentElement->getPolymorphicId()?>&itemId=<?=$currentItem->getId()?>" onclick="LT.Common.windowOpen(this.href, 'ElementOrder', 500, 500); return false;" title=""><img src="img/ico_order_sm.gif" width="15" height="15" alt="">&nbsp;<em><?php if($pager->getPageCount() > 1) {?>страница <?=$pager->getCurrentPage()?> из <?=$pager->getPageCount()?>; <?php }?>всего <?=$pager->getTotal()?> <?=RussianTextUtils::selectCaseForNumber($pager->getTotal(), array('элемент', 'элемента', 'элементов'))?></em></a></div></td>
+</tr>
+</table>
+<?php } else {?>
+<?php if($pager->getPageCount() > 1) {?>страница <?=$pager->getCurrentPage()?> из <?=$pager->getPageCount()?>; <?php }?>всего <?=$pager->getTotal()?> <?=RussianTextUtils::selectCaseForNumber($pager->getTotal(), array('элемент', 'элемента', 'элементов'))?>
+<?php }?>
+
+<div id="elementListContainer_<?=$currentItem->getId()?>" style="display: <?=$openItem ? 'block' : 'none'?>;">
+
+<?php
+	if(
+		isset($filterModelAndView)
+		&& $filterModelAndView instanceof ModelAndView
+	) {
+		$filterModelAndView->getView()->render($filterModelAndView->getModel());
+	}
+
+	if($openItem && $pager->getTotal()) {
+?>
+<table id="element_table_<?=$currentItem->getId()?>" class="elements-list">
+<col class="width-25">
+<tr>
+<th class="center"><?php if($orderBy->getField() == $currentItem->getOrderBy()->getField() && $orderBy->isAsc() == $currentItem->getOrderBy()->isAsc()) {?><img src="img/ico_browse_default_sorting_inactive.gif" alt="Убрать сортировку"><?php } else {?><span sort="true" itemid="<?=$currentItem->getId()?>" field="<?=$currentItem->getOrderBy()->getField()?>" direction="<?=$currentItem->getOrderBy()->isAsc() ? 'asc' : 'desc'?>"><img src="img/ico_browse_default_sorting.gif" alt="Убрать сортировку"></span><?php }?></th>
+<?php
+$direction = $orderBy->getField() == 'elementName' && $orderBy->isAsc() ? 'desc' : 'asc';
+$alt = $orderBy->getField() == 'elementName' && $orderBy->isAsc() ? 'Сортировать по убыванию' : 'Сортировать по возрастанию';
+$arrow = $orderBy->isAsc() ? '<img src="img/sort_up_arr.gif" class="sort" alt="Отсортировано по возрастанию" title="Отсортировано по возрастанию">' : '<img src="img/sort_down_arr.gif" class="sort" alt="Отсортировано по убыванию" title="Отсортировано по убыванию">';
+?>
+<th><span sort="true" itemid="<?=$currentItem->getId()?>" field="elementName" direction="<?=$direction?>" title="<?=$alt?>"><?=$currentItem->getMainPropertyDescription()?></span><?=$orderBy->getField() == 'elementName' ? $arrow : ''?></th>
+<?php
+		foreach($propertyList as $property) {
+			$propertyClass = $property->getClass(null)->setParameters();
+			$hidden = $propertyClass->getParameterValue('hidden');
+			if(!$hidden) {
+				$direction = $orderBy->getField() == $property->getPropertyName() && $orderBy->isAsc() ? 'desc' : 'asc';
+				$alt = $orderBy->getField() == $property->getPropertyName() && $orderBy->isAsc() ? 'Сортировать по убыванию' : 'Сортировать по возрастанию';
+?>
+<th><span sort="true" itemid="<?=$currentItem->getId()?>" field="<?=$property->getPropertyName()?>" direction="<?=$direction?>" title="<?=$alt?>"><?=$property->getPropertyDescription()?></span><?=$orderBy->getField() == $property->getPropertyName() ? $arrow : ''?></th>
+<?php
+			}
+		}
+?>
+<th class="width-25"><input type="checkbox" name="checkItem[]" check="item" value="<?=$currentItem->getId()?>" title="Отметить все"></th>
+</tr>
+<?php
+		foreach($elementList as $element) {
+?>
+<tr id="element_row_<?=$currentItem->getId()?>_<?=$element->getId()?>" valign="top">
+<td class="<?php if($currentItem->getIsFolder()) {?>folder<?php } else { ?>file<?php } ?>"><?php if($currentItem->getIsFolder()) {?><a href="<?=$baseUrl?>?module=ViewBrowse&elementId=<?=$element->getPolymorphicId()?>" title="Ниже"><img src="img/0.gif" width="18" height="18" alt="Ниже"></a><?php } else { ?><a href="<?=$baseUrl?>?module=ViewBrowse&elementId=<?=$element->getPolymorphicId()?>" title="Ниже"><img src="img/0.gif" width="18" height="18" alt="Ниже"></a><?php } ?></td>
+<td><div class="edit"><a href="<?=$baseUrl?>?module=ElementEdit&elementId=<?=$element->getPolymorphicId()?>" title="Редактировать"><img src="img/0.gif" width="18" height="18" alt="Редактировать"><?=$element->getElementName()?></a></div></td>
+<?php
+			foreach($propertyList as $property) {
+				$propertyClass = $property->getClass($element)->setParameters();
+				$hidden = $propertyClass->getParameterValue('hidden');
+				$readonly = $propertyClass->getParameterValue('readonly');
+				$editable = $propertyClass->getParameterValue('editable');
+				if(!$hidden && !$readonly && $editable) {
+?>
+<td editable="true" elementid="<?=$element->getPolymorphicId()?>" propertyname="<?=$property->getPropertyName()?>"><?=$propertyClass->getEditElementListView()?></td>
+<?php
+				} elseif(!$hidden) {
+?>
+<td><?=$propertyClass->getElementListView()?></td>
+<?php
+				}
+			}
+?>
+<td class="p-0"><input type="checkbox" name="check[]" check="element" itemid="<?=$currentItem->getId()?>" value="<?=$element->getPolymorphicId()?>"<?php if($permissionList[$element->getId()] < Permission::PERMISSION_DROP_ID) {?> disabled="true"<?php }?> title="Отметить"></td>
+</tr>
+<?php
+		}
+?>
+</table>
+
+<?php if($pager->getPageCount() > 1) {?>
+<?php 	$tens = ceil(log10($pager->getPageCount()));?>
+<br class="both">
+<div class="pager"><span>Страницы:&nbsp;</span>
+<?php if($pager->hasPrevPage()) {?><i pager="true" itemid="<?=$currentItem->getId()?>" page="<?=$pager->getPrevPage()?>" title="Предыдущая (Ctrl + Влево)" class="pager_arr">&larr;</i><?php }?>
+<?php if($pager->hasPrevPart()) {?><i pager="true" itemid="<?=$currentItem->getId()?>" page="<?=$pager->getPrevPart()?>" class="pager_arr">&hellip;</i><?php }?>
+<?php 	foreach($pager->getLimitedPageList() as $page) {?>
+<?php if($page == $pager->getCurrentPage()) {?><b><?=sprintf('%0'.$tens.'d', $page)?></b><?php } else {?><i pager="true" itemid="<?=$currentItem->getId()?>" page="<?=$page?>"><?=sprintf('%0'.$tens.'d', $page)?></i><?php }?>
+<?php 	}?>
+<?php if($pager->hasNextPart()) {?><i pager="true" itemid="<?=$currentItem->getId()?>" page="<?=$pager->getNextPart()?>" class="pager_arr">&hellip;</i><?php }?>
+<?php if($pager->hasNextPage()) {?><i pager="true" itemid="<?=$currentItem->getId()?>" page="<?=$pager->getNextPage()?>" title="Следующая (Ctrl + Вправо)" class="pager_arr">&rarr;</i><?php }?>
+</div><br class="both">
+<?php }?>
+
+<?php
+	}
+?>
+
+</div>
+<div class="line">&nbsp;</div>
+<?php }?>

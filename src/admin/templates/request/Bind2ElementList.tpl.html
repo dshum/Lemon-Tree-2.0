@@ -1,0 +1,12 @@
+<?php
+	$json = array();
+	$error = array();
+
+	if(isset($bind) && $bind == 'error') {
+		$error[] = 'Произошла ошибка при сохранении данных.';
+	}
+
+	$json['error'] = $error;
+
+	echo JsUtils::php2js($json);
+?>

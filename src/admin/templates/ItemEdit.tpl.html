@@ -1,0 +1,146 @@
+<?php $partViewer->view("include/header");?>
+
+<script type="text/javascript" src="<?=PATH_WEB_JS?>item.js"></script>
+
+<?php
+$classTypeList = array(
+	'default' => 'Класс по умолчанию',
+	'abstract' => 'Абстрактный класс',
+	'virtual' => 'Класс без таблицы',
+);
+?>
+
+<div class="path_top"><div><img src="img/path01.gif" width="5" height="8" alt=""></div></div>
+<div class="path">
+<a href="<?=$baseUrl?>?module=ItemList">Управление объектами</a> <img src="img/path_arr2.gif" alt=""> <?php if($mode == "edit") {?>Объект <?=$currentItem->getItemName()?><?php } else { ?>Новый объект<?php } ?>
+</div>
+<div class="path_bottom"><div><img src="img/path04.gif" width="5" height="8" alt=""></div></div>
+
+<br>
+
+<?php if($mode == 'create') {?>
+
+<?php
+ob_start();
+$partViewer->view('ItemEdit.default');
+$contentDefault = ob_get_contents();
+ob_end_clean();
+ob_start();
+$partViewer->view('ItemEdit.abstract');
+$contentAbstract = ob_get_contents();
+ob_end_clean();
+ob_start();
+$partViewer->view('ItemEdit.virtual');
+$contentVirtual = ob_get_contents();
+ob_end_clean();
+?>
+
+<script type="text/javascript">
+$(function(){
+	var classTypeContent = new Array();
+
+	LT.Common.mainForm = $('#ItemEditForm');
+
+	LT.Common.mainForm.submit(function() {
+		LT.Item.addItem();
+		return false;
+ 	});
+
+	classTypeContent['default'] = '<?=addcslashes(str_replace("\n", '', $contentDefault), '\'')?>';
+	classTypeContent['abstract'] = '<?=addcslashes(str_replace("\n", '', $contentAbstract), '\'')?>';
+	classTypeContent['virtual'] = '<?=addcslashes(str_replace("\n", '', $contentVirtual), '\'')?>';
+
+	$('input:radio[name=classType]').click(function(){
+		$('#item_block').hide().html(classTypeContent[this.value]).fadeIn('fast');
+	});
+});
+</script>
+
+<h2>Создание объекта</h2><br>
+
+<form id="ItemEditForm" name="ItemEditForm" action="<?=$selfUrl?>&action=add" method="post">
+
+<?php foreach($classTypeList as $classType => $classTypeDescription) {?>
+<input type="radio" id="classType_<?=$classType?>" name="classType" value="<?=$classType?>"<?=$classType == 'default' ? ' checked' : ''?>> <label for="classType_<?=$classType?>"><?=$classTypeDescription?></label> &nbsp;
+<?php }?>
+<br><br>
+
+<div id="item_block" class="item-block">
+<?php $partViewer->view("ItemEdit.default");?>
+</div>
+
+<input class="btn" type="submit" id="save_button" value="Ctrl+S Добавить">
+</form>
+
+<?php } else {?>
+
+<script type="text/javascript">
+$(function(){
+	LT.Item.countChecked = 0;
+
+	LT.Common.mainForm = $('#ItemEditForm');
+
+	LT.Common.mainForm.submit(function() {
+		if(LT.Item.countChecked > 0) {
+			if(!confirm('Внимание! Информация, содержащаяся в выбранных полях, будет потеряна.')) {
+				return false;
+			}
+		}
+		LT.Item.saveItem();
+		return false;
+ 	});
+
+	$('input:checkbox[name^=drop_]').click(function() {
+		if(this.checked) {
+			$(this).parents('tr').addClass('light');
+			LT.Item.countChecked++;
+		} else {
+			$(this).parents('tr').removeClass('light');
+			LT.Item.countChecked--;
+		}
+	}).mouseover(function() {
+		$(this).parents('tr').addClass('light_hover');
+	}).mouseout(function() {
+		$(this).parents('tr').removeClass('light_hover');
+	});
+
+	$('a[order=true]').click(function(){
+		LT.Common.windowOpen(this.href, 'PropertyOrder', 500, 450);
+		return false;
+	});
+
+	$('a[id^=parameterListButton_]').click(function(){
+		LT.Common.windowOpen(this.href, 'ParameterList', 600, 500);
+		return false;
+	});
+});
+</script>
+
+<h2>Редактирование объекта <?=$currentItem->getItemName()?> (<?=$classTypeList[$currentItem->getClassType()]?>)</h2><br>
+
+<form id="ItemEditForm" name="ItemEditForm" action="<?=$selfUrl?>&action=save&itemId=<?=$currentItem->getId()?>" method="post">
+
+<div id="item_form" class="item-block">
+<?php
+switch($currentItem->getClassType()) {
+	case 'abstract':
+		$partViewer->view("ItemEdit.abstract");
+		break;
+	case 'virtual':
+		$partViewer->view("ItemEdit.virtual");
+		break;
+	case 'final': default:
+		$partViewer->view("ItemEdit.default");
+		break;
+}
+?>
+</div>
+
+<?php $partViewer->view("ItemEdit.properties");?>
+
+<input class="btn" type="submit" id="save_button" value="Ctrl+S <?=$mode == 'create' ? 'Добавить' : 'Сохранить'?>">
+</form>
+
+<?php }?>
+
+<?php $partViewer->view("include/footer");?>

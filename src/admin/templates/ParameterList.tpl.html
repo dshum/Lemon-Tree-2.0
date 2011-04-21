@@ -1,0 +1,55 @@
+<?php $partViewer->view('include/header.small');?>
+
+<?php
+if($form->getErrors()) {
+	$form->addMissingLabel('propertyId', 'Отсутствует идентификатор поля.');
+	$form->addWrongLabel('propertyId', 'Некорректный идентификатор поля.');
+	foreach($form->getTextualErrors() as $label) {
+		echo $label.'<br>';
+	}
+} else {
+?>
+
+<script type="text/javascript">
+$(function() {
+	LT.Common.mainForm = $('#ParameterListForm');
+
+	LT.Common.mainForm.submit(function() {
+		LT.Common.ajaxSubmit();
+		return false;
+ 	});
+});
+</script>
+
+<div class="path_top"><div><img src="img/path01.gif" width="5" height="8" alt=""></div></div>
+<div class="path">Управление объектами</div>
+<div class="path_bottom"><div><img src="img/path04.gif" width="5" height="8" alt=""></div></div>
+<br>
+
+<form id="ParameterListForm" name="ItemListForm" action="<?=$selfUrl?>&propertyId=<?=$property->getId()?>&action=save" method="post">
+
+<h2>Параметры поля <span class="grey" title="<?=$property->getPropertyName()?>"><?=$property->getPropertyDescription()?></span>:</h2>
+<br>
+
+<table class="elements-list">
+<tr>
+<th width="50%">Название</th>
+<th width="50%">Значение</th>
+</tr>
+<?php foreach($parameterList as $parameter) {?>
+<tr>
+<td><?=$parameter->getDescription()?></td>
+<td><?=$parameter->printOnEdit()?></td>
+</tr>
+<?php }?>
+</table>
+<br>
+
+<input class="btn" type="submit" id="save_button" value="Ctrl+S Сохранить">
+</form>
+
+<?php
+}
+?>
+
+<?php $partViewer->view('include/footer');?>

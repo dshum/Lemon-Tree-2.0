@@ -1,0 +1,27 @@
+<?php if(!$readonly && $node instanceof Element && sizeof($tree)) {?>
+
+<script type="text/javascript">
+$(function() {
+<?php foreach($tree as $element) {?>
+	LT.MultilinkTree.addElement('<?=$propertyName?>', '<?=$element['parentId']?>', '<?=$element['elementId']?>', '<?=addslashes($element['elementName'])?>', <?=$element['isActive']?>, <?=$element['isOpen']?>, <?=$element['isCheckbox']?>);
+<?php }?>
+	LT.MultilinkTree.buildBranch('<?=$propertyName?>', '<?=$node->getPolymorphicId()?>');
+});
+</script>
+
+<?=$propertyDescription?>:
+<div id="<?=$propertyName?>_block" class="prop_block" style="overflow-y: scroll; display: block;" overflow="true">
+<div id="<?=$propertyName?>_branch_<?=$node->getPolymorphicId()?>"></div>
+</div><br>
+
+<?php } else {?>
+
+<?=$propertyDescription?>:
+<?php 	if(sizeof($list)) {?>
+<?php foreach($list as $k => $element) {?><?=$k ? ', ' : ''?><a href="<?=PATH_ADMIN_BROWSE.'?module=ElementEdit&elementId='.$element->getPolymorphicId()?>" title="<?=$element->getItem()->getItemDescription()?>"><?=$element->getElementName()?></a><?php }?>
+<?php 	} else {?>
+Не задано
+<?php 	}?>
+<br><br>
+
+<?php }?>

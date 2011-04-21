@@ -1,0 +1,56 @@
+<?php
+	$json = array();
+	$error = array();
+
+	if(isset($form) && $form->getErrors()) {
+
+		$form->addMissingLabel('itemDescription', 'Не заполнено название объекта.');
+		$form->addMissingLabel('itemName', 'Не заполнено название класса объекта.');
+
+		$form->addWrongLabel('classType', 'Некорректное значение типа класса объекта.');
+		$form->addWrongLabel('itemName', 'Некорректное название класса объекта.');
+		$form->addWrongLabel('itemNameUnique', 'Название класса объекта должно быть уникальным.');
+		$form->addWrongLabel('itemDescription', 'Длина описания объекта должна быть не более 255 символов.');
+		$form->addWrongLabel('parentClass', 'Некорректный наследуемый класс.');
+
+		switch ($form->getValue('classType')) {
+
+			case 'abstract':
+				break;
+
+			case 'virtual':
+				$form->addWrongLabel('parentProperty', 'Некорректный идентификатор родительского поля.');
+				break;
+
+			case 'default': default:
+				$form->addMissingLabel('mainPropertyDescription', 'Не заполнено название главного поля.');
+				$form->addMissingLabel('pathPrefix', 'Не заполнен префикс названия элементов в адресной строке.');
+				$form->addWrongLabel('mainPropertyDescription', 'Длина названия главного поля должна быть не более 255 символов.');
+				$form->addWrongLabel('parentProperty', 'Некорректный идентификатор родительского поля.');
+				$form->addWrongLabel('pathPrefix', 'Некорректное название префикса.');
+				$form->addWrongLabel('orderField', 'Некорректное значение поля сортировки по умолчанию.');
+				$form->addWrongLabel('orderDirection', 'Некорректное значение направления сортировки по умолчанию.');
+				$form->addWrongLabel('perPage', 'Количество элементов на страницу должно быть целым числом от 0 до 500.');
+				break;
+		}
+
+		foreach($form->getTextualErrors() as $label) {
+			$error[] = $label;
+		}
+
+	}
+
+	if(isset($autoGeneration) && $autoGeneration == 'error') {
+		$error[] = 'Произошла ошибка при генерации классов.';
+	}
+
+	if(isset($addItem) && $addItem == 'error') {
+		$error[] = 'Произошла ошибка при добавлении объекта.';
+	}
+
+	$json['error'] = $error;
+
+	$json['itemId'] = isset($item) ? $item->getId() : null;
+
+	echo JsUtils::php2js($json);
+?>

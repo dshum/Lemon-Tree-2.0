@@ -1,0 +1,146 @@
+<?php $partViewer->view("include/header");?>
+
+<script type="text/javascript" src="<?=PATH_WEB_JS?>elementmove.js"></script>
+<script type="text/javascript">
+
+$(function(){
+	var countChecked = <?=sizeof($moveElementList)?>;
+
+<?php
+foreach($itemList as $item) {
+	if(isset($itemElementList[$item->getId()])) {
+		foreach($itemElementList[$item->getId()] as $element) {
+			if($element->getParent()) {
+				$folder = $element->getItem()->getIsFolder() ? 1 : 0;
+				$active = $item->getId() == $sourceItem->getId() ? 1 : 0;
+				echo "	LT.ElementMove.addElement('".$element->getParent()->getPolymorphicId()."', '".$element->getPolymorphicId()."', '".$element->getElementName()."', ".$folder.", ".$active.");\n";
+			}
+		}
+	}
+}
+?>
+
+	LT.ElementMove.buildTree();
+
+	LT.Common.mainForm = $('#ElementMoveForm');
+
+	$('a[id^=link_]').click(function(){
+		var element = this;
+
+		if(countChecked > 0) {
+			if(!confirm('Перенести выбранные элементы в раздел "'+$(this).attr('elementname')+'"?')) {
+				return false;
+			}
+		} else {
+			alert('Не выбрано ни одного элемента.');
+			return false;
+		}
+
+		$(LT.Common.mainForm).each(function(){
+			this.action = LT.Common.baseUrl+'?module=ElementMove&action=move&targetId='+$(element).attr('elementid');
+		});
+
+		LT.Common.ajaxSubmit(function(data){
+			if(data.tree && data.tree.length) {
+				top.tree.LT.Tree.dropTree();
+				for(var i in data.tree) {
+					top.tree.LT.Tree.addElement(data.tree[i].parentId, data.tree[i].elementId, data.tree[i].elementName, data.tree[i].permissionId, data.tree[i].openFolder);
+				}
+				top.tree.LT.Tree.buildTree();
+			}
+			document.location.href = LT.Common.baseUrl+'?module=ViewBrowse&elementId='+$(element).attr('elementid');
+		});
+
+		return false;
+	});
+
+	LT.Common.mainForm.submit(function() {
+		return false;
+	});
+
+	$('#what_move').click(function(){
+		$('#table_move').each(function(){
+			if(this.style.display == 'none') {
+				$(this).css({display: 'block'});
+				$('#top_move').css({display: 'block'});
+				$('#bot_move').css({display: 'block'});
+				$('#move_body').css({borderColor: '#CCC', backgroundColor: '#FFF'});
+				$('#block_move').css({top: '75px'});
+			} else {
+				$(this).css({display: 'none'});
+				$('#top_move').css({display: 'none'});
+				$('#bot_move').css({display: 'none'});
+				$('#move_body').css({borderColor: '#FFF', backgroundColor: 'transparent'});
+				$('#block_move').css({top: '98px'});
+			}
+		});
+	});
+
+	$('input:checkbox[name=check[]]').click(function() {
+		if(this.checked) {
+			$(this).parents('tr').addClass('light');
+			countChecked++;
+		} else {
+			$(this).parents('tr').removeClass('light');
+			countChecked--;
+		}
+
+		if(countChecked > 0) {
+			$('#browse_drop').css({backgroundPosition: '0 -108px'});
+			$('#browse_move').css({backgroundPosition: '0 -108px'});
+		} else {
+			$('#browse_drop').css({backgroundPosition: '0 -162px'});
+			$('#browse_move').css({backgroundPosition: '0 -162px'});
+		}
+	}).mouseover(function() {
+		$(this).parents('tr').addClass('light_hover');
+	}).mouseout(function() {
+		$(this).parents('tr').removeClass('light_hover');
+	});
+});
+</script>
+
+<!-- path block -->
+<div class="path_top"><div><img src="img/path01.gif" width="5" height="8" alt=""></div></div>
+<div class="path">Перенос элементов</div>
+<div class="path_bottom"><div><img src="img/path04.gif" width="5" height="8" alt=""></div></div>
+<!-- end of path block -->
+
+<form id="ElementMoveForm" name="ElementMoveForm" action="<?=$selfUrl?>&action=move" method="post">
+
+<h2 class="h2_marg3">Куда переносим:</h2>
+<div class="move_records">
+<img src="img/root.png" width="43" height="56" alt="<?=Root::me()->getElementName()?>"><br>
+<div class="tree"><ul id="branch_<?=Root::me()->getPolymorphicId()?>"></ul></div>
+</div>
+
+<div id="block_move" class="block_move">
+<div id="top_move">
+<div class="move_ug_top"><img src="img/move_u01.png" width="11" height="12" alt=""></div>
+<div class="move_brd_top">&nbsp;</div>
+</div>
+<div class="move_body" id="move_body">
+<h2><span id="what_move" class="hand dashed">Что переносим:</span></h2>
+<div id="table_move">
+<table class="elements-list">
+<?php foreach($moveElementList as $element) {?>
+<tr class="light">
+<td class="width-25"><input type="checkbox" id="check[<?=$element->getPolymorphicId()?>]" name="check[]" value="<?=$element->getPolymorphicId()?>" checked></td>
+<td><label for="check[<?=$element->getPolymorphicId()?>]"><?=$element->getElementName()?></label></td>
+<td class="grey" nowrap><?=$element->getItem()->getItemDescription()?></td>
+</tr>
+<?php }?>
+</table><br>
+</div>
+</div>
+<div id="bot_move">
+<div class="move_brd_bot">&nbsp;</div>
+<div class="move_ug_bot"><img src="img/move_u04.png" width="11" height="12" alt=""></div>
+</div>
+</div>
+
+</form>
+
+<br>
+
+<?php $partViewer->view("include/footer");?>

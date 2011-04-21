@@ -1,0 +1,458 @@
+<?php $partViewer->view("include/header");?>
+
+<script type="text/javascript">
+$(function(){
+	var countChecked = 0;
+	var countChanged = 0;
+	var stopToggle = false;
+
+	LT.Common.mainForm = $('#ElementListForm');
+
+	LT.Common.mainForm.submit(function() {
+		if(!countChanged) return false;
+
+		this.action = LT.Common.selfUrl+'&action=save';
+
+		LT.Common.ajaxSubmit(function(data){
+			if(data.changed) {
+				for(var elementId in data.changed) {
+					for(var propertyName in data.changed[elementId]) {
+						$('td[editable=true][elementid='+elementId+'][propertyname='+propertyName+']').each(function(){
+							$(this).html(data.changed[elementId][propertyName]);
+						});
+					}
+				}
+			}
+			countChanged = 0;
+			$('#browse_save').css({backgroundPosition : '0 -162px'});
+
+		});
+		return false;
+	});
+
+	$('#browse_save').click(function(){
+		LT.Common.mainForm.submit();
+	}).mousedown(function(){
+		if(countChanged > 0) {
+			$(this).css({backgroundPosition: '0 -54px'});
+		}
+	}).mouseup(function(){
+		if(countChanged > 0) {
+			$(this).css({backgroundPosition: '0 0'});
+		}
+	}).mouseover(function(){
+		if(countChanged > 0) {
+			$(this).css({backgroundPosition: '0 0'});
+		}
+	}).mouseout(function(){
+		if(countChanged > 0) {
+			$(this).css({backgroundPosition: '0 -108px'});
+		}
+	});
+
+	$('#browse_drop').click(function(){
+		if(countChecked > 0) {
+			if(!confirm('Удалить выбранные элементы?')) {
+				return false;
+			}
+		} else {
+			return false;
+		}
+
+		LT.Common.mainForm.each(function(){
+			this.action = LT.Common.selfUrl+'&action=drop';
+		});
+
+		LT.Common.ajaxSubmit(function(data){
+			if(data.dropped && data.dropped.length) {
+				for(var i in data.dropped) {
+					top.tree.LT.Tree.dropNode(data.dropped[i]);
+				}
+				document.location.href = document.location.href;
+			}
+		});
+	}).mousedown(function(){
+		if(countChecked > 0) {
+			$(this).css({backgroundPosition: '0 -54px'});
+		}
+	}).mouseup(function(){
+		if(countChecked > 0) {
+			$(this).css({backgroundPosition: '0 0'});
+		}
+	}).mouseover(function(){
+		if(countChecked > 0) {
+			$(this).css({backgroundPosition: '0 0'});
+		}
+	}).mouseout(function(){
+		if(countChecked > 0) {
+			$(this).css({backgroundPosition: '0 -108px'});
+		}
+	});
+
+	$('input[check=item]').livequery('click', function(){
+		if(this.checked) {
+			$('input:checkbox[check=element][itemid='+this.value+']').each(function() {
+				if(!this.checked && !this.disabled) {
+					this.checked = true;
+					$(this).parents('tr').addClass('light');
+					countChecked++;
+				}
+			});
+		} else {
+			$('input:checkbox[check=element][itemid='+this.value+']').each(function() {
+				if(this.checked && !this.disabled) {
+					this.checked = false;
+					$(this).parents('tr').removeClass('light');
+					countChecked--;
+				}
+			});
+		}
+
+		if(countChecked > 0) {
+			$('#browse_drop').css({backgroundPosition: '0 -108px'});
+			$('#browse_move').css({backgroundPosition: '0 -108px'});
+		} else {
+			$('#browse_drop').css({backgroundPosition: '0 -162px'});
+			$('#browse_move').css({backgroundPosition: '0 -162px'});
+		}
+	});
+
+	$('input[check=element]').livequery('click', function() {
+		if(this.checked) {
+			$(this).parents('tr').addClass('light');
+			countChecked++;
+		} else {
+			$(this).parents('tr').removeClass('light');
+			countChecked--;
+		}
+
+		if(countChecked > 0) {
+			$('#browse_drop').css({backgroundPosition: '0 -108px'});
+			$('#browse_move').css({backgroundPosition: '0 -108px'});
+		} else {
+			$('#browse_drop').css({backgroundPosition: '0 -162px'});
+			$('#browse_move').css({backgroundPosition: '0 -162px'});
+		}
+	}).livequery('mouseover', function() {
+		$(this).parents('tr').addClass('light_hover');
+	}).livequery('mouseout', function() {
+		$(this).parents('tr').removeClass('light_hover');
+	});
+
+	$('[id^=edit]').livequery('mousedown', function(){
+		stopToggle = true;
+	});
+
+	$('td[editable=true]').livequery('mouseup', function(){
+		if(stopToggle) {
+			stopToggle = false;
+			return false;
+		}
+
+		var elementId = $(this).attr('elementid').replace(/\./, '\\.');
+		var propertyName = $(this).attr('propertyname');
+
+		$('#show\\['+elementId+'\\]\\['+propertyName+'\\]').toggle();
+		$('#edit\\['+elementId+'\\]\\['+propertyName+'\\]').each(function(){
+			if($(this).css('display') == 'none') {
+				$('#edited\\['+elementId+'\\]\\['+propertyName+'\\]').val(1);
+				countChanged++;
+				$(this).show();
+				this.focus();
+			} else {
+				if(this.type == 'checkbox') {
+					this.checked = $(this).attr('default') == 1;
+				} else {
+					this.value = $(this).attr('default');
+				}
+				$('#edited\\['+elementId+'\\]\\['+propertyName+'\\]').val(0);
+				countChanged--;
+				$(this).hide();
+			}
+		});
+
+		if(countChanged > 0) {
+			$('#browse_save').css({backgroundPosition : '0 -108px'});
+		} else {
+			$('#browse_save').css({backgroundPosition : '0 -162px'});
+		}
+	});
+
+	$('span[sort=true]').livequery('click', function() {
+		var itemId = $(this).attr('itemid');
+		var fieldName = $(this).attr('field');
+		var direction = $(this).attr('direction');
+
+		LT.Common.showIndicator();
+
+		$.post(
+			document.location.href,
+			{
+				action: 'show',
+				itemId: itemId,
+				fieldName: fieldName,
+				direction: direction
+			},
+			function(data) {
+				var itemId = data.itemId;
+				var elementListContent = data.elementListContent;
+				if(itemId && elementListContent) {
+					elementListContent = elementListContent.replace(/\[\[\[/g, '<').replace(/\]\]\]/g, '>');
+					$('#item_'+itemId).html(elementListContent);
+				}
+				LT.Common.unlock();
+			},
+			'json'
+		);
+	});
+
+	$('i[pager=true]').livequery('click', function() {
+		var itemId = $(this).attr('itemid');
+		var page = $(this).attr('page');
+
+		LT.Common.showIndicator();
+
+		$.post(
+			document.location.href,
+			{
+				action: 'show',
+				itemId: itemId,
+				page: page
+			},
+			function(data) {
+				var itemId = data.itemId;
+				var elementListContent = data.elementListContent;
+				if(itemId && elementListContent) {
+					elementListContent = elementListContent.replace(/\[\[\[/g, '<').replace(/\]\]\]/g, '>');
+					$('#item_'+itemId).html(elementListContent);
+				}
+				LT.Common.unlock();
+			},
+			'json'
+		);
+	}).livequery('mouseover', function() {
+		$(this).addClass('pager_over');
+	}).livequery('mouseout', function() {
+		$(this).removeClass('pager_over');
+	});
+
+	var onItemChange = function(itemId) {
+		if(itemId) {
+			$('#search_button').each(function() {this.disabled = true;});
+			$('#itemBlock').html('<span style="color: #999;">Минутку...</span><br><br>');
+			var url = LT.Common.selfUrl+'&action=expand';
+			$.post(
+				url, {itemId: itemId},
+				function(data) {
+					$('#elementIdContainer').show();
+					$('#elementNameContainer').show();
+					$('#shortNameContainer').show();
+
+					var str = '';
+					if(data.fieldList && data.fieldList.length) {
+						str += '<table cellpadding="0" cellspacing="0" width="97%">';
+						for(var i in data.fieldList) {
+							var content = data.fieldList[i];
+							content = content.replace(/\[/g, '<').replace(/\]/g, '>');
+							str += (i % 3 == 0 ? '<tr valign="top">' : '');
+							str += '<td width="30%" style="padding: 2px 5px 5px 5px">'+content+'</td>';
+							str += (i % 3 == 2 ? '</tr>' : '');
+						}
+						if(data.fieldList.length % 3 == 1) {
+							str += '<td width="30%"></td><td width="30%"></td>';
+						} else if(data.fieldList.length % 3 == 2) {
+							str += '<td width="30%"></td>';
+						}
+						str += '</table>';
+
+					}
+					$('#itemBlock').hide().html(str).fadeIn('fast');
+					$('#elementId').val('');
+					$('#elementName').val('');
+					$('#shortName').val('');
+					$('#search_button').each(function() {this.disabled = false;});
+				},
+				'json');
+		} else {
+			$('#elementIdContainer').hide();
+			$('#elementNameContainer').hide();
+			$('#shortNameContainer').hide();
+			$('#itemBlock').html('');
+			$('#search_button').each(function() {this.disabled = true;});
+		}
+	};
+
+	$('#itemId').change(function() {
+		onItemChange(this.value);
+	});
+
+	$('span[last=true]').click(function() {
+		var itemId = $(this).attr('itemid');
+		if(itemId != $('#itemId').val()) {
+			$('#itemId').val(itemId);
+			onItemChange(itemId);
+		}
+	});
+
+	$('span[switch=true]').livequery('click', function() {
+		var propertyName = $(this).attr('name');
+		var block = $('#'+propertyName+'_block');
+		if(block.css('display') == 'block') {
+			block.hide();
+			block.children('input').attr('disabled', true);
+		} else {
+			block.children('input').removeAttr('disabled');
+			block.show();
+			block.children('input:text:first').focus();
+		}
+	});
+
+	$('input:text[time=true]').change(function() {
+		setTime($(this).attr('property'));
+	}).keyup(function() {
+		setTime($(this).attr('property'));
+	}).mousewheel(function(event, delta) {
+		onTimeMousewheel($(this), delta);
+		setTime($(this).attr('property'));
+		return false;
+	});
+});
+
+var onTimeMousewheel = function(object, delta) {
+	var max = object.attr('max');
+	var val = object.val();
+
+	val = Math.round(val) + (delta > 0 ? 1 : -1);
+
+	if(val > max) val = 0;
+	if(val < 0) val = max;
+	if(val < 10) val = '0'+val;
+
+	object.val(val);
+}
+
+var setTime = function(propertyName) {
+	$('#'+propertyName).val(
+		$('#'+propertyName+'_hour').val()
+		+':'+$('#'+propertyName+'_minute').val()
+		+':'+$('#'+propertyName+'_second').val()
+	);
+}
+</script>
+
+<div class="path_top"><div><img src="img/path01.gif" width="5" height="8" alt=""></div></div>
+<div class="path">Поиск элементов</div>
+<div class="path_bottom"><div><img src="img/path04.gif" width="5" height="8" alt=""></div></div>
+<br>
+
+<form name="ElementSearchForm" action="<?=$baseUrl?>">
+<input type="hidden" name="module" value="ElementSearch">
+
+<div class="record_block_top"><div><img src="img/edit01.gif" width="12" height="12" alt=""></div></div>
+<div class="record_block">
+
+<?php $k = 0;?>
+<?php if(sizeof($lastItemList)) {?>
+<p>Последние выбранные классы:
+<?php foreach($lastItemList as $lastItem) {?><?=$k > 0 ? ', ' : ''?><?php $k++;?><span class="hand dashed" last="true" itemid="<?=$lastItem->getId()?>"><?=$lastItem->getItemDescription()?></span><?php }?>
+</p>
+<?php }?>
+
+<table cellpadding="0" cellspacing="0" width="97%">
+<tr>
+<td width="30%">
+Класс элемента:<br>
+<select id="itemId" name="itemId" style="width: 90%; font-size: 15px; font-weight: normal; margin-top: 4px;">
+<option value="">- Не определено -</option>
+<?php foreach($allowedItemList as $item) {?>
+<option value="<?=$item->getId()?>"<?=isset($currentItem) && $currentItem->getId() == $item->getId() ? ' selected' : ''?>><?=$item->getItemDescription()?></option>
+<?php
+}
+?>
+</select><br><br>
+</td>
+
+<td width="30%">
+
+</td>
+
+<td width="30%"></td>
+</tr>
+</table>
+
+<table cellpadding="0" cellspacing="0" width="97%">
+<tr>
+<td width="30%">
+<div id="elementIdContainer" style="display: <?=isset($currentItem) ? 'block' : 'none'?>;">
+ID элемента:<br>
+<input class="prop ename" type="text" id="elementId" name="elementId" value="<?=$elementId?>"><br><br>
+</div>
+</td>
+
+<td width="30%">
+<div id="elementNameContainer" style="display: <?=isset($currentItem) ? 'block' : 'none'?>;">
+Название элемента:<br>
+<input class="prop ename" type="text" id="elementName" name="elementName" value="<?=$elementName?>"><br><br>
+</div>
+</td>
+
+<td width="30%">
+<div id="shortNameContainer" style="display: <?=isset($currentItem) ? 'block' : 'none'?>;">
+Название в адресной строке:<br>
+<input class="prop ename" type="text" id="shortName" name="shortName" value="<?=$shortName?>"><br><br>
+</div>
+</td>
+</tr>
+</table>
+
+<div id="itemBlock">
+<?php if(isset($currentItem)) {?>
+<table cellpadding="0" cellspacing="0" width="97%">
+<?php
+	$k = 0;
+	foreach($propertyList as $property) {
+		$content = $property->getClass(null)->getElementSearchView($form);
+		if(!$content) continue;
+		echo $k % 3 == 0 ? '<tr valign="top">' : '';
+		echo '<td width="30%" style="padding: 2px 5px 5px 5px">'.$content.'</td>';
+		echo $k % 3 == 2 ? '</tr>' : '';
+		$k++;
+	}
+?>
+</table>
+<?php }?>
+</div><br>
+
+<input class="btn" type="submit" id="search_button" value="Найти"<?=isset($currentItem) ? '' : ' disabled="true"'?> style="width: 100px;">
+
+</div>
+<div class="record_block_bottom"><div><img src="img/edit04.gif" width="12" height="12" alt=""></div></div>
+<br>
+
+</form>
+
+<?php if($pager && $pager->getTotal()) {?>
+
+<!-- buttons block -->
+<div class="browse-control">
+<div class="fleft">
+<img src="img/0.gif" id="browse_save" width="59" height="54" alt="Сохранить" title="Сохранить">
+<img src="img/0.gif" id="browse_drop" width="49" height="54" alt="Удалить" title="Удалить">
+</div>
+<br class="both">
+</div>
+<!-- end of buttons block -->
+
+<form id="ElementListForm" name="ElementListForm" action="<?=$selfUrl?>" method="post" enctype="multipart/form-data" onsubmit="return false" onctrls="oElement.saveList()">
+<div id="item_<?=$currentItem->getId()?>">
+<?php $elementListModelAndView->getView()->render($elementListModelAndView->getModel());?>
+</div>
+</form>
+
+<?php } elseif($pager) {?>
+
+<p>Элементов не найдено. Попробуйте изменить параметры поиска.</p>
+
+<?php }?>
+
+<?php $partViewer->view("include/footer");?>

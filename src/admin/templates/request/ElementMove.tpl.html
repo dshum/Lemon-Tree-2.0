@@ -1,0 +1,24 @@
+<?php
+	$json = array();
+	$error = array();
+
+	if(isset($form0) && $form0->getErrors()) {
+
+		$form0->
+		addMissingLabel('itemId', 'Отсутствует идентификатор класса элемента.')->
+		addWrongLabel('itemId', 'Некорректный идентификатор класса элемента.')->
+		addMissingLabel('elementId', 'Отсутствует идентификатор элемента.')->
+		addWrongLabel('elementId', 'Некорректный идентификатор элемента.');
+
+		foreach($form0->getTextualErrors() as $label) {
+			$error[] = $label;
+		}
+
+	}
+
+	$json['error'] = $error;
+
+	$json['tree'] = isset($tree) ? $tree : array();
+
+	echo JsUtils::php2js($json);
+?>

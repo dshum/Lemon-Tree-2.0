@@ -1,0 +1,53 @@
+<html>
+<head>
+<title><?=LT_NAME?></title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="Robots" content="noindex">
+<link href="css/style.css" type="text/css" rel="stylesheet">
+</head>
+<body onload="document.RestoreForm['UserName'].focus();">
+
+<table class="login_tbl" align="center">
+<tr><td>
+<img src="img/logo_index.png" width="172" height="51" alt="<?=LT_NAME?>"><br><br>
+
+<?php
+switch($status) {
+	case "link_sent":
+		echo "Информация о получении нового пароля выслана<br>на $email.";
+		break;
+	case "email_empty":
+		echo "Введите e-mail.";
+		break;
+	case "user_not_found":
+		echo "Пользователь $UserName не найден.";
+		break;
+	case "user_has_no_email":
+		echo "Пользователь $UserName не имеет адреса электронной почты.";
+		break;
+	default:
+		echo "Введите логин.<br>Информация о получении нового пароля<br>будет выслана на почтовый адрес,<br>указанный в Ваших данных.";
+		break;
+}
+?>
+<br><br>
+
+<form action="<?=$selfUrl?>&someaction=send" name="RestoreForm" method="post">
+
+<table>
+<tr><td><img src="img/login.png" width="54" height="48" alt="Логин" title="Логин"></td><td><input type="text" name="UserName" value="<?=$UserName?>" class="pass"></td></tr>
+<tr><td></td><td><input type="submit" class="btn-sm" value="Отправить"></td></tr>
+</table>
+</form>
+
+<br>
+
+<a class="em" href="<?=$baseUrl?>" id="back"><img src="img/0.gif" width="11" height="5" alt="">&nbsp;Вернуться на страницу авторизации</a>
+
+<br><br><br>
+
+<a class="em" href="http://www.lemon-tree.ru"><img src="img/help.png" alt="">&nbsp;&nbsp;что такое Lemon Tree Site Engine?</a>
+</td></tr>
+</table>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<?php
+	$json = array();
+	$error = array();
+
+	if(isset($form0) && $form0->getErrors()) {
+
+		if($form0->primitiveExists('itemId')) {
+			$form0->
+			addMissingLabel('itemId', 'Отсутствует идентификатор класса элемента.')->
+			addWrongLabel('itemId', 'Некорректный идентификатор класса элемента.');
+		}
+		if($form0->primitiveExists('elementId')) {
+			$form0->
+			addMissingLabel('elementId', 'Отсутствует идентификатор элемента.')->
+			addWrongLabel('elementId', 'Некорректный идентификатор элемента.');
+		}
+		if($form0->primitiveExists('parentId')) {
+			$form0->
+			addMissingLabel('parentId', 'Отсутствует идентификатор родительского элемента.')->
+			addWrongLabel('parentId', 'Некорректный идентификатор родительского элемента.');
+		}
+
+		foreach($form0->getTextualErrors() as $label) {
+			$error[] = $label;
+		}
+
+	} elseif(isset($form) && $form->getErrors()) {
+
+		foreach($propertyList as $property) {
+			$form->
+			addMissingLabel(
+				$property->getPropertyName(),
+				'Не заполнено поле "'.$property->getPropertyDescription().'".'
+			)->
+			addWrongLabel(
+				$property->getPropertyName(),
+				'Некорректно заполнено поле "'.$property->getPropertyDescription().'".'
+			);
+		}
+
+		$form->
+		addWrongLabel('shortName', 'Некорректное название элемента в адресной строке.');
+
+		foreach($form->getTextualErrors() as $label) {
+			$error[] = $label;
+		}
+
+	}
+
+	if(isset($addElement) && $addElement == 'error') {
+		$error[] = 'Произошла ошибка при создании элемента.';
+	}
+
+	if(isset($saveElement) && $saveElement == 'error') {
+		$error[] = 'Произошла ошибка при сохранении элемента.';
+	}
+
+	if(isset($restrict) && $restrict == 'error') {
+		$error[] = 'Невозможно удалить этот элемент, пока существуют связанные с ним элементы.';
+	}
+
+	if(isset($denied) && $denied == 'drop') {
+		$error[] = 'Нет прав для удаления этого элемента.';
+	}
+
+	if(isset($denied) && $denied == 'save') {
+		$error[] = 'Нет прав для редактирования этого элемента.';
+	}
+
+	$json['error'] = $error;
+
+	$json['propertyContent'] = isset($propertyContent) ? $propertyContent : array();
+	$json['tree'] = isset($tree) ? $tree : array();
+	$json['parentId'] = isset($parentId) ? $parentId : null;
+	$json['returnElementId'] = isset($returnElementId) ? $returnElementId : null;
+	$json['dropped'] = isset($dropped) ? $dropped : null;
+	$json['elementId'] = isset($elementId) ? $elementId : null;
+	$json['elementName'] = isset($elementName) ? $elementName : null;
+
+	echo JsUtils::php2js($json);
+?>

@@ -1,0 +1,13 @@
+<table cellpadding="0" cellspacing="0" width="98%" class="forms">
+<tr>
+	<td width="33%">Название:</td>
+	<td width="33%">Класс объекта:</td>
+	<td width="33%">Наследовать класс:</td>
+</tr>
+<tr>
+	<td><input type="text" name="itemDescription" value="<?=$currentItem->getItemDescription()?>"></td>
+	<td><input type="text" name="itemName" value="<?=$currentItem->getItemName()?>"<?=$mode == 'edit' ? ' disabled="true"' : ''?>></td>
+	<td><input type="text" name="parentClass" value="<?=$currentItem->getParentClass()?>"></td>
+</tr>
+</table>
+<br>

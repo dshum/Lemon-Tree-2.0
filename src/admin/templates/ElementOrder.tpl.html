@@ -1,0 +1,105 @@
+<?php $partViewer->view("include/header.small");?>
+
+<h2 class="h2_marg">Список элементов</h2>
+
+<?php
+if($form->getErrors()) {
+
+	$form->
+	addMissingLabel('parentItemId', 'Отсутствует идентификатор класса родительского элемента.')->
+	addMissingLabel('parentId', 'Отсутствует идентификатор родительского элемента.')->
+	addMissingLabel('itemId', 'Отсутствует идентификатор класса списка элементов.')->
+	addWrongLabel('parentItemId', 'Некорректный идентификатор класса родительского элемента.')->
+	addWrongLabel('parentId', 'Некорректный идентификатор родительского элемента.')->
+	addWrongLabel('itemId', 'Некорректный идентификатор класса списка элементов.');
+
+	foreach($form->getTextualErrors() as $label) {
+		echo $label . '<br>';
+	}
+} else {
+?>
+
+<script type="text/javascript" src="<?=PATH_WEB_JS?>order.js"></script>
+<script type="text/javascript">
+$(function() {
+	LT.Common.mainForm = $('#ElementOrderForm');
+
+	LT.Common.mainForm.submit(function() {
+		LT.Common.ajaxSubmit(function() {
+			if(window.opener) {
+				window.opener.document.location.href = window.opener.document.location.href;
+				window.close();
+			}
+		});
+		return false;
+ 	});
+
+ 	$('#additional').click(function() {
+ 		$(this).toggleClass('additional').toggleClass('additional2');
+ 		$('#sort').toggle();
+ 		$('select[name=orderField]').each(function() {this.value = 'elementOrder';});
+ 		$('select[name=show]').each(function() {this.disabled = !this.disabled;});
+ 	});
+});
+</script>
+
+<form id="ElementOrderForm" name="ElementOrderForm" action="<?=$baseUrl?>?module=ElementOrder&elementId=<?=$parentElement->getPolymorphicId()?>&itemId=<?=$item->getId()?>&action=save" method="post">
+
+<select name="show" size="14" border="0" style="width: 100%;">
+<?php foreach($elementList as $element) {?>
+<option value="<?=$element->getId()?>"><?=$element->getAlterName()?></option>
+<?php }?>
+</select>
+
+<?php foreach($elementList as $k => $element) {?>
+<input type="hidden" name="orderList[<?=$element->getId()?>]" value="<?=$k?>">
+<?php }?>
+<div class="m-all">
+<img src="img/0.gif" id="order_first" width="53" height="45" alt="Расположить первым" title="Расположить первым">
+<img src="img/0.gif" id="order_up" width="38" height="45" alt="Передвинуть выше" title="Передвинуть выше">
+<img src="img/0.gif" id="order_down" width="36" height="45" alt="Передвинуть ниже" title="Передвинуть ниже">
+<img src="img/0.gif" id="order_last" width="49" height="45" alt="Расположить последним" title="Расположить последним">
+</div>
+
+<div class="relative">
+<div class="absolute">
+<div class="right"><div id="additional" class="additional"><a href="#" onclick="return false;">Дополнительные пераметры</a></div></div>
+<br class="both">
+<div class="record_block" id="sort" style="display: none;">
+<table cellpadding="0" cellspacing="0" width="90%">
+<tr>
+<td width="50%">Сортировать по полю:</td>
+<td width="50%">Направление:</td>
+</tr>
+<tr>
+<td>
+<select name="orderField" style="width: 90%;">
+<option value="elementOrder">Ручная сортировка</option>
+<option value="elementName"><?=$item->getMainPropertyDescription()?></option>
+<?php
+foreach($propertyList as $property) {
+?>
+<option value="<?=$property->getPropertyName()?>"><?=$property->getPropertyDescription()?></option>
+<?php
+}
+?>
+</select>
+</td>
+<td>
+<select name="orderDirection" style="width: 90%;">
+<option value="asc">По возрастанию</option>
+<option value="desc">По убыванию</option>
+</select>
+</td>
+</tr>
+</table>
+</div>
+<br>
+<input class="btn" type="submit" id="save_button" value="Ctrl+S Сохранить"></div></div>
+</form>
+
+<?php
+}
+?>
+
+<?php $partViewer->view("include/footer");?>
