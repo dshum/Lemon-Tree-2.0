@@ -222,11 +222,11 @@ td.file img {width: 18px; height: 18px; background: url(../img/file.png) no-repe
 * html .elements-list .editonbrowse td {padding: 0 0 2px 0; border: none;}
 .elements-list .editonbrowse td img {margin-right: 3px; width: 18px; height: 18px; background: url(../img/edit.png) no-repeat; background: expression('none'); filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=/LT/img/edit.png,sizingMethod=crop);}
 
-#trash {background: url(../img/btn_trash.png) no-repeat 0 -78px;}
-#search {background: url(../img/btn_search.png) no-repeat 0 -78px;}
-#refresh {background: url(../img/btn_refresh.png) no-repeat 0 -78px;}
-#control {background: url(../img/btn_control.png) no-repeat 0 -78px;}
-#user img {vertical-align: middle; margin: 0 5px 0 0;}
+#trash_icon {background: url(../img/btn_trash.png) no-repeat 0 -78px;}
+#search_icon {background: url(../img/btn_search.png) no-repeat 0 -78px;}
+#refresh_icon {background: url(../img/btn_refresh.png) no-repeat 0 -78px;}
+#control_icon {background: url(../img/btn_control.png) no-repeat 0 -78px;}
+#user_icon img {vertical-align: middle; margin: 0 5px 0 0;}
 
 #browse_edit {background: url(../img/btn_edit.png) no-repeat 0 -108px;}
 #browse_edit.off {background: url(../img/btn_edit.png) no-repeat 0 -162px;}

@@ -77,7 +77,6 @@
 			$model->
 			set('selfUrl', PATH_ADMIN.'index.php?module='.$controllerName)->
 			set('baseUrl', PATH_ADMIN.'index.php')->
-			set('controllerName', $controllerName)->
 			set('loggedUser', $loggedUser);
 		}
 
