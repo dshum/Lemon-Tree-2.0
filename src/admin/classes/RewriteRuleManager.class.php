@@ -1,105 +1,57 @@
 <?php
 	final class RewriteRuleManager extends Singleton implements Instantiatable
 	{
-		private $ruleList = array();
+		private $rewriteRuleList = array();
+		private $currentElement = null;
+		private $firstpageControllerName = null;
+		private $defaultControllerName = null;
+		private $controllerName = 'error';
 
 		public static function me()
 		{
 			return Singleton::getInstance(__CLASS__);
 		}
 
-		public static function check($rule, $search)
+		public function setDefaultControllerName($controllerName)
 		{
-			$method = $rule['method'];
-			$pattern = $rule['pattern'];
+			if(!ClassUtils::isClassName($controllerName)) return $this;
 
-			return self::$method($search, $pattern);
+			$this->defaultControllerName = $controllerName;
+
+			return $this;
 		}
 
-		public static function getItem($rule)
+		public function setFirstpageControllerName($controllerName)
 		{
-			$className = $rule['className'];
-			$item = Item::dao()->getItemByName($className);
+			if(!ClassUtils::isClassName($controllerName)) return $this;
 
-			return $item;
+			$this->firstpageControllerName = $controllerName;
+
+			return $this;
 		}
 
-		public static function getItemClass($rule)
-		{
-			$item = self::getItem($rule);
-
-			if($item instanceof Item) {
-				$itemClass = $item->getClass();
-				return $itemClass;
-			}
-
-			return null;
-		}
-
-		public static function addPathPrefix($rule, $elementPath)
-		{
-			$pathPrefix = $rule['pathPrefix'];
-			$elementPath = $pathPrefix.$elementPath;
-
-			return $elementPath;
-		}
-
-		public static function itself($search, $pattern)
-		{
-			$search = '/'.trim($search, '/');
-			$pattern = '/'.trim($pattern, '/');
-
-			return $search == $pattern;
-		}
-
-		public static function child($search, $pattern)
+		public function plain($search, $pattern)
 		{
 			$search = trim($search, '/');
 			$pattern = trim($pattern, '/');
 
-			$arr = explode('/', $search);
-			array_pop($arr);
-			$search = implode('/', $arr);
+			if($search == $pattern) return true;
 
-			return $search == $pattern;
-		}
+			$searchArray = explode('/', $search);
+			$patternArray = explode('/', $pattern);
 
-		public static function grandchild($search, $pattern)
-		{
-			$search = trim($search, '/');
-			$pattern = trim($pattern, '/');
+			if(sizeof($searchArray) != sizeof($patternArray)) return false;
 
-			$arr = explode('/', $search);
-			if(sizeof($arr) > 1) {
-				array_pop($arr);
-				array_pop($arr);
-				$search = implode('/', $arr);
-
-				return $search == $pattern;
+			foreach($patternArray as $key => $value) {
+				if($value == '*') continue;
+				if($value == $searchArray[$key]) continue;
+				return false;
 			}
 
-			return false;
+			return true;
 		}
 
-		public static function greatgrandchild($search, $pattern)
-		{
-			$search = trim($search, '/');
-			$pattern = trim($pattern, '/');
-
-			$arr = explode('/', $search);
-			if(sizeof($arr) > 2) {
-				array_pop($arr);
-				array_pop($arr);
-				array_pop($arr);
-				$search = implode('/', $arr);
-
-				return $search == $pattern;
-			}
-
-			return false;
-		}
-
-		public static function regexp($search, $pattern)
+		public function regexp($search, $pattern)
 		{
 			$search = '/'.trim($search, '/');
 			$pattern = '/'.trim($pattern, '/');
@@ -107,21 +59,126 @@
 			return preg_match('~'.$pattern.'~i', $search);
 		}
 
-		public function addRule($method, $pattern, $className, $pathPrefix = '')
+		public function addRule($pattern, $className, $controllerName)
 		{
-			$this->ruleList[] = array(
-				'method' => $method,
+			$this->rewriteRuleList[] = array(
+				'method' => 'plain',
 				'pattern' => $pattern,
 				'className' => $className,
-				'pathPrefix' => $pathPrefix,
+				'controllerName' => $controllerName,
 			);
 
 			return $this;
 		}
 
-		public function getRuleList()
+		public function addRegexpRule($pattern, $className, $controllerName)
 		{
-			return $this->ruleList;
+			$this->rewriteRuleList[] = array(
+				'method' => 'regexp',
+				'pattern' => $pattern,
+				'className' => $className,
+				'controllerName' => $controllerName,
+			);
+
+			return $this;
+		}
+
+		public function check($rewriteRule, $search)
+		{
+			$method = $rewriteRule['method'];
+			$pattern = $rewriteRule['pattern'];
+
+			return $this->$method($search, $pattern);
+		}
+
+		public function import($elementPath)
+		{
+			if($elementPath == '/') {
+
+				$this->controllerName = $this->getFirstpageControllerName();
+
+			} else {
+
+				$this->controllerName = $this->getDefaultControllerName();
+
+				$rewriteRuleList = $this->getRewriteRuleList();
+
+				foreach($rewriteRuleList as $rewriteRule) {
+
+					if($this->check($rewriteRule, $elementPath)) {
+
+						$className = $rewriteRule['className'];
+						$controllerName = $rewriteRule['controllerName'];
+
+						$item = Item::dao()->getItemByName($className);
+						$itemClass = $item->getClass();
+						$currentElement = $itemClass->dao()->getByElementPath($elementPath);
+
+						if($currentElement instanceof Element) {
+							$this->currentElement = $currentElement;
+							$this->controllerName = $controllerName;
+							break;
+						}
+					}
+				}
+			}
+
+			return $this;
+		}
+
+		public function getControllerNameByElement(Element $element)
+		{
+			if(!$element->getId()) return $this->getDefaultControllerName();
+
+			$elementClassName = $element->getClass();
+			$href = $element->getHref();
+
+			$elementPath = Site::prepareElementPath($href);
+
+			$rewriteRuleList = $this->getRewriteRuleList();
+
+			foreach($rewriteRuleList as $rewriteRule) {
+
+				if($this->check($rewriteRule, $elementPath)) {
+
+					$className = $rewriteRule['className'];
+					$controllerName = $rewriteRule['controllerName'];
+
+					if($elementClassName == $className) return $controllerName;
+				}
+			}
+
+			return $this->getDefaultControllerName();
+		}
+
+		public function getRewriteRuleList()
+		{
+			return $this->rewriteRuleList;
+		}
+
+		public function getDefaultControllerName()
+		{
+			return $this->defaultControllerName;
+		}
+
+		public function getFirstpageControllerName()
+		{
+			return $this->firstpageControllerName;
+		}
+
+		public function getCurrentElement()
+		{
+			return $this->currentElement;
+		}
+
+		public function getControllerName()
+		{
+			return $this->controllerName;
+		}
+
+		public function getController()
+		{
+			return new $this->controllerName;
 		}
 	}
 ?>

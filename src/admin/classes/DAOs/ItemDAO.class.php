@@ -43,20 +43,22 @@
 				get(new DBField('class_type', $this->getTable()))->
 				get(new DBField('parent_class', $this->getTable()))->
 				get(new DBField('path_prefix', $this->getTable()))->
+				get(new DBField('is_update_path', $this->getTable()))->
 				from($this->getTable())->
 				orderBy(new DBField('item_order', $this->getTable()));
 
 			try {
-				$itemList = $this->getCustomList($query);
+				$customList = $this->getCustomList($query);
 
-				foreach($itemList as $custom) {
+				foreach($customList as $custom) {
 					$item =
 						Item::create()->
 						setId($custom['id'])->
 						setItemName($custom['item_name'])->
 						setClassType($custom['class_type'])->
 						setParentClass($custom['parent_class'])->
-						setPathPrefix($custom['path_prefix']);
+						setPathPrefix($custom['path_prefix'])->
+						setIsUpdatePath((bool)$custom['is_update_path']);
 
 					$this->itemList[$item->getId()] = $item;
 					$this->itemMap[$item->getItemName()] = $item;
@@ -90,24 +92,56 @@
 
 		public function getExtendableItemList(Item $currentItem)
 		{
+			$extendableItemList = array();
+
 			$itemList = $this->getItemList();
 
-			$extendableItemList = array();
-			if(!$currentItem) {
-				foreach($itemList as $item) {
-					if(!sizeof(Property::dao()->getPropertyList($item))) {
-						$extendableItemList[] = $item;
-					}
-				}
-			} else {
-				foreach($itemList as $item) {
-					if($currentItem->isExtendable($item)) {
-						$extendableItemList[] = $item;
-					}
+			foreach($itemList as $item) {
+				if($currentItem->isExtendable($item)) {
+					$extendableItemList[] = $item;
 				}
 			}
 
 			return $extendableItemList;
+		}
+
+		public function getOffspringItemList(Item $currentItem)
+		{
+			$offspringItemList = array();
+
+			$tree = array();
+			$tmpItemList = array();
+
+			$itemList = Item::dao()->getDefaultItemList();
+
+			foreach($itemList as $item) {
+				if(!$item->getIsUpdatePath()) continue;
+				$propertyList = Property::dao()->getPropertyList($item);
+				foreach($propertyList as $property) {
+					if($property->getPropertyClass() == Property::ONE_TO_ONE_PROPERTY) {
+						$tree[$property->getFetchClass()][$item->getItemName()] = $item;
+					}
+				}
+			}
+
+			$tmpItemList[$currentItem->getItemName()] = $currentItem;
+
+			while(true) {
+				foreach($tmpItemList as $tmpItemName => $tmpItem) {
+					if(isset($tree[$tmpItemName])) {
+						foreach($tree[$tmpItemName] as $itemName => $item) {
+							if(!isset($offspringItemList[$itemName])) {
+								$tmpItemList[$itemName] = $item;
+								$offspringItemList[$itemName] = $item;
+							}
+						}
+					}
+					unset($tmpItemList[$tmpItemName]);
+				}
+				if(empty($tmpItemList)) break;
+			}
+
+			return $offspringItemList;
 		}
 
 		public function getItemById($itemId)
@@ -166,7 +200,7 @@
 					)->
 					addColumn(
 						DBColumn::create(
-							DataType::create(DataType::VARCHAR)->setNull(false)->setSize(255),
+							DataType::create(DataType::VARCHAR)->setSize(255),
 							'element_path'
 						)
 					)->

@@ -16,6 +16,27 @@
 			Site::printMicroTime('After property list');
 		}
 
+		public static function prepareElementPath($elementPath = null)
+		{
+			if(!$elementPath) $elementPath = $_SERVER['REQUEST_URI'];
+
+			try {
+				$elementPath = TextUtils::getPathFromUrl($elementPath);
+			} catch (BaseException $e) {
+				return '/';
+			}
+
+			$elementPath = '/'.trim($elementPath, '/');
+			$elementPath = strtolower($elementPath);
+			$elementPath = get_magic_quotes_gpc() ? stripslashes($elementPath) : $elementPath;
+
+			if(!RegexpUtils::checkUrl($elementPath)) {
+				$elementPath = '/';
+			}
+
+			return $elementPath;
+		}
+
 		public static function setLastModified()
 		{
 			try {
@@ -349,8 +370,9 @@
 				<property name="mainPropertyParameters" type="String" required="false" />
 				<property name="isFolder" type="Boolean" default="false" required="true" />
 				<property name="pathPrefix" type="String" size="50" required="false" />
+				<property name="isUpdatePath" type="Boolean" default="false" required="true" />
 				<property name="orderField" type="String" size="50" required="false" />
-				<property name="orderDirection" type="Boolean" required="true" />
+				<property name="orderDirection" type="Boolean" default="false" required="true" />
 				<property name="perPage" type="Integer" default="0" />
 				<property name="isSearch" type="Boolean" default="false" required="true" />
 			</properties>
@@ -465,7 +487,7 @@
 				<property name="elementName" type="String" size="255" required="true" />
 				<property name="elementOrder" type="Integer" required="false" />
 				<property name="status" type="String" size="50" required="true" />
-				<property name="elementPath" type="String" size="255" required="true" />
+				<property name="elementPath" type="String" size="255" required="false" />
 				<property name="group" type="Group" relation="OneToOne" fetch="lazy" required="false" />
 				<property name="user" type="User" relation="OneToOne" fetch="lazy" required="false" />
 			</properties>
