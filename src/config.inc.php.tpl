@@ -6,7 +6,7 @@
 /* $Id$ */
 
 	define('LT_NAME', 'Lemon Tree 2.0');
-	define('LT_VERSION', '2.2.2');
+	define('LT_VERSION', '2.2.1');
 
 	// Environment varyables
 
@@ -72,15 +72,15 @@
 	// Web paths
 
 	if(!defined('PATH_WEB')) {
-		define('PATH_WEB', 'http://'.HTTP_HOST.'/');
+		define('PATH_WEB', 'http://'.HTTP_HOST.DIRECTORY_SEPARATOR);
 	}
 
 	if(!defined('FOLDER_LT')) {
-		define('FOLDER_LT', 'LT'.'/');
+		define('FOLDER_LT', 'LT'.DIRECTORY_SEPARATOR);
 	}
 
 	if(!defined('FOLDER_LTDATA')) {
-		define('FOLDER_LTDATA', 'LT-data'.'/');
+		define('FOLDER_LTDATA', 'LT-data'.DIRECTORY_SEPARATOR);
 	}
 
 	define('PATH_ADMIN', PATH_WEB.FOLDER_LT);

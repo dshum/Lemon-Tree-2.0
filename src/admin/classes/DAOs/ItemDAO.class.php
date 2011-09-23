@@ -43,22 +43,20 @@
 				get(new DBField('class_type', $this->getTable()))->
 				get(new DBField('parent_class', $this->getTable()))->
 				get(new DBField('path_prefix', $this->getTable()))->
-				get(new DBField('is_update_path', $this->getTable()))->
 				from($this->getTable())->
 				orderBy(new DBField('item_order', $this->getTable()));
 
 			try {
-				$customList = $this->getCustomList($query);
+				$itemList = $this->getCustomList($query);
 
-				foreach($customList as $custom) {
+				foreach($itemList as $custom) {
 					$item =
 						Item::create()->
 						setId($custom['id'])->
 						setItemName($custom['item_name'])->
 						setClassType($custom['class_type'])->
 						setParentClass($custom['parent_class'])->
-						setPathPrefix($custom['path_prefix'])->
-						setIsUpdatePath((bool)$custom['is_update_path']);
+						setPathPrefix($custom['path_prefix']);
 
 					$this->itemList[$item->getId()] = $item;
 					$this->itemMap[$item->getItemName()] = $item;
@@ -115,7 +113,6 @@
 			$itemList = Item::dao()->getDefaultItemList();
 
 			foreach($itemList as $item) {
-				if(!$item->getIsUpdatePath()) continue;
 				$propertyList = Property::dao()->getPropertyList($item);
 				foreach($propertyList as $property) {
 					if($property->getPropertyClass() == Property::ONE_TO_ONE_PROPERTY) {
@@ -200,7 +197,7 @@
 					)->
 					addColumn(
 						DBColumn::create(
-							DataType::create(DataType::VARCHAR)->setSize(255),
+							DataType::create(DataType::VARCHAR)->setNull(false)->setSize(255),
 							'element_path'
 						)
 					)->

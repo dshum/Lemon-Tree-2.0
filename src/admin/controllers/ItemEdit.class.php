@@ -43,25 +43,15 @@
 
 				switch($form->getValue('classType')) {
 					case 'abstract': case 'virtual':
-						$newItem->
-						setMainPropertyDescription(null)->
-						setPathPrefix(null)->
-						setIsUpdatePath(false)->
-						setIsFolder(false)->
-						setOrderField(null)->
-						setOrderDirection(false)->
-						setPerPage(null)->
-						setIsSearch(false);
 						break;
 
 					case 'default': default:
 						$newItem->
 						setMainPropertyDescription($form->getValue('mainPropertyDescription'))->
 						setPathPrefix($form->getValue('pathPrefix'))->
-						setIsUpdatePath($form->getValue('isUpdatePath'))->
 						setIsFolder($form->getValue('isFolder'))->
 						setOrderField($form->getValue('orderField'))->
-						setOrderDirection($form->getValue('orderDirection'))->
+						setOrderDirection($form->getValue('orderDirection') == 1)->
 						setPerPage($form->getValue('perPage'))->
 						setIsSearch($form->getValue('isSearch'));
 						break;
@@ -373,9 +363,6 @@
 						addImportFilter(Filter::trim())
 					)->
 					add(
-						Primitive::boolean('isUpdatePath')
-					)->
-					add(
 						Primitive::boolean('isFolder')
 					)->
 					add(
@@ -505,9 +492,6 @@
 						setMax(50)->
 						setAllowedPattern('/^([a-z0-9_\-]*)$/')->
 						addImportFilter(Filter::trim())
-					)->
-					add(
-						Primitive::boolean('isUpdatePath')
 					)->
 					add(
 						Primitive::boolean('isFolder')
@@ -683,7 +667,6 @@
 					$currentItem->
 					setMainPropertyDescription($form->getValue('mainPropertyDescription'))->
 					setPathPrefix($form->getValue('pathPrefix'))->
-					setIsUpdatePath($form->getValue('isUpdatePath'))->
 					setIsFolder($form->getValue('isFolder'))->
 					setOrderField($form->getValue('orderField'))->
 					setOrderDirection($form->getValue('orderDirection') == 1)->

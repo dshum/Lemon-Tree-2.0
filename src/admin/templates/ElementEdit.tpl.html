@@ -1,6 +1,7 @@
 <?php $partViewer->view("include/header");?>
 
 <?php
+$controllerName = ControllerManager::me()->getController($currentElement);
 $defaultShortname =
 	$currentElement->getId()
 	? $currentItem->getPathPrefix().$currentElement->getId()
@@ -349,21 +350,13 @@ foreach ($propertyList as $property) {
 <table cellpadding="0" width="90%" cellspacing="0">
 <tr valign="top">
 <td width="50%">
-<span class="grey">
-<?php if($currentElement->getId()) {?>ID элемента: <?=$currentElement->getPolymorphicId()?><br><?php } else {?>Класс элемента: <?=$currentElement->getClass()?><br><?php }?>
-<?php if($currentElement->getElementPath()) {?>Адрес элемента: <?=$currentElement->getElementPath()?><br><?php }?>
-Контроллер: <?=$controllerName?>
-</span>
+Контроллер:<br>
+<input type="text" name="controllerName" value="<?=$controllerName?>" class="prop" disabled="disabled">
 </td>
 <td width="50%">
-<?php if($currentItem->getIsUpdatePath()) {?>
 <input type="checkbox" id="checkShortName" name="checkShortName" value="1" title="Отметить"<?=($currentElement->getShortName() != $defaultShortname) ? ' checked' : ''?>>
 <label for="checkShortName">Название в адресной строке:</label><br>
 <input type="text" name="shortName" value="<?=$currentElement->getShortName()?>" class="prop"<?=($currentElement->getShortName() == $defaultShortname) ? ' disabled="disabled"' : ''?>>
-<?php } else {?>
-Название в адресной строке:<br>
-<input type="text" name="shortName" value="" class="prop" disabled="disabled">
-<?php }?>
 </td>
 </tr>
 </table>
