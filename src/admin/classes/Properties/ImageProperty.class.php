@@ -19,7 +19,7 @@
 
 			$item = $property->getItem();
 			$itemClass = $item->getClass();
-			$this->folder = $itemClass->dao()->getTable().DIRECTORY_SEPARATOR;
+			$this->folder = $itemClass->dao()->getTable();
 		}
 
 		public function setParameters()
@@ -76,17 +76,17 @@
 
 		public function path()
 		{
-			return PATH_WEB_LTDATA.$this->folder.$this->value;
+			return PATH_WEB_LTDATA.$this->folder.'/'.$this->value;
 		}
 
 		public function abspath()
 		{
-			return PATH_LTDATA.$this->folder.$this->value;
+			return PATH_LTDATA.$this->folder.DIRECTORY_SEPARATOR.$this->value;
 		}
 
 		public function relpath()
 		{
-			return DIRECTORY_SEPARATOR.FOLDER_LTDATA.$this->folder.$this->value;
+			return '/'.FOLDER_LTDATA.$this->folder.'/'.$this->value;
 		}
 
 		public function src()
@@ -149,12 +149,12 @@
 
 		public function thumbnail_path()
 		{
-			return PATH_WEB_LTDATA.$this->folder.self::$thumbnail_prefix.$this->value;
+			return PATH_WEB_LTDATA.$this->folder.'/'.self::$thumbnail_prefix.$this->value;
 		}
 
 		public function thumbnail_abspath()
 		{
-			return PATH_LTDATA.$this->folder.self::$thumbnail_prefix.$this->value;
+			return PATH_LTDATA.$this->folder.DIRECTORY_SEPARATOR.self::$thumbnail_prefix.$this->value;
 		}
 
 		public function thumbnail_src()
@@ -292,13 +292,13 @@
 					) {
 						ImageUtils::resizeAndCopyImage(
 							$file,
-							PATH_LTDATA.$this->folder.self::$thumbnail_prefix.$filename,
+							PATH_LTDATA.$this->folder.DIRECTORY_SEPARATOR.self::$thumbnail_prefix.$filename,
 							$thumbnailWidth,
 							$thumbnailHeight,
 							$jpegQuality
 						);
 						chmod(
-							PATH_LTDATA.$this->folder.self::$thumbnail_prefix.$filename,
+							PATH_LTDATA.$this->folder.DIRECTORY_SEPARATOR.self::$thumbnail_prefix.$filename,
 							self::$file_mod
 						);
 					}
@@ -313,22 +313,22 @@
 					) {
 						ImageUtils::resizeAndCopyImage(
 							$file,
-							PATH_LTDATA.$this->folder.$filename,
+							PATH_LTDATA.$this->folder.DIRECTORY_SEPARATOR.$filename,
 							$resizeWidth,
 							$resizeHeight,
 							$jpegQuality
 						);
 						chmod(
-							PATH_LTDATA.$this->folder.$filename,
+							PATH_LTDATA.$this->folder.DIRECTORY_SEPARATOR.$filename,
 							self::$file_mod
 						);
 						unlink($file);
 					} else {
 						$primitive->copyToPath(
-							PATH_LTDATA.$this->folder.$filename
+							PATH_LTDATA.$this->folder.DIRECTORY_SEPARATOR.$filename
 						);
 						chmod(
-							PATH_LTDATA.$this->folder.$filename,
+							PATH_LTDATA.$this->folder.DIRECTORY_SEPARATOR.$filename,
 							self::$file_mod
 						);
 					}
@@ -343,11 +343,11 @@
 		public function drop()
 		{
 			try {
-				if(file_exists(PATH_LTDATA.$this->folder.$this->value)) {
-					unlink(PATH_LTDATA.$this->folder.$this->value);
+				if(file_exists(PATH_LTDATA.$this->folder.DIRECTORY_SEPARATOR.$this->value)) {
+					unlink(PATH_LTDATA.$this->folder.DIRECTORY_SEPARATOR.$this->value);
 				}
-				if(file_exists(PATH_LTDATA.$this->folder.self::$thumbnail_prefix.$this->value)) {
-					unlink(PATH_LTDATA.$this->folder.self::$thumbnail_prefix.$this->value);
+				if(file_exists(PATH_LTDATA.$this->folder.DIRECTORY_SEPARATOR.self::$thumbnail_prefix.$this->value)) {
+					unlink(PATH_LTDATA.$this->folder.DIRECTORY_SEPARATOR.self::$thumbnail_prefix.$this->value);
 				}
 			} catch (BaseException $e) {}
 		}

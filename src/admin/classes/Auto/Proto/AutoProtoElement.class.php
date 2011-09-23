@@ -15,7 +15,7 @@
 				'elementName' => LightMetaProperty::fill(new LightMetaProperty(), 'elementName', 'element_name', 'string', null, 255, true, true, false, null, null),
 				'elementOrder' => LightMetaProperty::fill(new LightMetaProperty(), 'elementOrder', 'element_order', 'integer', null, 4, false, true, false, null, null),
 				'status' => LightMetaProperty::fill(new LightMetaProperty(), 'status', null, 'string', null, 50, true, true, false, null, null),
-				'elementPath' => LightMetaProperty::fill(new LightMetaProperty(), 'elementPath', 'element_path', 'string', null, 255, true, true, false, null, null),
+				'elementPath' => LightMetaProperty::fill(new LightMetaProperty(), 'elementPath', 'element_path', 'string', null, 255, false, true, false, null, null),
 				'group' => LightMetaProperty::fill(new LightMetaProperty(), 'group', 'group_id', 'identifier', 'Group', 4, false, false, false, 1, 3),
 				'user' => LightMetaProperty::fill(new LightMetaProperty(), 'user', 'user_id', 'identifier', 'User', 4, false, false, false, 1, 3)
 			);

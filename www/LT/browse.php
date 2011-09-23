@@ -91,7 +91,6 @@
 			$model->
 			set('selfUrl', PATH_ADMIN_BROWSE.'?module='.$controllerName)->
 			set('baseUrl', PATH_ADMIN_BROWSE)->
-			set('controllerName', $controllerName)->
 			set('loggedUser', $loggedUser);
 		}
 

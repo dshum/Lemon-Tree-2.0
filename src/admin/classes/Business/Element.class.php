@@ -330,7 +330,7 @@
 				$propertyList = Property::dao()->getPropertyList($item);
 				foreach($propertyList as $property) {
 					if(
-						$property->getPropertyClass() == 'OneToOneProperty'
+						$property->getPropertyClass() == Property::ONE_TO_ONE_PROPERTY
 						&& $property->getFetchClass() == $this->getClass()
 					) {
 						$childrenItemList[] = $item;
@@ -352,7 +352,7 @@
 			$itemList = Item::dao()->getItemList();
 
 			foreach($itemList as $item) {
-				if($item->getClassType() == 'abstract') continue;
+				if($item->isAbstract()) continue;
 
 				$itemClass = $item->getClass();
 
@@ -360,7 +360,7 @@
 
 				foreach($propertyList as $property) {
 					if(
-						$property->getPropertyClass() == 'OneToOneProperty'
+						$property->getPropertyClass() == Property::ONE_TO_ONE_PROPERTY
 						&& $property->getFetchClass() == $currentItem->getItemName()
 					) {
 						if(
@@ -376,7 +376,7 @@
 			}
 
 			foreach($itemList as $item) {
-				if($item->getClassType() == 'abstract') continue;
+				if($item->isAbstract()) continue;
 
 				$itemClass = $item->getClass();
 
@@ -384,7 +384,7 @@
 
 				foreach($propertyList as $property) {
 					if(
-						$property->getPropertyClass() == 'OneToOneProperty'
+						$property->getPropertyClass() == Property::ONE_TO_ONE_PROPERTY
 						&& $property->getFetchClass() == $currentItem->getItemName()
 					) {
 						if(

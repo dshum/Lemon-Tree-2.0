@@ -78,8 +78,7 @@
 		if(!$view instanceof RedirectView) {
 			$model->
 			set('selfUrl', PATH_ADMIN.'index.php?module='.$controllerName)->
-			set('baseUrl', PATH_ADMIN.'index.php')->
-			set('controllerName', $controllerName);
+			set('baseUrl', PATH_ADMIN.'index.php');
 		}
 
 		$view->render($model);

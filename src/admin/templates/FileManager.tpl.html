@@ -2,7 +2,17 @@
 
 <script type="text/javascript">
 $(function() {
-
+	$('a[ok=true]').click(function() {
+		var win = window.dialogArguments || opener || parent || top;
+		var tinyMCE = win.tinyMCE;
+		var params = tinyMCE.activeEditor.windowManager.params;
+		params.window.document.getElementById(params.input).value = this.href;
+		try {
+			params.window.ImageDialog.showPreviewImage(this.href);
+		} catch(e) {}
+		tinyMCE.activeEditor.windowManager.close(window);
+		return false;
+	});
 });
 </script>
 
@@ -22,9 +32,40 @@ $(function() {
 <?php }?>
 
 <?php if(sizeof($fileList)) {?>
-<?php 	foreach($fileList as $file) {?>
-<a href=""><img src="img/file.png"> <?=$file?></a><br>
+
+<?php 	if($type == 'image') {?>
+
+<table width="100%" cellspacing="10" cellpadding="5" border="1">
+<col width="33%">
+<col width="33%">
+<col width="33%">
+<tr align="center" valign="bottom">
+<?php 		foreach($fileList as $k => $file) {?>
+<td><a href="<?=$root.$folder.'/'.$file?>" ok="true"><img src="<?=$root.$folder.'/'.$file?>" width="120" height="80"><br><?=$file?></a></td>
+<?=$k % 3 == 2 ? '</tr><tr align="center" valign="bottom">' : ''?>
+<?php 		}?>
+</tr>
+</table>
+
+<?php 	} else {?>
+
+<table width="100%">
+<col width="50%">
+<col width="50%">
+<tr>
+<?php 		foreach($fileList as $k => $file) {?>
+<td><a href="<?=$root.$folder.'/'.$file?>" ok="true"><img src="img/file.png">&nbsp;<?=$file?></a></td>
+<?=$k % 2 == 1 ? '</tr><tr>' : ''?>
+<?php 		}?>
+</tr>
+</table>
+
 <?php 	}?>
+
+<?php } else {?>
+
+<p>Файлы не найдены.</p>
+
 <?php }?>
 
 <?php $partViewer->view("include/footer");?>

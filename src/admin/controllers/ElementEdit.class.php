@@ -438,6 +438,7 @@
 				$model->set('saveElement', 'ok');
 
 			} catch (BaseException $e) {
+				ErrorMessageUtils::sendMessage($e);
 				$model->set('saveElement', 'error');
 			}
 
@@ -469,6 +470,9 @@
 				$currentItem->getClass()->
 				setId(null)->
 				setStatus('root');
+
+			# Controller Name
+			$controllerName = RewriteRuleManager::me()->getControllerNameByElement($currentElement);
 
 			# Plugin
 
@@ -537,6 +541,7 @@
 			$model->set('mode', 'create');
 			$model->set('currentItem', $currentItem);
 			$model->set('currentElement', $currentElement);
+			$model->set('controllerName', $controllerName);
 			$model->set('parentList', $parentList);
 			$model->set('pluginModelAndView', $pluginModelAndView);
 			$model->set('propertyList', $propertyList);
@@ -581,6 +586,9 @@
 					setModel(Model::create())->
 					setView(new RedirectToView('ViewBrowse'));
 			}
+
+			# Controller Name
+			$controllerName = RewriteRuleManager::me()->getControllerNameByElement($currentElement);
 
 			$parentList = $currentElement->getParentList();
 
@@ -648,6 +656,7 @@
 			$model->set('mode', 'edit');
 			$model->set('currentItem', $currentItem);
 			$model->set('currentElement', $currentElement);
+			$model->set('controllerName', $controllerName);
 			$model->set('permission', $permission);
 			$model->set('parentList', $parentList);
 			$model->set('pluginModelAndView', $pluginModelAndView);

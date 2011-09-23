@@ -1,17 +1,16 @@
 <?php
 	final class FileManager extends MethodMappedController
 	{
-		private $rootDir = null;
+		const FOLDER_FILEMANAGER = 'filemanager';
+
 		private $allowedTypes = array(
-			'media' => array("avi", "wmv", "mpg", "mpeg", "wav", "wma", "mid", "mp3", "swf"),
-			'image' => array("gif", "jpg", "jpeg", "png"),
-			'document' => array("doc", "rtf", "xls", "csv", "pdf", "ppt", "txt", "fb2"),
+			'media' => array('avi', 'wmv', 'mpg', 'mpeg', 'wav', 'wma', 'mid', 'mp3', 'swf'),
+			'image' => array('gif', 'jpg', 'jpeg', 'png'),
+			'file' => array('doc', 'rtf', 'xls', 'csv', 'pdf', 'ppt', 'txt', 'fb2'),
 		);
 
 		public function __construct()
 		{
-			$this->rootDir = PATH_LTDATA.TABLE_PREFIX.'file_manager'.DIRECTORY_SEPARATOR;
-
 			$this->
 			setMethodMapping('removeDir', 'removeDir')->
 			setMethodMapping('makeDir', 'makeDir')->
@@ -55,12 +54,18 @@
 			$dirList = $this->getDirList($folder);
 			$fileList = $this->getFileList($folder, $type);
 
+			$root =
+				PATH_WEB_LTDATA
+				.TABLE_PREFIX
+				.self::FOLDER_FILEMANAGER.'/';
+
 			$model->set('url', $url);
 			$model->set('type', $type);
 			$model->set('folder', $folder);
 			$model->set('parentList', $parentList);
 			$model->set('dirList', $dirList);
 			$model->set('fileList', $fileList);
+			$model->set('root', $root);
 
 			return ModelAndView::create()->
 				setModel($model)->
@@ -80,12 +85,13 @@
 		{
 			$dirList = array();
 
-			$dir = opendir($this->rootDir.$folder);
+			$root = PATH_LTDATA.TABLE_PREFIX.self::FOLDER_FILEMANAGER.'/';
+			$dir = opendir($root.$folder);
 
 			while($filename = readdir($dir)) {
 				if($filename == '.' || $filename == '..') continue;
 
-				if(is_dir($this->rootDir.$folder.DIRECTORY_SEPARATOR.$filename)) {
+				if(is_dir($dir.'/'.$filename)) {
 					$dirList[] = $filename;
 				}
 			}
@@ -99,16 +105,17 @@
 		{
 			$fileList = array();
 
-			$dir = opendir($this->rootDir.$folder);
+			$root = PATH_LTDATA.TABLE_PREFIX.self::FOLDER_FILEMANAGER.'/';
+			$dir = opendir($root.$folder);
 
 			while($filename = readdir($dir)) {
 				if($filename == '.' || $filename == '..') continue;
 
-				if(is_dir($this->rootDir.$folder.DIRECTORY_SEPARATOR.$filename)) continue;
+				if(is_dir($dir.'/'.$filename)) continue;
 
 				if(
 					$type
-					&& is_array($this->allowedTypes[$type])
+					&& isset($this->allowedTypes[$type])
 					&& !in_array(
 						$this->getExtension($filename),
 						$this->allowedTypes[$type]

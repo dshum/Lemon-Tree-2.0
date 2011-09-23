@@ -202,7 +202,9 @@
 			$parent = $element->getParent();
 			$item = $element->getItem();
 
-			$rand = substr(md5(rand()), 0, 8);
+			$elementPathPrefix = $parent->getElementPath().'/';
+
+			$rand = substr(md5(rand()), 0, 16);
 
 			if(!$element->getElementName()) {
 				$element->setElementName($rand);
@@ -214,28 +216,33 @@
 			$status = $parent->getStatus();
 			$element->setStatus($status);
 
-			if(!$element->getShortName()) {
-				$element->
-				setShortName($rand)->
-				setElementPath($parent->getElementPath().'/'.$rand);
-			} else {
-				$elementPath = $parent->getElementPath().'/'.$element->getShortName();
-
-				$hasDuplicates =
-					$item->getClass()->dao()->hasDuplicates(
-						null,
-						$element->getStatus(),
-						$elementPath
-					);
-
-				if($hasDuplicates) {
+			if($item->getIsUpdatePath()) {
+				if(!$element->getShortName()) {
 					$element->
 					setShortName($rand)->
-					setElementPath($parent->getElementPath().'/'.$rand);
+					setElementPath($elementPathPrefix.$rand);
 				} else {
-					$element->
-					setElementPath($elementPath);
+					$elementPath = $elementPathPrefix.$element->getShortName();
+
+					$hasDuplicates =
+						$item->getClass()->dao()->hasDuplicates(
+							null,
+							$element->getStatus(),
+							$elementPath
+						);
+
+					if($hasDuplicates) {
+						$element->
+						setShortName($rand)->
+						setElementPath($elementPathPrefix.$rand);
+					} else {
+						$element->
+						setElementPath($elementPath);
+					}
 				}
+			} else {
+				$element->
+				setElementPath(null);
 			}
 
 			$propertyList = Property::dao()->getPropertyList($item);
@@ -259,22 +266,24 @@
 			}
 
 			# Update element path
-			if($element->getShortName() == $rand) {
-				$shortName = $item->getPathPrefix().$element->getId();
-				$elementPath = $parent->getElementPath().'/'.$shortName;
+			if($item->getIsUpdatePath()) {
+				if($element->getShortName() == $rand) {
+					$shortName = $item->getPathPrefix().$element->getId();
+					$elementPath = $elementPathPrefix.$shortName;
 
-				$hasDuplicates =
-					$item->getClass()->dao()->hasDuplicates(
-						$element->getId(),
-						$element->getStatus(),
-						$elementPath
-					);
+					$hasDuplicates =
+						$item->getClass()->dao()->hasDuplicates(
+							$element->getId(),
+							$element->getStatus(),
+							$elementPath
+						);
 
-				if(!$hasDuplicates) {
-					$element->
-					setShortName($shortName)->
-					setElementPath($elementPath);
-					$isUpdate = true;
+					if(!$hasDuplicates) {
+						$element->
+						setShortName($shortName)->
+						setElementPath($elementPath);
+						$isUpdate = true;
+					}
 				}
 			}
 
@@ -295,30 +304,34 @@
 			}
 
 			# Update element path
-			$shortName =
-				$element->getShortName()
-				? $element->getShortName()
-				: $item->getPathPrefix().$element->getId();
-			$elementPath = $parent->getElementPath().'/'.$shortName;
+			if($item->getIsUpdatePath()) {
+				$shortName =
+					$element->getShortName()
+					? $element->getShortName()
+					: $item->getPathPrefix().$element->getId();
 
-			if($elementPath != $element->getElementPath()) {
-				$hasDuplicates =
-					$item->getClass()->dao()->hasDuplicates(
-						$element->getId(),
-						$element->getStatus(),
-						$elementPath
-					);
+				$elementPath = $parent->getElementPath().'/'.$shortName;
 
-				if($hasDuplicates) {
-					$shortName = substr(md5(rand()), 0, 8);
-					$elementPath = $parent->getElementPath().'/'.$shortName;
+				if($elementPath != $element->getElementPath()) {
+					$hasDuplicates =
+						$item->getClass()->dao()->hasDuplicates(
+							$element->getId(),
+							$element->getStatus(),
+							$elementPath
+						);
+
+					if($hasDuplicates) {
+						$shortName = substr(md5(rand()), 0, 8);
+						$elementPath = $parent->getElementPath().'/'.$shortName;
+					}
+
+					$this->updateOffspringElementPath($element, $elementPath);
 				}
 
-				$this->updateOffspringElementPath($element, $elementPath);
+				$element->setElementPath($elementPath);
 			}
 
-			$element->setElementPath($elementPath);
-
+			# Update properties
 			$propertyList = Property::dao()->getPropertyList($item);
 			foreach($propertyList as $property) {
 				$propertyClass = $property->getClass($element);
@@ -352,26 +365,34 @@
 			}
 
 			if($move) {
+
 				$parent = $element->getParent();
 				$status = $parent->getStatus();
-				$elementPath = $parent->getElementPath().'/'.$element->getShortName();
 
-				$hasDuplicates =
-					$item->getClass()->dao()->hasDuplicates(
-						$element->getId(),
-						$status,
-						$elementPath
-					);
+				$element->setStatus($status);
 
-				if($hasDuplicates) {
-					$shortName = substr(md5(rand()), 0, 8);
-					$elementPath = $parent->getElementPath().'/'.$shortName;
-					$element->setShortName($shortName);
+				# Update element path
+				if($item->getIsUpdatePath()) {
+					$elementPath = $parent->getElementPath().'/'.$element->getShortName();
+
+					$hasDuplicates =
+						$item->getClass()->dao()->hasDuplicates(
+							$element->getId(),
+							$status,
+							$elementPath
+						);
+
+					if($hasDuplicates) {
+						$shortName = substr(md5(rand()), 0, 8);
+						$elementPath = $parent->getElementPath().'/'.$shortName;
+						$element->setShortName($shortName);
+					}
+
+					$this->updateOffspringElementPath($element, $elementPath);
+
+					$element->setElementPath($elementPath);
 				}
 
-				$this->updateOffspringElementPath($element, $elementPath);
-
-				$element->setElementPath($elementPath)->setStatus($status);
 				$element = $element->dao()->saveElement($element);
 			}
 
@@ -436,14 +457,28 @@
 			return $custom['count'] > 0;
 		}
 
+		private function getOffspringItemList(Element $element)
+		{
+			$offspringItemList = array();
+
+			$itemList = Item::dao()->getDefaultItemList();
+
+			foreach($itemList as $item) {
+
+			}
+
+			return $offspringItemList;
+		}
+
 		private function updateOffspringElementPath(Element $element, $newElementPath)
 		{
 			$oldStatus = $element->getStatus();
 			$oldElementPath = $element->getElementPath();
+			$currentItem = $element->getItem();
+
+			$itemList = Item::dao()->getOffspringItemList($currentItem);
 
 			$offspringItemList = array();
-
-			$itemList = Item::dao()->getDefaultItemList();
 
 			foreach($itemList as $item) {
 				$count = $item->getClass()->dao()->getOffspringsCount($element);
@@ -573,6 +608,11 @@
 			$currentItem = $currentElement->getItem();
 			$parentElement = $currentElement->getParent();
 
+			$elementPathPrefix =
+				$currentItem->getIsUpdatePath()
+				? $parentElement->getElementPath().'/'
+				: '/';
+
 			$status = 'trash';
 			$elementPath = $currentElement->getElementPath();
 
@@ -585,11 +625,12 @@
 
 			if($hasDuplicates) {
 				$shortName = substr(md5(rand()), 0, 8);
-				$elementPath = $parentElement->getElementPath().'/'.$shortName;
+				$elementPath = $elementPathPrefix.$shortName;
 				$currentElement->setShortName($shortName)->setElementPath($elementPath);
 			}
 
 			$currentElement->setStatus($status);
+
 			$currentElement = $currentElement->dao()->save($currentElement);
 
 			return $currentElement;
@@ -629,6 +670,11 @@
 			$currentItem = $currentElement->getItem();
 			$parentElement = $currentElement->getParent();
 
+			$elementPathPrefix =
+				$currentItem->getIsUpdatePath()
+				? $parentElement->getElementPath().'/'
+				: '/';
+
 			$status = 'root';
 			$elementPath = $currentElement->getElementPath();
 
@@ -641,7 +687,7 @@
 
 			if($hasDuplicates) {
 				$shortName = substr(md5(rand()), 0, 8);
-				$elementPath = $parentElement->getElementPath().'/'.$shortName;
+				$elementPath = $elementPathPrefix.$shortName;
 				$currentElement->setShortName($shortName)->setElementPath($elementPath);
 			}
 
@@ -655,18 +701,16 @@
 		{
 			# Drop children (recursively)
 
-			$itemList = Item::dao()->getItemList();
+			$itemList = Item::dao()->getDefaultItemList();
 
 			foreach($itemList as $item) {
-				if($item->getClassType() == 'abstract') continue;
-
 				$itemClass = $item->getClass();
 
 				$propertyList = Property::dao()->getPropertyList($item);
 
 				foreach($propertyList as $property) {
 					if(
-						$property->getPropertyClass() == 'OneToOneProperty'
+						$property->getPropertyClass() == Property::ONE_TO_ONE_PROPERTY
 						&& $property->getFetchClass() == $currentElement->getClass()
 					) {
 						switch($property->getOnDelete()) {
