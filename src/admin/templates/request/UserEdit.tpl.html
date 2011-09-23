@@ -18,11 +18,11 @@
 		$form->
 		addMissingLabel('userName', 'Отсутствует логин.')->
 		addMissingLabel('userPassword', 'Отсутствует пароль.')->
-		addMissingLabel('userDescription', 'Отсутствует имя пользователя.')->
+		addMissingLabel('userDescription', 'Отсутствует описание пользователя.')->
 		addMissingLabel('userEmail', 'Отсутствует электронный адрес.')->
 		addWrongLabel('userName', 'Некорректный логин.')->
 		addWrongLabel('userPassword', 'Некорректный пароль.')->
-		addWrongLabel('userDescription', 'Длина имени должна быть не более 255 символов.')->
+		addWrongLabel('userDescription', 'Длина описания должна быть не более 255 символов.')->
 		addWrongLabel('userEmail', 'Некорректный электронный адрес.');
 
 		foreach($form->getTextualErrors() as $label) {
@@ -30,24 +30,8 @@
 		}
 	}
 
-	if(isset($deniedDropUserError)) {
-		$error[] = 'Недостаточно прав для удаления данного пользователя.';
-	}
-
-	if(isset($dropUserError)) {
-		$error[] = 'Произошла ошибка при удалении пользователя.';
-	}
-
-	if(isset($deniedAddUserError)) {
-		$error[] = 'Недостаточно прав для создания данного пользователя.';
-	}
-
 	if(isset($addUserError)) {
 		$error[] = 'Произошла ошибка при добавлении пользователя.';
-	}
-
-	if(isset($deniedSaveUserError)) {
-		$error[] = 'Недостаточно прав для изменения данного пользователя.';
 	}
 
 	if(isset($saveUserError)) {

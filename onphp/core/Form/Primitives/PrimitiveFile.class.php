@@ -12,7 +12,7 @@
 
 	/**
 	 * File uploads helper.
-	 *
+	 * 
 	 * @ingroup Primitives
 	**/
 	class PrimitiveFile extends RangedPrimitive
@@ -31,7 +31,7 @@
 		{
 			return $this->mimeType;
 		}
-
+		
 		/**
 		 * @return PrimitiveFile
 		**/
@@ -39,10 +39,10 @@
 		{
 			$this->originalName = null;
 			$this->mimeType = null;
-
+			
 			return parent::clean();
 		}
-
+		
 		/**
 		 * @throws WrongArgumentException
 		 * @return PrimitiveFile
@@ -50,9 +50,9 @@
 		public function setAllowedMimeTypes($mimes)
 		{
 			Assert::isArray($mimes);
-
+			
 			$this->allowedMimeTypes = $mimes;
-
+			
 			return $this;
 		}
 
@@ -63,12 +63,12 @@
 		public function addAllowedMimeType($mime)
 		{
 			Assert::isString($mime);
-
+			
 			$this->allowedMimeTypes[] = $mime;
 
 			return $this;
 		}
-
+		
 		public function getAllowedMimeTypes()
 		{
 			return $this->allowedMimeTypes;
@@ -86,7 +86,7 @@
 		{
 			return $this->copyToPath($path.$name);
 		}
-
+		
 		public function copyToPath($path)
 		{
 			if (is_readable($this->value) && is_writable(dirname($path))) {
@@ -96,7 +96,7 @@
 					"can not move '{$this->value}' to '{$path}'"
 				);
 		}
-
+		
 		public function import($scope)
 		{
 			if (
@@ -108,22 +108,22 @@
 				)
 			)
 				return null;
-
+			
 			if (isset($scope[$this->name]['tmp_name']))
 				$file = $scope[$this->name]['tmp_name'];
 			else
 				return false;
-
+			
 			if (is_readable($file) && is_uploaded_file($file))
 				$size = filesize($file);
 			else
 				return false;
-
+			
 			$this->mimeType = $scope[$this->name]['type'];
-
+			
 			if (!$this->isAllowedMimeType())
 				return false;
-
+			
 			if (
 				isset($scope[$this->name])
 				&& !($this->max && ($size > $this->max))
@@ -131,13 +131,13 @@
 			) {
 				$this->value = $scope[$this->name]['tmp_name'];
 				$this->originalName = $scope[$this->name]['name'];
-
+				
 				return true;
 			}
-
+			
 			return false;
 		}
-
+		
 		public function exportValue()
 		{
 			throw new UnimplementedFeatureException();

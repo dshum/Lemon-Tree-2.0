@@ -4,13 +4,13 @@
 		public function __construct()
 		{
 			$this->
-			setMethodMapping('drop', 'drop')->
-			setMethodMapping('restore', 'restore')->
-			setMethodMapping('add', 'add')->
-			setMethodMapping('save', 'save')->
-			setMethodMapping('create', 'create')->
-			setMethodMapping('edit', 'edit')->
-			setDefaultAction('edit');
+				setMethodMapping('drop', 'dropElement')->
+				setMethodMapping('restore', 'restoreElement')->
+				setMethodMapping('add', 'addElement')->
+				setMethodMapping('save', 'saveElement')->
+				setMethodMapping('create', 'createElement')->
+				setMethodMapping('edit', 'editElement')->
+				setDefaultAction('edit');
 		}
 
 		public function handleRequest(HttpRequest $request)
@@ -21,93 +21,89 @@
 			return parent::handleRequest($request);
 		}
 
-		public function drop(HttpRequest $request)
+		public function dropElement($request)
 		{
 			$model = Model::create();
-
-			$loggedUser = LoggedUser::getUser();
 
 			$form0 = $this->makeEditForm();
 
 			if($form0->getErrors()) {
+
 				$model->set('form0', $form0);
-				return
-					ModelAndView::create()->
-					setModel($model)->
-					setView('request/ElementEdit');
-			}
 
-			$currentElement = $form0->getValue('elementId');
-			$currentItem = $currentElement->getItem();
-			$itemClass = $currentItem->getClass();
+			} else {
 
-			$permission = $currentElement->getPermission($loggedUser);
+				$currentElement = $form0->getValue('elementId');
+				$currentItem = $currentElement->getItem();
+				$itemClass = $currentItem->getClass();
 
-			if($permission < Permission::PERMISSION_DROP_ID) {
-				$model->set('denied', 'drop');
-				return
-					ModelAndView::create()->
-					setModel($model)->
-					setView('request/ElementEdit');
-			}
-
-			try {
-
-				# Before delete action
 				try {
-					$actionName = PluginManager::me()->getBeforeDeleteAction(
-						$currentItem->getItemName()
-					);
-					if($actionName && ClassUtils::isClassName($actionName)) {
-						$action = new $actionName($currentElement);
-					}
-				} catch (BaseException $e) {
-					ErrorMessageUtils::sendMessage($e);
-				}
 
-				$returnElementId = $currentElement->getParent()->getPolymorphicId();
+					$returnElementId = $currentElement->getParent()->getPolymorphicId();
 
-				# Drop element
-				if($currentElement->getStatus() == 'trash') {
-					$result = $itemClass->dao()->dropElement($currentElement);
-					$actionTypeId = UserActionType::ACTION_TYPE_DROP_ELEMENT_ID;
-				} else {
-					$result = $itemClass->dao()->moveElementToTrash($currentElement);
-					$actionTypeId = UserActionType::ACTION_TYPE_DROP_ELEMENT_TO_TRASH_ID;
-				}
+					$result =
+						$currentElement->getStatus() == 'trash'
+						? $itemClass->dao()->dropElement($currentElement)
+						: $itemClass->dao()->moveElementToTrash($currentElement);
 
-				if($result) {
+					if($result) {
 
-					# After delete action
-					try {
-						$actionName = PluginManager::me()->getAfterDeleteAction(
-							$currentItem->getItemName()
-						);
-						if($actionName && ClassUtils::isClassName($actionName)) {
-							$action = new $actionName($currentElement);
-						}
-					} catch (BaseException $e) {
-						ErrorMessageUtils::sendMessage($e);
+						Site::updateLastModified();
+
+						$model->set('returnElementId', $returnElementId);
+						$model->set('dropped', $result->getPolymorphicId());
+
+					} else {
+
+						$model->set('restrict', 'error');
+
 					}
 
-					# User log
-					UserLog::me()->log(
-						$actionTypeId,
-						$result->getPolymorphicId()
-					);
+				} catch (BaseException $e) {}
+			}
+
+			return
+				ModelAndView::create()->
+				setModel($model)->
+				setView('request/ElementEdit');
+		}
+
+		public function restoreElement($request)
+		{
+			$model = Model::create();
+
+			$form0 = $this->makeEditForm();
+
+			if($form0->getErrors()) {
+
+				$model->set('form0', $form0);
+
+			} else {
+
+				$currentElement = $form0->getValue('elementId');
+				$currentItem = $currentElement->getItem();
+				$itemClass = $currentItem->getClass();
+
+				try {
+
+					$returnElementId = $currentElement->getParent()->getPolymorphicId();
+
+					if($currentElement->getStatus() == 'trash') {
+						$result = $itemClass->dao()->restoreElementFromTrash($currentElement);
+					}
 
 					Site::updateLastModified();
 
 					$model->set('returnElementId', $returnElementId);
-					$model->set('dropped', $result->getPolymorphicId());
 
-				} else {
+					# Refresh tree
+					if($currentItem->getIsFolder()) {
+						$tree = Tree::getTree();
+						$model->set('tree', $tree);
+					}
 
-					$model->set('restrict', 'error');
-
-				}
-
-			} catch (BaseException $e) {}
+				} catch (BaseException $e) {}
+			}
 
 			return
 				ModelAndView::create()->
@@ -115,98 +111,7 @@
 				setView('request/ElementEdit');
 		}
 
-		public function restore(HttpRequest $request)
-		{
-			$model = Model::create();
-
-			$loggedUser = LoggedUser::getUser();
-
-			$form0 = $this->makeEditForm();
-
-			if($form0->getErrors()) {
-				$model->set('form0', $form0);
-				return
-					ModelAndView::create()->
-					setModel($model)->
-					setView('request/ElementEdit');
-			}
-
-			$currentElement = $form0->getValue('elementId');
-			$currentItem = $currentElement->getItem();
-			$itemClass = $currentItem->getClass();
-
-			$permission = $currentElement->getPermission($loggedUser);
-
-			if($permission < Permission::PERMISSION_DROP_ID) {
-				$model->set('denied', 'drop');
-				return
-					ModelAndView::create()->
-					setModel($model)->
-					setView('request/ElementEdit');
-			}
-
-			try {
-
-				# After restore action
-
-				$returnElementId = $currentElement->getParent()->getPolymorphicId();
-
-				if($currentElement->getStatus() == 'trash') {
-
-					# Before restore action
-
-					try {
-						$actionName = PluginManager::me()->getBeforeInsertAction(
-							$currentItem->getItemName()
-						);
-						if($actionName && ClassUtils::isClassName($actionName)) {
-							$action = new $actionName($currentElement);
-						}
-					} catch (BaseException $e) {
-						ErrorMessageUtils::sendMessage($e);
-					}
-
-					$result = $itemClass->dao()->restoreElementFromTrash($currentElement);
-
-					# After restore action
-
-					try {
-						$actionName = PluginManager::me()->getAfterInsertAction(
-							$currentItem->getItemName()
-						);
-						if($actionName && ClassUtils::isClassName($actionName)) {
-							$action = new $actionName($currentElement);
-						}
-					} catch (BaseException $e) {
-						ErrorMessageUtils::sendMessage($e);
-					}
-
-					# User log
-					UserLog::me()->log(
-						UserActionType::ACTION_TYPE_RESTORE_ELEMENT_ID,
-						$result->getPolymorphicId()
-					);
-
-					Site::updateLastModified();
-				}
-
-				$model->set('returnElementId', $returnElementId);
-
-				# Refresh tree
-				if($currentItem->getIsFolder()) {
-					$tree = Tree::getTree();
-					$model->set('tree', $tree);
-				}
-
-			} catch (BaseException $e) {}
-
-			return
-				ModelAndView::create()->
-				setModel($model)->
-				setView('request/ElementEdit');
-		}
-
-		public function add(HttpRequest $request)
+		public function addElement($request)
 		{
 			$model = Model::create();
 
@@ -218,101 +123,66 @@
 				of('Item')->
 				required()
 			)->
-			import($request->getGet());
+			importMore($_GET);
 
 			if($form0->getErrors()) {
+
 				$model->set('form0', $form0);
-				return
-					ModelAndView::create()->
-					setModel($model)->
-					setView('request/ElementEdit');
-			}
 
-			$currentItem = $form0->getValue('itemId');
+			} else {
 
-			$propertyList = Property::dao()->getPropertyList($currentItem);
+				$currentItem = $form0->getValue('itemId');
 
-			$form = $this->makeAddForm($currentItem);
+				$propertyList = Property::dao()->getPropertyList($currentItem);
 
-			if($form->getErrors()) {
-				$model->set('form', $form);
-				$model->set('propertyList', $propertyList);
-				return
-					ModelAndView::create()->
-					setModel($model)->
-					setView('request/ElementEdit');
-			}
+				$form = $this->makeAddForm($currentItem);
 
-			try {
+				if($form->getErrors()) {
 
-				$loggedUser = LoggedUser::getUser();
+					$model->set('form', $form);
+					$model->set('propertyList', $propertyList);
 
-				$currentElement = $currentItem->getClass();
+				} else {
 
-				$currentElement->
-				setElementName($form->getValue('elementName'))->
-				setShortName($form->getValue('shortName'))->
-				setStatus('root')->
-				setGroup($loggedUser->getGroup())->
-				setUser($loggedUser);
+					try {
 
-				foreach($propertyList as $property) {
-					$property->getClass($currentElement)->setParameters()->set($form);
-				}
+						$currentElement = $currentItem->getClass();
 
-				# Before insert action
-				try {
-					$actionName = PluginManager::me()->getBeforeInsertAction(
-						$currentItem->getItemName()
-					);
-					if($actionName && ClassUtils::isClassName($actionName)) {
-						$action = new $actionName($currentElement);
+						$currentElement->
+						setElementName($form->getValue('elementName'))->
+						setShortName($form->getValue('shortName'))->
+						setStatus('root');
+
+						foreach($propertyList as $property) {
+							$property->getClass($currentElement)->setParameters()->set($form);
+						}
+
+						# Add element
+						$currentElement =
+							$currentItem->getClass()->dao()->
+							addElement($currentElement);
+
+						foreach($propertyList as $property) {
+							$property->getClass($currentElement)->setParameters()->setAfter($form);
+						}
+
+						# Refresh tree
+						if($currentItem->getIsFolder()) {
+							$tree = Tree::getTree();
+							$model->set('tree', $tree);
+						}
+
+						Site::updateLastModified();
+
+						$model->set('parentId', $currentElement->getParent()->getPolymorphicId());
+
+						$model->set('addElement', 'ok');
+
+					} catch (BaseException $e) {
+						$model->set('addElement', 'error');
 					}
-				} catch (BaseException $e) {
-					ErrorMessageUtils::sendMessage($e);
 				}
 
-				# Add element
-				$currentElement =
-					$currentItem->getClass()->dao()->
-					addElement($currentElement);
-
-				foreach($propertyList as $property) {
-					$property->getClass($currentElement)->setParameters()->setAfter($form);
-				}
-
-				# After insert action
-				try {
-					$actionName = PluginManager::me()->getAfterInsertAction(
-						$currentItem->getItemName()
-					);
-					if($actionName && ClassUtils::isClassName($actionName)) {
-						$action = new $actionName($currentElement);
-					}
-				} catch (BaseException $e) {
-					ErrorMessageUtils::sendMessage($e);
-				}
-
-				# Refresh tree
-				if($currentItem->getIsFolder()) {
-					$tree = Tree::getTree();
-					$model->set('tree', $tree);
-				}
-
-				# User log
-				UserLog::me()->log(
-					UserActionType::ACTION_TYPE_ADD_ELEMENT_ID,
-					$currentElement->getPolymorphicId()
-				);
-
-				Site::updateLastModified();
-
-				$model->set('parentId', $currentElement->getParent()->getPolymorphicId());
-
-				$model->set('addElement', 'ok');
-
-			} catch (BaseException $e) {
-				$model->set('addElement', 'error');
 			}
 
 			return
@@ -321,125 +191,84 @@
 				setView('request/ElementEdit');
 		}
 
-		public function save(HttpRequest $request)
+		public function saveElement($request)
 		{
 			$model = Model::create();
-
-			$loggedUser = LoggedUser::getUser();
 
 			$form0 = $this->makeEditForm();
 
 			if($form0->getErrors()) {
+
 				$model->set('form0', $form0);
-				return
-					ModelAndView::create()->
-					setModel($model)->
-					setView('request/ElementEdit');
-			}
 
-			$currentElement = $form0->getValue('elementId');
-			$currentItem = $currentElement->getItem();
+			} else {
 
-			$permission = $currentElement->getPermission($loggedUser);
+				$currentElement = $form0->getValue('elementId');
+				$currentItem = $currentElement->getItem();
 
-			if($permission < Permission::PERMISSION_WRITE_ID) {
-				$model->set('denied', 'save');
-				return
-					ModelAndView::create()->
-					setModel($model)->
-					setView('request/ElementEdit');
-			}
+				$propertyList = Property::dao()->getPropertyList($currentItem);
 
-			$propertyList = Property::dao()->getPropertyList($currentItem);
+				$form = $this->makeSaveForm($currentItem);
 
-			$form = $this->makeSaveForm($currentItem);
+				if($form->getErrors()) {
 
-			if($form->getErrors()) {
-				$model->set('form', $form);
-				$model->set('propertyList', $propertyList);
-				return
-					ModelAndView::create()->
-					setModel($model)->
-					setView('request/ElementEdit');
-			}
+					$model->set('form', $form);
+					$model->set('propertyList', $propertyList);
 
-			try {
+				} else {
 
-				$originalElement = clone $currentElement;
+					try {
 
-				# Before update action
-				try {
-					$actionName = PluginManager::me()->getBeforeUpdateAction(
-						$currentItem->getItemName()
-					);
-					if($actionName && ClassUtils::isClassName($actionName)) {
-						$action = new $actionName($originalElement);
-					}
-				} catch (BaseException $e) {
-					ErrorMessageUtils::sendMessage($e);
-				}
+						$currentElement->
+						setElementName($form->getValue('elementName'))->
+						setShortName($form->getValue('shortName'));
 
-				$currentElement->
-				setElementName($form->getValue('elementName'))->
-				setShortName($form->getValue('shortName'));
+						foreach($propertyList as $property) {
+							$propertyClass = $property->getClass($currentElement)->setParameters();
+							$propertyClass->set($form);
+						}
 
-				foreach($propertyList as $property) {
-					$propertyClass = $property->getClass($currentElement)->setParameters();
-					$propertyClass->set($form);
-				}
+						# Save element
+						$currentElement =
+							$currentItem->getClass()->dao()->
+							saveElement($currentElement);
 
-				# Save element
-				$currentElement =
-					$currentItem->getClass()->dao()->
-					saveElement($currentElement);
+						$propertyContent = array();
 
-				# After update action
-				try {
-					$actionName = PluginManager::me()->getAfterUpdateAction(
-						$currentItem->getItemName()
-					);
-					if($actionName && ClassUtils::isClassName($actionName)) {
-						$action = new $actionName($currentElement, $originalElement);
-					}
-				} catch (BaseException $e) {
-					ErrorMessageUtils::sendMessage($e);
-				}
+						foreach($propertyList as $property) {
+							$propertyClass = $property->getClass($currentElement)->setParameters();
+							$propertyClass->setAfter($form);
 
-				$propertyContent = array();
+							# Update properties content
+							if($propertyClass->isUpdate()) {
+								$content = $propertyClass->getEditElementView();
+								$content = str_replace(
+									array('<', '>'),
+									array('[', ']'),
+									$content
+								);
+								$propertyContent[] = array(
+									'propertyName' => $property->getPropertyName(),
+									'propertyContent' => $content,
+								);
+							}
+						}
 
-				foreach($propertyList as $property) {
-					$propertyClass = $property->getClass($currentElement)->setParameters();
-					$propertyClass->setAfter($form);
+						Site::updateLastModified();
 
-					# Update properties content
-					if($propertyClass->isUpdate()) {
-						$content = $propertyClass->getEditElementView();
-						$propertyContent[] = array(
-							'propertyName' => $property->getPropertyName(),
-							'propertyContent' => str_replace(array('<', '>'), array('[[[', ']]]'), $content),
-						);
+						if($currentItem->getIsFolder()) {
+							$model->set('elementId', $currentElement->getPolymorphicId());
+							$model->set('elementName', $currentElement->getElementName());
+						}
+
+						$model->set('propertyContent', $propertyContent);
+						$model->set('saveElement', 'ok');
+
+					} catch (BaseException $e) {
+						$model->set('saveElement', 'error');
 					}
 				}
 
-				# User log
-				UserLog::me()->log(
-					UserActionType::ACTION_TYPE_SAVE_ELEMENT_ID,
-					$currentElement->getPolymorphicId()
-				);
-
-				Site::updateLastModified();
-
-				if($currentItem->getIsFolder()) {
-					$model->set('elementId', $currentElement->getPolymorphicId());
-					$model->set('elementName', $currentElement->getElementName());
-				}
-
-				$model->set('propertyContent', $propertyContent);
-				$model->set('saveElement', 'ok');
-
-			} catch (BaseException $e) {
-				ErrorMessageUtils::sendMessage($e);
-				$model->set('saveElement', 'error');
 			}
 
 			return
@@ -448,19 +277,15 @@
 				setView('request/ElementEdit');
 		}
 
-		public function create(HttpRequest $request)
+		public function createElement($request)
 		{
-			$model = Model::create();
-
-			$loggedUser = LoggedUser::getUser();
-
 			$form = $this->makeCreateForm();
 
 			if($form->getErrors()) {
 				return
 					ModelAndView::create()->
 					setModel(Model::create())->
-					setView(new RedirectToView('ViewBrowse'));
+					setView(new RedirectToView('ElementList'));
 			}
 
 			$currentItem = $form->getValue('itemId');
@@ -470,46 +295,6 @@
 				$currentItem->getClass()->
 				setId(null)->
 				setStatus('root');
-
-			# Controller Name
-			$controllerName = RewriteRuleManager::me()->getControllerNameByElement($currentElement);
-
-			# Plugin
-
-			$pluginModelAndView = null;
-
-			$pluginName = PluginManager::me()->getEditPlugin(
-				$currentElement->getPolymorphicId()
-			);
-
-			if($pluginName) {
-
-				$pluginClass = new $pluginName($currentElement);
-				$pluginModelAndView = $pluginClass->handleRequest($request);
-
-				$pluginModel = $pluginModelAndView->getModel();
-				$pluginView = $pluginModelAndView->getView();
-
-				if(!$pluginView instanceof View) {
-					$pluginViewName = $pluginView;
-					$viewResolver =
-						MultiPrefixPhpViewResolver::create()->
-						setViewClassName('SimplePhpView')->
-						addPrefix(PATH_USER_PLUGIN_TEMPLATES)->
-						addPrefix(PATH_USER_TEMPLATES);
-					$pluginView = $viewResolver->resolveViewName($pluginViewName);
-					$pluginModelAndView->setView($pluginView);
-				}
-
-				$pluginModel->
-				set('element', $currentElement)->
-				set('selfUrl', PATH_ADMIN_BROWSE.'?module='.get_class($this))->
-				set('baseUrl', PATH_ADMIN_BROWSE);
-
-				if($request->hasGetVar('print')) {
-					return $pluginModelAndView;
-				}
-			}
 
 			# Property list
 			$propertyList = Property::dao()->getPropertyList($currentItem);
@@ -528,22 +313,23 @@
 			$parentList = $currentElement->getParentList();
 
 			# Set id for active element
-			$activeElement =
-				Session::exist('activeElement')
-				? Session::get('activeElement')
-				: Root::me();
+			if(Session::exist('activeElement')) {
+				$activeElement = Session::get('activeElement');
+			} else {
+				$activeElement = Root::me();
+			}
 
-			$oldActiveElement =
-				Session::exist('oldActiveElement')
-				? Session::get('oldActiveElement')
-				: Root::me();
+			if(Session::exist('oldActiveElement')) {
+				$oldActiveElement = Session::get('oldActiveElement');
+			} else {
+				$oldActiveElement = Root::me();
+			}
 
+			$model = Model::create();
 			$model->set('mode', 'create');
 			$model->set('currentItem', $currentItem);
 			$model->set('currentElement', $currentElement);
-			$model->set('controllerName', $controllerName);
 			$model->set('parentList', $parentList);
-			$model->set('pluginModelAndView', $pluginModelAndView);
 			$model->set('propertyList', $propertyList);
 			$model->set('oldActiveElement', $oldActiveElement);
 			$model->set('activeElement', $activeElement);
@@ -554,119 +340,121 @@
 				setView('ElementEdit');
 		}
 
-		public function edit(HttpRequest $request)
+		public function editElement($request)
 		{
-			$model = Model::create();
-
 			$loggedUser = LoggedUser::getUser();
-
-			$requestUri = $request->getServerVar('REQUEST_URI');
-			Session::assign('browseLastUrl', $requestUri);
+			$loggedUserGroup = $loggedUser->getGroup();
 
 			$form = $this->makeEditForm();
 
 			if($form->getErrors()) {
+
 				return
 					ModelAndView::create()->
 					setModel(Model::create())->
-					setView(new RedirectToView('ViewBrowse'));
-			}
+					setView(new RedirectToView('ElementList'));
 
-			$currentElement = $form->getValue('elementId');
-			$currentItem = $currentElement->getItem();
+			} else {
 
-			$permission = $currentElement->getPermission($loggedUser);
+				$currentElement = $form->getValue('elementId');
+				$currentItem = $currentElement->getItem();
 
-			if(
-				!$currentItem->isDefault()
-				|| $permission < Permission::PERMISSION_READ_ID
-			) {
+				if(!$currentItem->isDefault()) {
+					return
+						ModelAndView::create()->
+						setModel(Model::create())->
+						setView(new RedirectToView('ElementList'));
+				}
+
+				# Permission
+
+				$elementPermission =
+					ElementPermission::dao()->getByGroupAndElement(
+						$loggedUserGroup,
+						$currentElement
+					);
+
+				if($elementPermission) {
+
+					$permission = $elementPermission->getPermission();
+
+				} else {
+
+					$itemPermission =
+						ItemPermission::dao()->getByGroupAndItem(
+							$loggedUserGroup,
+							$currentItem
+						);
+
+					if($itemPermission) {
+
+						if(
+							$currentElement->getUser()
+							&& $currentElement->getUser()->getId() == $loggedUser->getId()
+						) {
+							$permission = $itemPermission->getOwnerPermission();
+						} elseif(
+							$currentElement->getGroup()
+							&& $currentElement->getGroup()->getId() == $loggedUserGroup->getId()
+						) {
+							$permission = $itemPermission->getGroupPermission();
+						} else {
+							$permission = $itemPermission->getWorldPermission();
+						}
+
+					} else {
+
+						if(
+							$currentElement->getUser()
+							&& $currentElement->getUser()->getId() == $loggedUser->getId()
+						) {
+							$permission = $loggedUserGroup->getOwnerPermission();
+						} elseif(
+							$currentElement->getGroup()
+							&& $currentElement->getGroup()->getId() == $loggedUserGroup->getId()
+						) {
+							$permission = $loggedUserGroup->getGroupPermission();
+						} else {
+							$permission = $loggedUserGroup->getWorldPermission();
+						}
+					}
+				}
+
+				$parentList = $currentElement->getParentList();
+
+				# Property list
+				$propertyList = Property::dao()->getPropertyList($currentItem);
+
+				# Set id for active element and opened folder in tree
+				if(
+					($currentItem && $currentItem->getIsFolder())
+					|| $currentElement instanceof Root
+				) {
+					Session::assign('activeElement', $currentElement);
+					$openFolderList = Session::get('openFolderList');
+					$openFolderList[$currentElement->getPolymorphicId()] = 1;
+					Session::assign('openFolderList', $openFolderList);
+				}
+
+				$activeElement =
+					Session::exist('activeElement')
+					? Session::get('activeElement')
+					: Root::me();
+
+				$model = Model::create();
+				$model->set('mode', 'edit');
+				$model->set('currentItem', $currentItem);
+				$model->set('currentElement', $currentElement);
+				$model->set('permission', $permission);
+				$model->set('parentList', $parentList);
+				$model->set('propertyList', $propertyList);
+				$model->set('activeElement', $activeElement);
+
 				return
 					ModelAndView::create()->
-					setModel(Model::create())->
-					setView(new RedirectToView('ViewBrowse'));
+					setModel($model)->
+					setView('ElementEdit');
 			}
-
-			# Controller Name
-			$controllerName = RewriteRuleManager::me()->getControllerNameByElement($currentElement);
-
-			$parentList = $currentElement->getParentList();
-
-			# Plugin
-
-			$pluginModelAndView = null;
-
-			$pluginName = PluginManager::me()->getEditPlugin(
-				$currentElement->getPolymorphicId()
-			);
-
-			if($pluginName) {
-
-				$pluginClass = new $pluginName($currentElement);
-				$pluginModelAndView = $pluginClass->handleRequest($request);
-
-				$pluginModel = $pluginModelAndView->getModel();
-				$pluginView = $pluginModelAndView->getView();
-
-				if(!$pluginView instanceof View) {
-					$pluginViewName = $pluginView;
-					$viewResolver =
-						MultiPrefixPhpViewResolver::create()->
-						setViewClassName('SimplePhpView')->
-						addPrefix(PATH_USER_PLUGIN_TEMPLATES)->
-						addPrefix(PATH_USER_TEMPLATES);
-					$pluginView = $viewResolver->resolveViewName($pluginViewName);
-					$pluginModelAndView->setView($pluginView);
-				}
-
-				$pluginModel->
-				set('element', $currentElement)->
-				set('selfUrl', PATH_ADMIN_BROWSE.'?module='.get_class($this))->
-				set('baseUrl', PATH_ADMIN_BROWSE);
-
-				if($request->hasGetVar('print')) {
-					return $pluginModelAndView;
-				}
-			}
-
-			# Property list
-			$propertyList = Property::dao()->getPropertyList($currentItem);
-
-			# Set id for active element and opened folder in tree
-			if(
-				($currentItem && $currentItem->getIsFolder())
-				|| $currentElement instanceof Root
-			) {
-				Session::assign('activeElement', $currentElement);
-				$openFolderList = Session::get('openFolderList');
-				$openFolderList[$currentElement->getPolymorphicId()] = 1;
-				Session::assign('openFolderList', $openFolderList);
-			}
-
-			$activeElement =
-				Session::exist('activeElement')
-				? Session::get('activeElement')
-				: Root::me();
-
-			UserLog::me()->log(
-				UserActionType::ACTION_TYPE_EDIT_ELEMENT_ID,
-				$currentElement->getPolymorphicId()
-			);
-
-			$model->set('mode', 'edit');
-			$model->set('currentItem', $currentItem);
-			$model->set('currentElement', $currentElement);
-			$model->set('controllerName', $controllerName);
-			$model->set('permission', $permission);
-			$model->set('parentList', $parentList);
-			$model->set('pluginModelAndView', $pluginModelAndView);
-			$model->set('propertyList', $propertyList);
-			$model->set('activeElement', $activeElement);
-
-			return
-				ModelAndView::create()->
-				setModel($model)->
-				setView('ElementEdit');
 		}
 
 		private function makeCreateForm()
@@ -729,7 +517,7 @@
 			);
 
 			foreach($propertyList as $property) {
-				$form = $property->getClass(null)->setParameters()->add2form($form);
+				$form = $property->getClass(null)->add2form($form);
 			}
 
 			$form->
@@ -751,8 +539,7 @@
 				required()->
 				setMax(255)->
 				addImportFilter(Filter::trim())->
-				addImportFilter(Filter::stripTags())->
-				addImportFilter(Filter::replaceSymbols('\'', '&#146;'))
+				addImportFilter(Filter::stripTags())
 			)->
 			add(
 				Primitive::string('shortName')->
@@ -761,7 +548,7 @@
 			);
 
 			foreach($propertyList as $property) {
-				$form = $property->getClass(null)->setParameters()->add2form($form);
+				$form = $property->getClass(null)->add2form($form);
 			}
 
 			$form->

@@ -307,7 +307,7 @@
 			$itemClass = $item->getClass();
 
 			if(
-				$item->isDefault()
+				$item->getClassType() == 'default'
 				&& $property->getPropertyClass() != 'OneToManyProperty'
 				&& $property->getPropertyClass() != 'ManyToManyProperty'
 			) {
@@ -340,22 +340,10 @@
 				} catch (DatabaseException $e) {
 					echo ErrorMessageUtils::printMessage($e);
 				}
-
-			} elseif(!$item->isDefault()) {
-
-				$this->drop($property);
-
-				if(isset($this->propertyList[$item->getId()][$property->getId()])) {
-					unset($this->propertyList[$item->getId()][$property->getId()]);
-				}
-				if(isset($this->propertyMap[$item->getId()][$property->getPropertyName()])) {
-					unset($this->propertyMap[$item->getId()][$property->getPropertyName()]);
-				}
-
 			}
 
 			if(
-				$item->isDefault()
+				$item->getClassType() == 'default'
 				&& $property->getPropertyClass() == 'ManyToManyProperty'
 			) {
 				# Drop helper table for N:N relation

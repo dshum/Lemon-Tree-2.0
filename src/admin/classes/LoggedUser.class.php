@@ -5,7 +5,7 @@
 		private static $class = null;
 		private static $user = null;
 
-		public static function create()
+		public function create()
 		{
 			return new self();
 		}

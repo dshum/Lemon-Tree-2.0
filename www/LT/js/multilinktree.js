@@ -40,7 +40,7 @@ LT.MultilinkTree = function() {
 				var elementId = branch[propertyName][parentId][i];
 				var element = elementList[propertyName][elementId];
 				var id = getId(elementId);
-				var checked = element.isActive ? ' checked="true"' : '';
+				var checked = element.isActive ? ' checked' : 'false';
 
 				var div = $('<div></div>').appendTo(parentObject);
 

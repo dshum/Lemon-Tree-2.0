@@ -1,44 +1,22 @@
 <?php
 	final class Property extends AutoProperty implements Prototyped, DAOConnected
 	{
-		const TEXTFIELD_PROPERTY = 'TextfieldProperty';
-		const TEXTAREA_PROPERTY = 'TextareaProperty';
-		const RICHTEXT_PROPERTY = 'RichtextProperty';
-		const INTEGER_PROPERTY = 'IntegerProperty';
-		const FLOAT_PROPERTY = 'FloatProperty';
-		const BOOLEAN_PROPERTY = 'BooleanProperty';
-		const IMAGE_PROPERTY = 'ImageProperty';
-		const FILE_PROPERTY = 'FileProperty';
-		const LINK_PROPERTY = 'LinkProperty';
-		const DATE_PROPERTY = 'DateProperty';
-		const TIMESTAMP_PROPERTY = 'TimestampProperty';
-		const TIME_PROPERTY = 'TimeProperty';
-		const PASSWORD_PROPERTY = 'PasswordProperty';
-		const YANDEX_MAP_PROPERTY = 'YandexMapProperty';
-		const POINT_PROPERTY = 'PointProperty';
-		const ONE_TO_ONE_PROPERTY = 'OneToOneProperty';
-		const ONE_TO_MANY_PROPERTY = 'OneToManyProperty';
-		const MANY_TO_MANY_PROPERTY = 'ManyToManyProperty';
-
 		const PARAMETER_ROW_DELIMETER = EOL;
 		const PARAMETER_VALUE_DELIMETER = ':';
 
 		private static $propertyClassList = array(
-			self::TEXTFIELD_PROPERTY => 'Текстовое поле',
-			self::TEXTAREA_PROPERTY => 'Многострочное текстовое поле',
-			self::RICHTEXT_PROPERTY => 'Визуальный редактор (TinyMCE)',
-			self::INTEGER_PROPERTY => 'Целое число',
-			self::FLOAT_PROPERTY => 'Число с плавающей запятой',
-			self::BOOLEAN_PROPERTY => 'Чекбокс',
-			self::IMAGE_PROPERTY => 'Изображение',
-			self::FILE_PROPERTY => 'Файл',
-			self::LINK_PROPERTY => 'Ссылка на элемент',
-			self::DATE_PROPERTY => 'Дата',
-			self::TIMESTAMP_PROPERTY => 'Дата и время',
-			self::TIME_PROPERTY => 'Время',
-			self::PASSWORD_PROPERTY => 'Пароль',
-			self::YANDEX_MAP_PROPERTY => 'Яндекс.Карты',
-			self::POINT_PROPERTY => 'Координаты точки',
+			'TextfieldProperty' => 'Текстовое поле',
+			'TextareaProperty' => 'Многострочное текстовое поле',
+			'RichtextProperty' => 'Визуальный редактор (TinyMCE)',
+			'IntegerProperty' => 'Целое число',
+			'FloatProperty' => 'Число с плавающей запятой',
+			'BooleanProperty' => 'Чекбокс',
+			'ImageProperty' => 'Изображение',
+			'FileProperty' => 'Файл',
+			'DateProperty' => 'Дата',
+			'TimeProperty' => 'Время',
+			'TimestampProperty' => 'Дата и время',
+			'PasswordProperty' => 'Пароль',
 		);
 
 		private static $parameterClassMap = array(

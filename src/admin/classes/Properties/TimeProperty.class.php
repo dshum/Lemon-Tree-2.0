@@ -5,7 +5,7 @@
 		{
 			parent::__construct($property, $element);
 
-			$this->value = $this->value ? $this->value : null;
+			$this->value = $this->value ? $this->value : Time::create(date('H:i:s'));
 		}
 
 		public function getDataType()
@@ -39,12 +39,6 @@
 			$columnName = Property::getColumnName($this->property->getPropertyName());
 			$tableName = $criteria->getDao()->getTable();
 
-			if($from && $to && $from->toString() > $to->toString()) {
-				$tmp = $to;
-				$to = $from;
-				$from = $tmp;
-			}
-
 			if($from) {
 				$criteria->
 				add(
@@ -55,7 +49,7 @@
 				);
 			}
 
-			if($to) {
+			if($to && $to->toString() >= $from->toString()) {
 				$criteria->
 				add(
 					Expression::ltEq(
@@ -68,91 +62,64 @@
 			return $criteria;
 		}
 
-		public function set(Form $form)
-		{
-			if(
-				$this->getParameterValue('hidden') == false
-				&& $this->getParameterValue('readonly') == false
-				&& $form->primitiveExists($this->property->getPropertyName())
-			) {
-				$setter = $this->property->setter();
-				$dropper = $this->property->dropper();
-				$value = $form->getValue($this->property->getPropertyName());
-				if($value instanceof Time) {
-					$this->element->$setter($value);
-				} else {
-					$this->element->$dropper();
-				}
-			}
-		}
-
 		public function hour()
 		{
-			return $this->value ? $this->doublize($this->value->getHour()) : null;
+			return $this->doublize($this->value->getHour());
 		}
 
 		public function minute()
 		{
-			return $this->value ? $this->doublize($this->value->getMinute()) : null;
+			return $this->doublize($this->value->getMinute());
 		}
 
 		public function second()
 		{
-			return $this->value ? $this->doublize($this->value->getSecond()) : null;
+			return $this->doublize($this->value->getSecond());
 		}
 
-		public function time($delimeter = ':', $seconds = false)
+		public function printOnElementSearch(Form $form)
 		{
-			return
-				$this->value
-				? (
-					$this->hour()
-					.$delimeter.$this->minute()
-					.($seconds ? $delimeter.$this->second() : null)
-				)
-				: null;
-		}
-
-		public function getElementSearchView(Form $form)
-		{
-			$propertyDescription = $this->property->getPropertyDescription();
-			if(mb_strlen($propertyDescription) > 50) {
-				$propertyDescription = mb_substr($propertyDescription, 0, 50).'...';
-			}
-
-			$propertyName = $this->property->getPropertyName();
-
 			$from =
-				$form->primitiveExists($propertyName.'_from')
-				&& $form->getValue($propertyName.'_from')
-				? $form->getValue($propertyName.'_from')
+				$form->primitiveExists($this->property->getPropertyName().'_from')
+				? $form->getValue($this->property->getPropertyName().'_from')
 				: Time::create('00:00');
-
 			$to =
-				$form->primitiveExists($propertyName.'_to')
-				&& $form->getValue($propertyName.'_to')
-				? $form->getValue($propertyName.'_to')
+				$form->primitiveExists($this->property->getPropertyName().'_to')
+				? $form->getValue($this->property->getPropertyName().'_to')
 				: Time::create('23:59');
 
-			if($from->toString() > $to->toString()) {
-				$tmp = $to;
-				$to = $from;
-				$from = $tmp;
-			}
+			$str = '';
 
-			$open = $from->toString() > '00:00' || $to->toString() < '23:59';
+			$str .= '<input type="hidden" id="'.$this->property->getPropertyName().'_from" name="'.$this->property->getPropertyName().'_from" value="'.$from->toString().'">';
+			$str .= '<input type="hidden" id="'.$this->property->getPropertyName().'_to" name="'.$this->property->getPropertyName().'_to" value="'.$to->toString().'">';
+			$str .= '<input type="hidden" id="'.$this->property->getPropertyName().'_from_second" name="'.$this->property->getPropertyName().'_from_second" value="'.$this->doublize($from->getSecond()).'">';
+			$str .= '<input type="hidden" id="'.$this->property->getPropertyName().'_to_second" name="'.$this->property->getPropertyName().'_to_second" value="'.$this->doublize($to->getSecond()).'">';
 
-			$model =
-				Model::create()->
-				set('propertyName', $propertyName)->
-				set('propertyDescription', $propertyDescription)->
-				set('open', $open)->
-				set('from', $from)->
-				set('to', $to);
+			$str .= $this->property->getPropertyDescription().'';
+			$str .= ' от <input class="prop-time" type="text" name="'.$this->property->getPropertyName().'_from_hour" value="'.$this->doublize($from->getHour()).'" maxlength="2" onchange="oElement.setTime(this.form, \''.$this->property->getPropertyName().'_from\')" onkeyup="oElement.setTime(this.form, \''.$this->property->getPropertyName().'_from\')">&nbsp;:&nbsp;';
+			$str .= '<input class="prop-time" type="text" name="'.$this->property->getPropertyName().'_from_minute" value="'.$this->doublize($from->getMinute()).'" maxlength="2" onchange="oElement.setTime(this.form, \''.$this->property->getPropertyName().'_from\')" onkeyup="oElement.setTime(this.form, \''.$this->property->getPropertyName().'_from\')">';
+			$str .= ' до <input class="prop-time" type="text" name="'.$this->property->getPropertyName().'_to_hour" value="'.$this->doublize($to->getHour()).'" maxlength="2" onchange="oElement.setTime(this.form, \''.$this->property->getPropertyName().'_to\')" onkeyup="oElement.setTime(this.form, \''.$this->property->getPropertyName().'_to\')">&nbsp;:&nbsp;';
+			$str .= '<input class="prop-time" type="text" name="'.$this->property->getPropertyName().'_to_minute" value="'.$this->doublize($to->getMinute()).'" maxlength="2" onchange="oElement.setTime(this.form, \''.$this->property->getPropertyName().'_to\')" onkeyup="oElement.setTime(this.form, \''.$this->property->getPropertyName().'_to\')">';
 
-			$viewName = 'properties/'.get_class($this).'.search';
+			$str .= '<script type="text/javascript">';
+			$str .= '$(function() {';
+			$str .= '$(\'input[name^=$this->property->getPropertyName()]\').change(function() {';
+			$str .= '$(\'input[name='.$this->property->getPropertyName().']\').val(';
+			$str .= '$(\'input[name='.$this->property->getPropertyName().'_hour]\').val()+\':\'';
+			$str .= '+$(\'input[name='.$this->property->getPropertyName().'_minute]\').val()+\':\'';
+			$str .= '+$(\'input[name='.$this->property->getPropertyName().'_second]\').val()';
+			$str .= ');';
+			$str .= '}).keyup(function() {';
+			$str .= '$(\'input[name='.$this->property->getPropertyName().']\').val(';
+			$str .= '$(\'input[name='.$this->property->getPropertyName().'_hour]\').val()+\':\'';
+			$str .= '+$(\'input[name='.$this->property->getPropertyName().'_minute]\').val()+\':\'';
+			$str .= '+$(\'input[name='.$this->property->getPropertyName().'_second]\').val()';
+			$str .= ');';
+			$str .= '});';
+			$str .= '});';
+			$str .= '</script>';
 
-			return $this->render($model, $viewName);
+			return $str;
 		}
 
 		private function doublize($int)

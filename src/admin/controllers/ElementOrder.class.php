@@ -4,9 +4,9 @@
 		public function __construct()
 		{
 			$this->
-			setMethodMapping('save', 'saveList')->
-			setMethodMapping('show', 'showList')->
-			setDefaultAction('show');
+				setMethodMapping('save', 'saveList')->
+				setMethodMapping('show', 'showList')->
+				setDefaultAction('show');
 		}
 
 		public function handleRequest(HttpRequest $request)
@@ -66,17 +66,11 @@
 							$element = $itemClass->dao()->save($element);
 						}
 					}
-
-					# User log
-					UserLog::me()->log(
-						UserActionType::ACTION_TYPE_ORDER_ELEMENT_LIST_ID,
-						$parent->getPolymorphicId()
-					);
-
-					Site::updateLastModified();
 				}
 
-				$model->set('form', $form);
+				Site::updateLastModified();
+
+				$model->set("form", $form);
 			}
 
 			return

@@ -1,4 +1,16 @@
-<?php $partViewer->view('include/header.small');?>
+<?php $partViewer->view("include/header.small");?>
+
+<?php
+if(isset($form) && $form->getErrors()) {
+	$form->
+	addMissingLabel('groupId', 'Отсутствует идентификатор группы.')->
+	addWrongLabel('groupId', 'Некорректный идентификатор группы.');
+
+	foreach($form->getTextualErrors() as $label) {
+		echo $label.'<br>';
+	}
+} else {
+?>
 
 <script type="text/javascript">
 $(function() {
@@ -36,63 +48,86 @@ $(function() {
 <form id="ItemPermissionListForm" name="ItemPermissionListForm" action="<?=$selfUrl?>&action=save" method="post">
 <input type="hidden" name="groupId" value="<?=$currentGroup->getId()?>">
 
+<h3>Доступ по умолчанию к своим разделам</h3>
+
 <table class="elements-list setrights">
 <tr valign="top">
-<td></td>
-<td colspan="4" align="left">Владелец</td>
-<td></td>
-<td colspan="4" align="left">Группа</td>
-<td></td>
-<td colspan="4" align="left">Прочие</td>
-<td></td>
-</tr>
-<tr valign="top">
-<th class="left" width="58%">Название</th>
+<th class="left" width="50%">Название</th>
 <?php foreach(Permission::getPermissionTitleList() as $id => $title) {?>
-<th width="2%"><?=$title?></th>
+<th width="10%"><?=$title?></th>
 <?php }?>
-<th width="4%"><br></th>
-<?php foreach(Permission::getPermissionTitleList() as $id => $title) {?>
-<th width="2%"><?=$title?></th>
-<?php }?>
-<th width="4%"><br></th>
-<?php foreach(Permission::getPermissionTitleList() as $id => $title) {?>
-<th width="2%"><?=$title?></th>
-<?php }?>
-<th width="10%">Поиск</th>
 </tr>
 <?php
 	foreach($itemList as $item) {
-		$ownerPermission =
+		$permission	=
 			isset($itemPermissionMap['ownerPermission'][$item->getId()])
 			? $itemPermissionMap['ownerPermission'][$item->getId()]
 			: $currentGroup->getOwnerPermission();
-		$groupPermission =
+?>
+<input type="hidden" name="ownerPermission[<?=$item->getId()?>]" value="<?=$permission?>">
+<tr>
+<td class="left" nowrap><?=$item->getItemDescription()?> (<?=$item->getItemName()?>)</td>
+<?php foreach(Permission::getPermissionNameList() as $id => $name) {?>
+<td radio="true" permissiontype="ownerPermission" itemid="<?=$item->getId()?>" permissionid="<?=$id?>"><div id="ownerPermission_<?=$item->getId()?>_<?=$id?>" class="<?=$id == $permission ? 'radio_on' : 'radio_off'?>"><spacer type="block"></div></td>
+<?php }?>
+</tr>
+<?php
+}
+?>
+</table>
+<br>
+
+<h3>Доступ по умолчанию к разделам группы</h3>
+
+<table class="elements-list setrights">
+<tr valign="top">
+<th class="left" width="50%">Название</th>
+<?php foreach(Permission::getPermissionTitleList() as $id => $title) {?>
+<th width="10%"><?=$title?></th>
+<?php }?>
+</tr>
+<?php
+	foreach($itemList as $item) {
+		$permission	=
 			isset($itemPermissionMap['groupPermission'][$item->getId()])
 			? $itemPermissionMap['groupPermission'][$item->getId()]
 			: $currentGroup->getGroupPermission();
-		$worldPermission =
+?>
+<input type="hidden" name="groupPermission[<?=$item->getId()?>]" value="<?=$permission?>">
+<tr>
+<td class="left" nowrap><?=$item->getItemDescription()?> (<?=$item->getItemName()?>)</td>
+<?php foreach(Permission::getPermissionNameList() as $id => $name) {?>
+<td radio="true" permissiontype="groupPermission" itemid="<?=$item->getId()?>" permissionid="<?=$id?>"><div id="groupPermission_<?=$item->getId()?>_<?=$id?>" class="<?=$id == $permission ? 'radio_on' : 'radio_off'?>"><spacer type="block"></div></td>
+<?php }?>
+</tr>
+<?php
+}
+?>
+</table>
+<br>
+
+<h3>Доступ по умолчанию к разделам прочих</h3>
+
+<table class="elements-list setrights">
+<tr valign="top">
+<th class="left" width="50%">Название</th>
+<?php foreach(Permission::getPermissionTitleList() as $id => $title) {?>
+<th width="10%"><?=$title?></th>
+<?php }?>
+</tr>
+<?php
+	foreach($itemList as $item) {
+		$permission	=
 			isset($itemPermissionMap['worldPermission'][$item->getId()])
 			? $itemPermissionMap['worldPermission'][$item->getId()]
 			: $currentGroup->getWorldPermission();
 ?>
-<input type="hidden" name="ownerPermission[<?=$item->getId()?>]" value="<?=$ownerPermission?>">
-<input type="hidden" name="groupPermission[<?=$item->getId()?>]" value="<?=$groupPermission?>">
-<input type="hidden" name="worldPermission[<?=$item->getId()?>]" value="<?=$worldPermission?>">
+<input type="hidden" name="worldPermission[<?=$item->getId()?>]" value="<?=$permission?>">
 <tr>
 <td class="left" nowrap><?=$item->getItemDescription()?> (<?=$item->getItemName()?>)</td>
 <?php foreach(Permission::getPermissionNameList() as $id => $name) {?>
-<td radio="true" permissiontype="ownerPermission" itemid="<?=$item->getId()?>" permissionid="<?=$id?>"><div id="ownerPermission_<?=$item->getId()?>_<?=$id?>" class="<?=$id == $ownerPermission ? 'radio_on' : 'radio_off'?>"><spacer type="block"></div></td>
+<td radio="true" permissiontype="worldPermission" itemid="<?=$item->getId()?>" permissionid="<?=$id?>"><div id="worldPermission_<?=$item->getId()?>_<?=$id?>" class="<?=$id == $permission ? 'radio_on' : 'radio_off'?>"><spacer type="block"></div></td>
 <?php }?>
-<td><br></td>
-<?php foreach(Permission::getPermissionNameList() as $id => $name) {?>
-<td radio="true" permissiontype="groupPermission" itemid="<?=$item->getId()?>" permissionid="<?=$id?>"><div id="groupPermission_<?=$item->getId()?>_<?=$id?>" class="<?=$id == $groupPermission ? 'radio_on' : 'radio_off'?>"><spacer type="block"></div></td>
-<?php }?>
-<td><br></td>
-<?php foreach(Permission::getPermissionNameList() as $id => $name) {?>
-<td radio="true" permissiontype="worldPermission" itemid="<?=$item->getId()?>" permissionid="<?=$id?>"><div id="worldPermission_<?=$item->getId()?>_<?=$id?>" class="<?=$id == $worldPermission ? 'radio_on' : 'radio_off'?>"><spacer type="block"></div></td>
-<?php }?>
-<td checkbox="true" permissiontype="searchPermission" itemid="<?=$item->getId()?>" permissionid="1"><div id="searchPermission_<?=$item->getId()?>_<?=$id?>" class="<?=1 ? 'checkbox_on' : 'checkbox_off'?>"><spacer type="block"></div></td>
 </tr>
 <?php
 }
@@ -103,4 +138,8 @@ $(function() {
 <input class="btn" type="submit" id="save_button" value="Ctrl+S Сохранить">
 </form>
 
-<?php $partViewer->view('include/footer');?>
+<?php
+}
+?>
+
+<?php $partViewer->view("include/footer");?>

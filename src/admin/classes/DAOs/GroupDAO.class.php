@@ -41,13 +41,5 @@
 
 			return $custom['count'];
 		}
-
-		public function dropGroup(Group $group)
-		{
-			ItemPermission::dao()->dropByGroup($group);
-			ElementPermission::dao()->dropByGroup($group);
-
-			$this->drop($group);
-		}
 	}
 ?>

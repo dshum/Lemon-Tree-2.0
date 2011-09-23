@@ -16,27 +16,6 @@
 			Site::printMicroTime('After property list');
 		}
 
-		public static function prepareElementPath($elementPath = null)
-		{
-			if(!$elementPath) $elementPath = $_SERVER['REQUEST_URI'];
-
-			try {
-				$elementPath = TextUtils::getPathFromUrl($elementPath);
-			} catch (BaseException $e) {
-				return '/';
-			}
-
-			$elementPath = '/'.trim($elementPath, '/');
-			$elementPath = strtolower($elementPath);
-			$elementPath = get_magic_quotes_gpc() ? stripslashes($elementPath) : $elementPath;
-
-			if(!RegexpUtils::checkUrl($elementPath)) {
-				$elementPath = '/';
-			}
-
-			return $elementPath;
-		}
-
 		public static function setLastModified()
 		{
 			try {
@@ -283,7 +262,7 @@
 				define('ONPHP_META_PROTO_DIR', PATH_USER_CLASSES.'Proto'.DIRECTORY_SEPARATOR);
 			}
 			if(!defined('ONPHP_META_AUTO_DIR')) {
-				define('ONPHP_META_AUTO_DIR', PATH_USER_CLASSES_AUTO);
+				define('ONPHP_META_AUTO_DIR', PATH_USER_CLASSES.'Auto'.DIRECTORY_SEPARATOR);
 			}
 			if(!defined('ONPHP_META_AUTO_BUSINESS_DIR')) {
 				define('ONPHP_META_AUTO_BUSINESS_DIR', ONPHP_META_AUTO_DIR.'Business'.DIRECTORY_SEPARATOR);
@@ -368,13 +347,11 @@
 				<property name="parentClass" type="String" size="50" required="false" />
 				<property name="mainPropertyDescription" type="String" size="255" required="false" />
 				<property name="mainPropertyParameters" type="String" required="false" />
-				<property name="isFolder" type="Boolean" default="false" required="true" />
+				<property name="isFolder" type="Boolean" default="false" required="false" />
 				<property name="pathPrefix" type="String" size="50" required="false" />
-				<property name="isUpdatePath" type="Boolean" default="false" required="true" />
 				<property name="orderField" type="String" size="50" required="false" />
-				<property name="orderDirection" type="Boolean" default="false" required="true" />
+				<property name="orderDirection" type="Boolean" required="false" />
 				<property name="perPage" type="Integer" default="0" />
-				<property name="isSearch" type="Boolean" default="false" required="true" />
 			</properties>
 			<pattern name="DictionaryClass" />
 		</class>
@@ -388,12 +365,12 @@
 				<property name="propertyDescription" type="String" size="255" required="true" />
 				<property name="propertyOrder" type="Integer" required="false" />
 				<property name="propertyParameters" type="String" required="false" />
-				<property name="isRequired" type="Boolean" default="false" required="true" />
-				<property name="isShow" type="Boolean" default="false" required="true" />
+				<property name="isRequired" type="Boolean" default="false" />
+				<property name="isShow" type="Boolean" default="false" />
 				<property name="fetchClass" type="String" size="50" required="false" />
 				<property name="fetchStrategyId" type="Integer" required="false" />
 				<property name="onDelete" type="String" size="50" required="false" />
-				<property name="isParent" type="Boolean" required="true" />
+				<property name="isParent" type="Boolean" required="false" />
 			</properties>
 			<pattern name="DictionaryClass" />
 		</class>
@@ -424,7 +401,6 @@
 				<property name="ownerPermission" type="Integer" default="0" required="true" />
 				<property name="groupPermission" type="Integer" default="0" required="true" />
 				<property name="worldPermission" type="Integer" default="0" required="true" />
-				<property name="isSearch" type="Boolean" default="false" required="true" />
 				<property name="isDeveloper" type="Boolean" default="false" required="true" />
 				<property name="isAdmin" type="Boolean" default="false" required="true" />
 			</properties>
@@ -439,21 +415,8 @@
 				<property name="userPassword" type="String" size="255" required="true" />
 				<property name="userDescription" type="String" size="255" required="true" />
 				<property name="userEmail" type="String" size="255" required="false" />
-				<property name="userParameters" type="String" required="false" />
 				<property name="registrationDate" type="Timestamp" required="true" />
 				<property name="loginDate" type="Timestamp" required="true" />
-			</properties>
-			<pattern name="DictionaryClass" />
-		</class>
-
-		<class name="UserAction" type="final" table="cytrus_user_action">
-			<properties>
-				<identifier type="Integer" />
-				<property name="user" type="User" relation="OneToOne" fetch="lazy" required="true" />
-				<property name="actionTypeId" type="Integer" required="true" />
-				<property name="comments" type="String" required="false" />
-				<property name="url" type="String" size="255" required="true" />
-				<property name="date" type="Timestamp" required="true" />
 			</properties>
 			<pattern name="DictionaryClass" />
 		</class>
@@ -466,7 +429,6 @@
 				<property name="ownerPermission" type="Integer" default="0" required="true" />
 				<property name="groupPermission" type="Integer" default="0" required="true" />
 				<property name="worldPermission" type="Integer" default="0" required="true" />
-				<property name="isSearch" type="Boolean" default="false" required="true" />
 			</properties>
 			<pattern name="DictionaryClass" />
 		</class>
@@ -487,7 +449,7 @@
 				<property name="elementName" type="String" size="255" required="true" />
 				<property name="elementOrder" type="Integer" required="false" />
 				<property name="status" type="String" size="50" required="true" />
-				<property name="elementPath" type="String" size="255" required="false" />
+				<property name="elementPath" type="String" size="255" required="true" />
 				<property name="group" type="Group" relation="OneToOne" fetch="lazy" required="false" />
 				<property name="user" type="User" relation="OneToOne" fetch="lazy" required="false" />
 			</properties>

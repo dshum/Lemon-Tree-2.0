@@ -33,10 +33,5 @@
 		{
 			return null;
 		}
-
-		public function getElementSearchView()
-		{
-			return null;
-		}
 	}
 ?>

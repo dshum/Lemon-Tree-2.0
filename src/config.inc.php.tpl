@@ -1,12 +1,12 @@
 <?php
 /***************************************************************************
- *   Copyright Denis Shumeev 2008-2010                                     *
+ *   Copyright Denis Shumeev 2008-2009                                     *
  *   denis@lemon-tree.ru                                                   *
  ***************************************************************************/
 /* $Id$ */
 
 	define('LT_NAME', 'Lemon Tree 2.0');
-	define('LT_VERSION', '2.2.2');
+	define('LT_VERSION', '2.1');
 
 	// Environment varyables
 
@@ -21,7 +21,6 @@
 	// Paths
 
 	define('PATH_LT_BASE', realpath(dirname(__FILE__)).DIRECTORY_SEPARATOR);
-	define('PATH_ONPHP', PATH_LT_BASE.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'onphp'.DIRECTORY_SEPARATOR);
 
 	define('PATH_ADMIN_SRC', PATH_LT_BASE.'admin'.DIRECTORY_SEPARATOR);
 	define('PATH_ADMIN_CLASSES', PATH_ADMIN_SRC.'classes'.DIRECTORY_SEPARATOR);
@@ -72,15 +71,15 @@
 	// Web paths
 
 	if(!defined('PATH_WEB')) {
-		define('PATH_WEB', 'http://'.HTTP_HOST.'/');
+		define('PATH_WEB', 'http://'.HTTP_HOST.DIRECTORY_SEPARATOR);
 	}
 
 	if(!defined('FOLDER_LT')) {
-		define('FOLDER_LT', 'LT'.'/');
+		define('FOLDER_LT', 'LT'.DIRECTORY_SEPARATOR);
 	}
 
 	if(!defined('FOLDER_LTDATA')) {
-		define('FOLDER_LTDATA', 'LT-data'.'/');
+		define('FOLDER_LTDATA', 'LT-data'.DIRECTORY_SEPARATOR);
 	}
 
 	define('PATH_ADMIN', PATH_WEB.FOLDER_LT);
@@ -109,7 +108,7 @@
 	}
 
 	if(!defined('BUGLOVERS')) {
-		define('BUGLOVERS', 'bugs@lr1.ru');
+		define('BUGLOVERS', 'bugs@lemon-tree.ru');
 	}
 
 	if(!defined('FEEDBACK_EMAIL')) {
@@ -118,7 +117,7 @@
 
 	// Include onPHP
 
-	require PATH_ONPHP.'global.inc.php.tpl';
+	require PATH_LT_BASE.'..'.DIRECTORY_SEPARATOR.'onphp/global.inc.php.tpl';
 
 	define('ONPHP_META_BUILDERS', ONPHP_META_PATH.'builders'.DIRECTORY_SEPARATOR);
 	define('ONPHP_META_PATTERNS', ONPHP_META_PATH.'patterns'.DIRECTORY_SEPARATOR);
@@ -162,35 +161,6 @@
 		.ONPHP_META_TYPES.PATH_SEPARATOR
 	);
 
-	include PATH_ADMIN_CLASSES.'Utils'.DIRECTORY_SEPARATOR.'RussianTypograph.class.php';
-
 	mb_internal_encoding(DEFAULT_ENCODING);
 	mb_regex_encoding(DEFAULT_ENCODING);
-
-	function fatalErrorHandler($buffer)
-	{
-		if(isset($GLOBALS['tmp_buf'])) unset($GLOBALS['tmp_buf']);
-
-		if(preg_match('@(Fatal error</b>:)(.+)(<br)@', $buffer, $matches) ) {
-
-			$message = trim($matches[2]);
-
-			ErrorMessageUtils::sendFatalError($message);
-
-			header('Content-type:  text/html; charset='.DEFAULT_CHARSET);
-
-			$html =
-				defined('__LOCAL_DEBUG__')
-				? $buffer
-				: 'На сайте ведутся технические работы.'
-					.' Обновите страницу, пожалуйста.'
-					.' Если это не поможет, зайдите на сайт через 15 минут.<br>'
-					.'Приносим извинения за возможные неудобства.';
-
-			return $html;
-
-		}
-
-		return $buffer;
-	}
 ?>

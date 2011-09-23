@@ -39,11 +39,7 @@
 
 		public function add2multiform(Form $form)
 		{
-			$primitiveName =
-				'edit_'.$this->element->getClass()
-				.'_'.$this->element->getId()
-				.'_'.$this->property->getPropertyName().'';
-
+			$primitiveName = 'edit_'.$this->element->getClass().'_'.$this->element->getId().'_'.$this->property->getPropertyName().'';
 			return
 				$form->
 				add(
@@ -68,7 +64,6 @@
 				$form->primitiveExists($this->property->getPropertyName())
 				? $form->getValue($this->property->getPropertyName())
 				: null;
-
 			if($value !== null) {
 				$columnName = Property::getColumnName($this->property->getPropertyName());
 				$tableName = $criteria->getDao()->getTable();
@@ -88,8 +83,20 @@
 					);
 				}
 			}
-
 			return $criteria;
+		}
+
+		public function printOnElementSearch(Form $form)
+		{
+			$value =
+				$form->primitiveExists($this->property->getPropertyName())
+				? $form->getValue($this->property->getPropertyName())
+				: null;
+			$str = $this->property->getPropertyDescription().': ';
+			$str .= '<input type="radio" id="'.$this->property->getPropertyName().'_true" name="'.$this->property->getPropertyName().'" value="true"'.($value === true ? ' checked' : '').'><label for="'.$this->property->getPropertyName().'_true">Да</label>';
+			$str .= '<input type="radio" id="'.$this->property->getPropertyName().'_false" name="'.$this->property->getPropertyName().'" value="false"'.($value === false ? ' checked' : '').'><label for="'.$this->property->getPropertyName().'_false">Нет</label>';
+			$str .= '<input type="radio" id="'.$this->property->getPropertyName().'_null" name="'.$this->property->getPropertyName().'" value="null"'.($value === null ? ' checked' : '').'><label for="'.$this->property->getPropertyName().'_null">Не важно</label>';
+			return $str;
 		}
 	}
 ?>

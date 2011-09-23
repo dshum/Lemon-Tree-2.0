@@ -70,25 +70,19 @@
 
 		public function showList(HttpRequest $request)
 		{
-			$model = Model::create();
-
-			$requestUri = $request->getServerVar('REQUEST_URI');
-			Session::assign('browseLastUrl', $requestUri);
-
 			$itemList = Item::dao()->getItemList();
 
 			$bindList = array();
-
 			$bind2ItemList =
 				Criteria::create(Bind2Item::dao())->
 				getList();
-
 			foreach($bind2ItemList as $bind2Item) {
 				$bindList[$bind2Item->getItem()->getId()][] = $bind2Item->getBindItem()->getId();
 			}
 
-			$model->set('itemList', $itemList);
-			$model->set('bindList', $bindList);
+			$model = Model::create();
+			$model->set("itemList", $itemList);
+			$model->set("bindList", $bindList);
 
 			return
 				ModelAndView::create()->

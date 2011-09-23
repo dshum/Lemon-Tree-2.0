@@ -1,18 +1,16 @@
 <?php
-if($value) {
-	if($value->getYear() == Date::makeToday()->getYear()) {
-		echo sprintf(
-			'%d&nbsp;%s',
-			$value->getDay(),
-			RussianTextUtils::getMonthInGenitiveCase($value->getMonth())
-		);
-	} else {
-		echo sprintf(
-			'%d&nbsp;%s %04d года',
-			$value->getDay(),
-			RussianTextUtils::getMonthInGenitiveCase($value->getMonth()),
-			$value->getYear()
-		);
-	}
+if($value->getYear() == Date::makeToday()->getYear()) {
+	echo sprintf(
+		'%d&nbsp;%s',
+		$value->getDay(),
+		RussianTextUtils::getMonthInGenitiveCase($value->getMonth())
+	);
+} else {
+	echo sprintf(
+		'%d&nbsp;%s %04d года',
+		$value->getDay(),
+		RussianTextUtils::getMonthInGenitiveCase($value->getMonth()),
+		$value->getYear()
+	);
 }
 ?>

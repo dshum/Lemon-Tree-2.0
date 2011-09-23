@@ -4,25 +4,13 @@
 		public function __construct()
 		{
 			$this->
-			setMethodMapping('save', 'save')->
-			setMethodMapping('edit', 'edit')->
-			setDefaultAction('edit');
+				setMethodMapping('save', 'save')->
+				setMethodMapping('edit', 'edit')->
+				setDefaultAction('edit');
 		}
 
 		public function handleRequest(HttpRequest $request)
 		{
-			$loggedUser = LoggedUser::getUser();
-
-			if(!$loggedUser->getGroup()->getIsAdmin()) {
-				return
-					ModelAndView::create()->
-					setModel(
-						Model::create()->
-						set('userId', $loggedUser->getId())
-					)->
-					setView(new RedirectToView('UserEdit'));
-			}
-
 			Item::dao()->setItemList();
 
 			return parent::handleRequest($request);
@@ -51,71 +39,67 @@
 			} else {
 
 				$currentGroup = $form->getValue('groupId');
+				$ownerPermissionList = $form->getValue('ownerPermission');
+				$groupPermissionList = $form->getValue('groupPermission');
+				$worldPermissionList = $form->getValue('worldPermission');
 
-				if($currentGroup->isAllowed()) {
+				$itemList = Item::dao()->getDefaultItemList();
 
-					$ownerPermissionList = $form->getValue('ownerPermission');
-					$groupPermissionList = $form->getValue('groupPermission');
-					$worldPermissionList = $form->getValue('worldPermission');
+				$itemPermissionList =
+					Criteria::create(ItemPermission::dao())->
+					add(
+						Expression::eqId(
+							new DBField('group_id', ItemPermission::dao()->getTable()),
+							$currentGroup
+						)
+					)->
+					getList();
 
-					$itemList = Item::dao()->getDefaultItemList();
+				$itemPermissionMap = array();
+				foreach($itemPermissionList as $itemPermission) {
+					$itemPermissionMap[$itemPermission->getItem()->getId()] = $itemPermission;
+				}
 
-					$itemPermissionList =
-						Criteria::create(ItemPermission::dao())->
-						add(
-							Expression::eqId(
-								new DBField('group_id', ItemPermission::dao()->getTable()),
-								$currentGroup
-							)
-						)->
-						getList();
-
-					$itemPermissionMap = array();
-					foreach($itemPermissionList as $itemPermission) {
-						$itemPermissionMap[$itemPermission->getItem()->getId()] = $itemPermission;
-					}
-
-					foreach($itemList as $item) {
+				foreach($itemList as $item) {
+					if(
+						isset($ownerPermissionList[$item->getId()])
+						&& isset($groupPermissionList[$item->getId()])
+						&& isset($worldPermissionList[$item->getId()])
+						&& Permission::permissionExists($ownerPermissionList[$item->getId()])
+						&& Permission::permissionExists($groupPermissionList[$item->getId()])
+						&& Permission::permissionExists($worldPermissionList[$item->getId()])
+					) {
 						if(
-							isset($ownerPermissionList[$item->getId()])
-							&& isset($groupPermissionList[$item->getId()])
-							&& isset($worldPermissionList[$item->getId()])
-							&& Permission::permissionExists($ownerPermissionList[$item->getId()])
-							&& Permission::permissionExists($groupPermissionList[$item->getId()])
-							&& Permission::permissionExists($worldPermissionList[$item->getId()])
+							$ownerPermissionList[$item->getId()] == $currentGroup->getOwnerPermission()
+							&& $groupPermissionList[$item->getId()] == $currentGroup->getGroupPermission()
+							&& $worldPermissionList[$item->getId()] == $currentGroup->getWorldPermission()
 						) {
-							if(
-								$ownerPermissionList[$item->getId()] == $currentGroup->getOwnerPermission()
-								&& $groupPermissionList[$item->getId()] == $currentGroup->getGroupPermission()
-								&& $worldPermissionList[$item->getId()] == $currentGroup->getWorldPermission()
-							) {
-								if(isset($itemPermissionMap[$item->getId()])) {
-									ItemPermission::dao()->drop($itemPermissionMap[$item->getId()]);
+							if(isset($itemPermissionMap[$item->getId()])) {
+								ItemPermission::dao()->drop($itemPermissionMap[$item->getId()]);
+							}
+						} else {
+							if(isset($itemPermissionMap[$item->getId()])) {
+								$permission = $itemPermissionMap[$item->getId()];
+								if(
+									$ownerPermissionList[$item->getId()] != $permission->getOwnerPermission()
+									|| $groupPermissionList[$item->getId()] != $permission->getGroupPermission()
+									|| $worldPermissionList[$item->getId()] != $permission->getWorldPermission()
+								) {
+									$permission->
+									setOwnerPermission($ownerPermissionList[$item->getId()])->
+									setGroupPermission($groupPermissionList[$item->getId()])->
+									setWorldPermission($worldPermissionList[$item->getId()]);
+									ItemPermission::dao()->save($permission);
 								}
 							} else {
-								if(isset($itemPermissionMap[$item->getId()])) {
-									$permission = $itemPermissionMap[$item->getId()];
-									if(
-										$ownerPermissionList[$item->getId()] != $permission->getOwnerPermission()
-										|| $groupPermissionList[$item->getId()] != $permission->getGroupPermission()
-										|| $worldPermissionList[$item->getId()] != $permission->getWorldPermission()
-									) {
-										$permission->
-										setOwnerPermission($ownerPermissionList[$item->getId()])->
-										setGroupPermission($groupPermissionList[$item->getId()])->
-										setWorldPermission($worldPermissionList[$item->getId()]);
-										ItemPermission::dao()->save($permission);
-									}
-								} else {
-									$permission =
-										ItemPermission::create()->
-										setGroup($currentGroup)->
-										setItem($item)->
-										setOwnerPermission($ownerPermissionList[$item->getId()])->
-										setGroupPermission($groupPermissionList[$item->getId()])->
-										setWorldPermission($worldPermissionList[$item->getId()]);
-									ItemPermission::dao()->add($permission);
-								}
+								$permission =
+									ItemPermission::create()->
+									setGroup($currentGroup)->
+									setItem($item)->
+									setOwnerPermission($ownerPermissionList[$item->getId()])->
+									setGroupPermission($groupPermissionList[$item->getId()])->
+									setWorldPermission($worldPermissionList[$item->getId()]);
+								ItemPermission::dao()->add($permission);
 							}
 						}
 					}
@@ -143,43 +127,37 @@
 				import($_GET);
 
 			if($form->getErrors()) {
-				return
-					ModelAndView::create()->
-					setModel(Model::create())->
-					setView(new RedirectToView('GroupList'));
+
+				$model->set('form', $form);
+
+			} else {
+
+				$currentGroup = $form->getValue('groupId');
+
+				$itemList = Item::dao()->getDefaultItemList();
+
+				$itemPermissionList =
+					Criteria::create(ItemPermission::dao())->
+					add(
+						Expression::eqId(
+							new DBField('group_id', ItemPermission::dao()->getTable()),
+							$currentGroup
+						)
+					)->
+					getList();
+
+				$itemPermissionMap = array('ownerPermission', 'groupPermission', 'worldPermission');
+				foreach($itemPermissionList as $itemPermission) {
+					$itemPermissionMap['ownerPermission'][$itemPermission->getItem()->getId()] = $itemPermission->getOwnerPermission();
+					$itemPermissionMap['groupPermission'][$itemPermission->getItem()->getId()] = $itemPermission->getGroupPermission();
+					$itemPermissionMap['worldPermission'][$itemPermission->getItem()->getId()] = $itemPermission->getWorldPermission();
+				}
+
+				$model->set('currentGroup', $currentGroup);
+				$model->set('itemList', $itemList);
+				$model->set('itemPermissionMap', $itemPermissionMap);
+
 			}
-
-			$currentGroup = $form->getValue('groupId');
-
-			if(!$currentGroup->isAllowed()) {
-				return
-					ModelAndView::create()->
-					setModel(Model::create())->
-					setView(new RedirectToView('GroupList'));
-			}
-
-			$itemList = Item::dao()->getDefaultItemList();
-
-			$itemPermissionList =
-				Criteria::create(ItemPermission::dao())->
-				add(
-					Expression::eqId(
-						new DBField('group_id', ItemPermission::dao()->getTable()),
-						$currentGroup
-					)
-				)->
-				getList();
-
-			$itemPermissionMap = array('ownerPermission', 'groupPermission', 'worldPermission');
-			foreach($itemPermissionList as $itemPermission) {
-				$itemPermissionMap['ownerPermission'][$itemPermission->getItem()->getId()] = $itemPermission->getOwnerPermission();
-				$itemPermissionMap['groupPermission'][$itemPermission->getItem()->getId()] = $itemPermission->getGroupPermission();
-				$itemPermissionMap['worldPermission'][$itemPermission->getItem()->getId()] = $itemPermission->getWorldPermission();
-			}
-
-			$model->set('currentGroup', $currentGroup);
-			$model->set('itemList', $itemList);
-			$model->set('itemPermissionMap', $itemPermissionMap);
 
 			return ModelAndView::create()->
 				setModel($model)->

@@ -3,7 +3,7 @@
 <script type="text/javascript">
 $(function() {
 <?php foreach($tree as $element) {?>
-	LT.MultilinkTree.addElement('<?=$propertyName?>', '<?=$element['parentId']?>', '<?=$element['elementId']?>', '<?=addslashes($element['elementName'])?>', <?=$element['isActive']?>, <?=$element['isOpen']?>, <?=$element['isCheckbox']?>);
+	LT.MultilinkTree.addElement('<?=$propertyName?>', '<?=$element['parentId']?>', '<?=$element['elementId']?>', '<?=$element['elementName']?>', <?=$element['isActive']?>, <?=$element['isOpen']?>, <?=$element['isCheckbox']?>);
 <?php }?>
 	LT.MultilinkTree.buildBranch('<?=$propertyName?>', '<?=$node->getPolymorphicId()?>');
 });

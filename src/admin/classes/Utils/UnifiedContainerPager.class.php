@@ -29,13 +29,6 @@
 			return $this->container->getCriteria();
 		}
 
-		public function getCountOnly()
-		{
-			$this->process();
-
-			return $this->total;
-		}
-
 		public function getList()
 		{
 			$this->process();
@@ -48,6 +41,11 @@
 
 		private function process()
 		{
+			$offset =
+				$this->currentPage > 1
+				? ($this->currentPage - 1) * $this->perpage
+				: 0;
+
 			$criteria = $this->getCriteria();
 
 			$this->total = $this->container->getCount();
@@ -56,10 +54,6 @@
 
 				$this->pageCount = ceil($this->total / $this->perpage);
 
-				if($this->currentPage > $this->pageCount) {
-					$this->currentPage = 1;
-				}
-
 				for($i = 1; $i <= $this->pageCount; $i++) {
 					$this->pageList[] = $i;
 				}
@@ -67,18 +61,13 @@
 				$this->prevPage =
 					$this->currentPage > 1
 					? $this->currentPage - 1
-					: 1;
+					: 0;
 
 				$this->nextPage = $this->currentPage + 1;
 
 				$this->hasPrevPage = $this->currentPage > 1 ? true : false;
 
 				$this->hasNextPage = $this->currentPage < $this->pageCount ? true : false;
-
-				$offset =
-					$this->currentPage > 1
-					? ($this->currentPage - 1) * $this->perpage
-					: 0;
 
 				$criteria->setLimit($this->perpage)->setOffset($offset);
 

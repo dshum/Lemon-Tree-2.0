@@ -19,9 +19,9 @@
 				OSQL::delete()->
 				from($this->getTable())->
 				where(
-					Expression::eqId(
+					Expression::eq(
 						new DBField('bind_item_id', $this->getTable()),
-						$item
+						new DBValue($item->getId())
 					)
 				);
 

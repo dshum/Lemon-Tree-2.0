@@ -27,30 +27,22 @@
 				Primitive::string($this->property->getPropertyName())->
 				setMax(65536)->
 				addImportFilter(Filter::trim());
-
 			if($this->getParameterValue('typograph')) {
-				$primitive->addImportFilter(RussianTypograph::me());
+				$primitive->addImportFilter(MyRussianTypograph::me());
 			}
-
 			return $form->add($primitive);
 		}
 
 		public function add2multiform(Form $form)
 		{
-			$primitiveName =
-				'edit_'.$this->element->getClass()
-				.'_'.$this->element->getId()
-				.'_'.$this->property->getPropertyName().'';
-
+			$primitiveName = 'edit_'.$this->element->getClass().'_'.$this->element->getId().'_'.$this->property->getPropertyName().'';
 			$primitive =
 				Primitive::string($primitiveName)->
 				setMax(65536)->
 				addImportFilter(Filter::trim());
-
 			if($this->getParameterValue('typograph')) {
-				$primitive->addImportFilter(RussianTypograph::me());
+				$primitive->addImportFilter(MyRussianTypograph::me());
 			}
-
 			return $form->add($primitive);
 		}
 

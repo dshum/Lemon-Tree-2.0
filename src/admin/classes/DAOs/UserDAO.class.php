@@ -41,12 +41,5 @@
 
 			return $custom['count'];
 		}
-
-		public function dropUser(User $user)
-		{
-			UserAction::dao()->dropByUser($user);
-
-			$this->drop($user);
-		}
 	}
 ?>

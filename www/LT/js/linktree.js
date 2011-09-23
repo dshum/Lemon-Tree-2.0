@@ -31,26 +31,6 @@ LT.LinkTree = function() {
 		};
 	};
 
-	object.addPlainElement = function(propertyName, elementId, elementName, isActive) {
-		if(!branch[propertyName]) {
-			branch[propertyName] = new Array();
-		}
-
-		if(!elementList[propertyName]) {
-			elementList[propertyName] = new Array();
-		}
-
-		var count = branch[propertyName].length;
-
-		branch[propertyName][count] = elementId;
-
-		elementList[propertyName][elementId] = {
-			elementId: elementId,
-			elementName: elementName,
-			isActive: isActive
-		};
-	};
-
 	object.buildBranch = function(propertyName, parentId) {
 		var escapedParentId = escapeId(parentId);
 		var parentObject = $('#'+propertyName+'_branch_'+escapedParentId);
@@ -60,7 +40,7 @@ LT.LinkTree = function() {
 				var elementId = branch[propertyName][parentId][i];
 				var element = elementList[propertyName][elementId];
 				var id = getId(elementId);
-				var checked = element.isActive ? ' checked="true"' : '';
+				var checked = element.isActive ? ' checked' : 'false';
 
 				var div = $('<div></div>').appendTo(parentObject);
 
@@ -112,34 +92,6 @@ LT.LinkTree = function() {
 					LT.LinkTree.buildBranch(propertyName, elementId);
 				}
 
-			}
-		}
-	};
-
-	object.buildPlainList = function(propertyName, parentId) {
-		var escapedParentId = escapeId(parentId);
-		var parentObject = $('#'+propertyName+'_branch_'+escapedParentId);
-
-		if(branch[propertyName] && branch[propertyName].length) {
-			for(var i = 0; i < branch[propertyName].length; i++) {
-				var elementId = branch[propertyName][i];
-				var element = elementList[propertyName][elementId];
-				var id = getId(elementId);
-				var checked = element.isActive ? ' checked="true"' : '';
-
-				var div = $('<div></div>').appendTo(parentObject);
-
-				var img = $('<img width="11" height="11" src="img/p.gif" />').appendTo(div);
-
-				var radio = $('<input type="radio" id="'+propertyName+'_check_'+elementId+'" name="'+propertyName+'" elementname="'+element.elementName+'" value="'+id+'"'+checked+'" title="Выбрать" />').appendTo(div).click(function() {
-					var propertyName = $(this).attr('name');
-					var elementName = $(this).attr('elementname');
-					$('#'+propertyName+'_block').slideToggle('fast', function() {
-						$('#'+propertyName+'_description').html(elementName);
-					});
-				});
-
-				var span = $('<label for="'+propertyName+'_check_'+elementId+'">&nbsp;'+element.elementName+'</label>').appendTo(div);
 			}
 		}
 	};

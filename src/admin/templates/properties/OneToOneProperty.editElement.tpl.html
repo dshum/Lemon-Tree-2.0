@@ -2,21 +2,10 @@
 
 <script type="text/javascript">
 $(function() {
-<?php if($plainList) {?>
-
-<?php 	foreach($tree as $element) {?>
-	LT.LinkTree.addPlainElement('<?=$propertyName?>', '<?=$element['elementId']?>', '<?=addslashes($element['elementName'])?>', <?=$element['isActive']?>);
-<?php 	}?>
-	LT.LinkTree.buildPlainList('<?=$propertyName?>', 'root');
-
-<?php } else {?>
-
-<?php 	foreach($tree as $element) {?>
-	LT.LinkTree.addElement('<?=$propertyName?>', '<?=$element['parentId']?>', '<?=$element['elementId']?>', '<?=addslashes($element['elementName'])?>', <?=$element['isActive']?>, <?=$element['isOpen']?>, <?=$element['isRadio']?>);
-<?php 	}?>
-	LT.LinkTree.buildBranch('<?=$propertyName?>', '<?=$node->getPolymorphicId()?>');
-
+<?php foreach($tree as $element) {?>
+	LT.LinkTree.addElement('<?=$propertyName?>', '<?=$element['parentId']?>', '<?=$element['elementId']?>', '<?=$element['elementName']?>', <?=$element['isActive']?>, <?=$element['isOpen']?>, <?=$element['isRadio']?>);
 <?php }?>
+	LT.LinkTree.buildBranch('<?=$propertyName?>', '<?=$node->getPolymorphicId()?>');
 
 	$('#<?=$propertyName?>_description').click(function() {
 		$('#<?=$propertyName?>_block').slideToggle('fast');
@@ -32,42 +21,26 @@ $(function() {
 
 <?=$propertyDescription?>:
 <?php 	if($value) {?>
-<span id="<?=$propertyName?>_description" class="dashed hand"><?=$value->getAlterName()?></span><br>
+<span id="<?=$propertyName?>_description" class="dashed hand"><?=$value->getElementName()?></span><br>
 <?php 	} else {?>
 <span id="<?=$propertyName?>_description" class="dashed hand">Не определено</span><br>
 <?php 	}?>
 <div id="<?=$propertyName?>_block" class="prop_block" style="overflow-y: scroll; display: none;" overflow="true">
 <img src="img/p.gif" width="11" height="11" alt=""><input type="radio" id="<?=$propertyName?>_check_0" name="<?=$propertyName?>" value=""<?=$checked?> title="Выбрать"><label for="<?=$propertyName?>_check_0">&nbsp;Не определено</label>
-<div id="<?=$propertyName?>_branch_<?=$plainList ? 'root' : $node->getPolymorphicId()?>"></div>
+<div id="<?=$propertyName?>_branch_<?=$node->getPolymorphicId()?>"></div>
 </div><br>
 
 <?php } else {?>
 
-<script type="text/javascript">
-$(function() {
-	$('#<?=$propertyName?>_show').click(function() {
-		$(this).hide();
-		$('#<?=$propertyName?>').show().focus();
-	});
-});
-</script>
-
 <?=$propertyDescription?>:
 <?php 	if($value) {?>
 <?php 		if($value instanceof Root) {?>
-<input type="hidden" name="<?=$propertyName?>" value="<?=$value->getId()?>">
-<?=$value->getAlterName()?><br><br>
+<input type="hidden" name="<?=$propertyName?>" value="<?=$value->getId()?>"><?=$value->getElementName()?><br><br>
 <?php 		} else {?>
-<a href="<?=PATH_ADMIN_BROWSE.'?module=ElementEdit&elementId='.$value->getPolymorphicId()?>" title="<?=$value->getItem()->getItemDescription()?>"><?=$value->getAlterName()?></a>
-<?php 			if(!$readonly && !$plainList && empty($showItemList)) {?>
-(<span id="<?=$propertyName?>_show" class="dashed hand">ID <?=$value->getId()?></span><input type="text" id="<?=$propertyName?>" name="<?=$propertyName?>" value="<?=$value->getId()?>" class="prop-mini" style="width: 75px; display: none;">)
-<?php 			}?><br><br>
+<input type="hidden" name="<?=$propertyName?>" value="<?=$value->getId()?>"><a href="<?=PATH_ADMIN_BROWSE.'?module=ElementEdit&elementId='.$value->getPolymorphicId()?>" title="<?=$value->getItem()->getItemDescription()?>"><?=$value->getElementName()?></a><br><br>
 <?php 		}?>
 <?php 	} else {?>
-Не определено
-<?php 		if(!$readonly && !$plainList && empty($showItemList)) {?>
-(<span id="<?=$propertyName?>_show" class="dashed hand">ID</span><input type="text" id="<?=$propertyName?>" name="<?=$propertyName?>" value="" class="prop-mini" style="width: 75px; display: none;">)
-<?php 		}?><br><br>
+Не определено<br><br>
 <?php 	}?>
 
 <?php }?>

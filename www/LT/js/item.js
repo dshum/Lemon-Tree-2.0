@@ -44,7 +44,7 @@ LT.Item = function() {
 			}
 		}
 
-		if(data.tree && data.tree.length && top.tree) {
+		if(data.tree && data.tree.length) {
 			top.tree.LT.Tree.dropTree();
 			for(var i in data.tree) {
 				top.tree.LT.Tree.addElement(data.tree[i].parentId, data.tree[i].elementId, data.tree[i].elementName, 1, 0);

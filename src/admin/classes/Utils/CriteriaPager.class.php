@@ -24,25 +24,20 @@
 			return $this->criteria;
 		}
 
-		public function getCountOnly()
-		{
-			$this->process();
-
-			return $this->total;
-		}
-
 		public function getList()
 		{
 			$this->process();
 
-			return
-				$this->total > 0
-				? $this->criteria->getList()
-				: array();
+			return $this->total > 0 ? $this->criteria->getList() : array();
 		}
 
 		private function process()
 		{
+			$offset =
+				$this->currentPage > 1
+				? ($this->currentPage - 1) * $this->perpage
+				: 0;
+
 			$criteria = clone $this->criteria;
 
 			$query =
@@ -55,8 +50,7 @@
 						new DBField('id', $criteria->getDao()->getTable())
 					),
 					'count'
-				)->
-				limit(1);
+				);
 
 			$custom = $criteria->getDao()->getCustom($query);
 
@@ -66,10 +60,6 @@
 
 				$this->pageCount = ceil($this->total / $this->perpage);
 
-				if($this->currentPage > $this->pageCount) {
-					$this->currentPage = 1;
-				}
-
 				for($i = 1; $i <= $this->pageCount; $i++) {
 					$this->pageList[] = $i;
 				}
@@ -77,18 +67,13 @@
 				$this->prevPage =
 					$this->currentPage > 1
 					? $this->currentPage - 1
-					: 1;
+					: 0;
 
 				$this->nextPage = $this->currentPage + 1;
 
 				$this->hasPrevPage = $this->currentPage > 1 ? true : false;
 
 				$this->hasNextPage = $this->currentPage < $this->pageCount ? true : false;
-
-				$offset =
-					$this->currentPage > 1
-					? ($this->currentPage - 1) * $this->perpage
-					: 0;
 
 				$this->criteria->setLimit($this->perpage)->setOffset($offset);
 

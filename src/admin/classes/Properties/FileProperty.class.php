@@ -4,8 +4,7 @@
 		private static $allowedMimeTypes = array(
 			'text/plain',
 			'application/pdf',
-			'application/vnd.ms-excel', 'application/octet-stream', 'application/x-excel',
-			'application/vnd.ms-powerpoint', 'application/msword',
+			'application/vnd.ms-excel', 'application/vnd.ms-powerpoint', 'application/msword',
 			'image/gif', 'image/jpeg', 'image/pjpeg', 'image/png', 'image/tiff', 'image/vnd.microsoft.icon',
 			'application/x-shockwave-flash',
 			'audio/mpeg', 'audio/x-ms-wma', 'audio/vnd.rn-realaudio', 'audio/x-wav',
@@ -19,9 +18,7 @@
 		{
 			parent::__construct($property, $element);
 
-			$item = $property->getItem();
-			$itemClass = $item->getClass();
-			$this->folder = $itemClass->dao()->getTable();
+			$this->folder = $this->property->getItem()->getDefaultTableName().DIRECTORY_SEPARATOR;
 		}
 
 		public function setParameters()
@@ -67,12 +64,12 @@
 
 		public function path()
 		{
-			return PATH_WEB_LTDATA.$this->folder.'/'.$this->value;
+			return PATH_WEB_LTDATA.$this->folder.$this->value;
 		}
 
 		public function abspath()
 		{
-			return PATH_LTDATA.$this->folder.DIRECTORY_SEPARATOR.$this->value;
+			return PATH_LTDATA.$this->folder.$this->value;
 		}
 
 		public function filename()
@@ -179,9 +176,9 @@
 
 		public function drop()
 		{
-			if(file_exists(PATH_LTDATA.$this->folder.DIRECTORY_SEPARATOR.$this->value)) {
+			if(file_exists(PATH_LTDATA.$this->folder.$this->value)) {
 				try {
-					unlink(PATH_LTDATA.$this->folder.DIRECTORY_SEPARATOR.$this->value);
+					unlink(PATH_LTDATA.$this->folder.$this->value);
 				} catch (BaseException $e) {}
 			}
 		}

@@ -40,8 +40,6 @@
 
 		public function dropByElement(Element $element)
 		{
-			$db = DBPool::me()->getByDao($this);
-
 			$query =
 				OSQL::delete()->
 				from($this->getTable())->
@@ -52,28 +50,7 @@
 					)
 				);
 
-			$db->query($query);
-
-			$this->uncacheLists();
-		}
-
-		public function dropByGroup(Group $group)
-		{
-			$db = DBPool::me()->getByDao($this);
-
-			$query =
-				OSQL::delete()->
-				from($this->getTable())->
-				where(
-					Expression::eqId(
-						new DBField('group_id', $this->getTable()),
-						$group
-					)
-				);
-
-			$db->query($query);
-
-			$this->uncacheLists();
+			DBPool::me()->getByDao($this)->query($query);
 		}
 	}
 ?>

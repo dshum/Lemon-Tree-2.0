@@ -6,8 +6,8 @@
 			parent::setParameters();
 
 			$this->addParameter('node', 'element', 'Вершина дерева', Root::me());
+			$this->addParameter('mount', 'integer', 'Глубина дерева', 1);
 			$this->addParameter('showItems', 'itemList', 'Показывать классы элементов', array());
-			$this->addParameter('plainList', 'boolean', 'Плоский вид списка', false);
 			$this->addParameter('showList', 'boolean', 'Выводить список элементов', true);
 
 			return $this;
@@ -68,7 +68,6 @@
 
 		public function add2criteria(Criteria $criteria, Form $form)
 		{
-			$raw = $form->getRawValue($this->property->getPropertyName());
 			$value = $form->getValue($this->property->getPropertyName());
 
 			$columnName = Property::getColumnName($this->property->getPropertyName()).'_id';
@@ -82,37 +81,14 @@
 						$value
 					)
 				);
-			} elseif($raw) {
-				$criteria->
-				add(
-					Expression::isTrue(
-						DBValue::create(false)
-					)
-				);
 			}
 
 			return $criteria;
 		}
 
-		public function isUpdate()
-		{
-			$readonly = $this->getParameterValue('readonly');
-			$showItemList = $this->getParameterValue('showItems');
-			$plainList = $this->getParameterValue('plainList');
-
-			return
-				!$readonly && !$plainList && empty($showItemList)
-				? true
-				: false;
-		}
-
 		public function set(Form $form)
 		{
-			if(
-				$this->getParameterValue('hidden') == false
-				&& $form->primitiveExists($this->property->getPropertyName())
-				&& $this->element instanceof Element
-			) {
+			if($form->PrimitiveExists($this->property->getPropertyName())) {
 				$setter = $this->property->setter();
 				$value = $form->getValue($this->property->getPropertyName());
 				if($value) {
@@ -129,50 +105,26 @@
 			$required = $this->property->getIsRequired();
 			$readonly = $this->getParameterValue('readonly');
 			$node = $this->getParameterValue('node');
+			$mount = $this->getParameterValue('mount');
 			$showItemList = $this->getParameterValue('showItems');
-			$plainList = $this->getParameterValue('plainList');
 			$checked = $this->value ? '' : ' checked';
 
-			if($plainList) {
-
-				$tree = Tree::getLinkPlainList(
-					null,
-					$this->property->getFetchClass(),
-					$this->value
-				);
-
-			} elseif($node == 'parent' && $this->element instanceof Element) {
-
-				$node = $this->element->getParent();
-
-				$tree = Tree::getLinkPlainList(
-					$node,
-					$this->property->getFetchClass(),
-					$this->value
-				);
-
-			} elseif(!$readonly && $node instanceof Element) {
-
+			if(!$readonly && $node instanceof Element) {
 				$openIdList = array();
-
 				if($this->value) {
 					$parentList = $this->value->getParentList();
 					foreach($parentList as $parent) {
 						$openIdList[$parent->getPolymorphicId()] = 1;
 					}
 				}
-
 				$tree = Tree::getLinkTree(
 					$showItemList,
 					$openIdList,
-					$this->property->getFetchClass(),
-					$this->value
+					$this->value,
+					$this->property->getFetchClass()
 				);
-
 			} else {
-
 				$tree = array();
-
 			}
 
 			$model =
@@ -184,8 +136,6 @@
 				set('readonly', $readonly)->
 				set('node', $node)->
 				set('checked', $checked)->
-				set('showItemList', $showItemList)->
-				set('plainList', $plainList)->
 				set('tree', $tree);
 
 			$viewName = 'properties/'.get_class($this).'.editElement';
@@ -193,35 +143,16 @@
 			return $this->render($model, $viewName);
 		}
 
-		public function getElementSearchView(Form $form)
+		public function printOnElementSearch(Form $form)
 		{
-			$propertyDescription = $this->property->getPropertyDescription();
-			if(mb_strlen($propertyDescription) > 50) {
-				$propertyDescription = mb_substr($propertyDescription, 0, 50).'...';
-			}
-
-			$propertyName = $this->property->getPropertyName();
-
-			$raw =
-				$form->primitiveExists($propertyName)
-				? $form->getRawValue($propertyName)
-				: null;
-
+			$fetchClass = $this->property->getFetchClass();
 			$value =
-				$form->primitiveExists($propertyName)
-				? $form->getValue($propertyName)
+				$form->primitiveExists($this->property->getPropertyName())
+				? $form->getValue($this->property->getPropertyName())
 				: null;
-
-			$model =
-				Model::create()->
-				set('propertyName', $propertyName)->
-				set('propertyDescription', $propertyDescription)->
-				set('raw', $raw)->
-				set('value', $value);
-
-			$viewName = 'properties/'.get_class($this).'.search';
-
-			return $this->render($model, $viewName);
+			$str = $this->property->getPropertyDescription().' (ID элемента): ';
+			$str .= '<input type="text" class="prop-mini" name="'.$this->property->getPropertyName().'" value="'.($value ? $value->getId() : '').'" style="width: 75px;">';
+			return $str;
 		}
 	}
 ?>

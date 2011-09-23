@@ -4,10 +4,10 @@
 		public function __construct()
 		{
 			$this->
-			setMethodMapping('login', 'login')->
-			setMethodMapping('logout', 'logout')->
-			setMethodMapping('form', 'form')->
-			setDefaultAction('form');
+				setMethodMapping('login', 'login')->
+				setMethodMapping('logout', 'logout')->
+				setMethodMapping('form', 'form')->
+				setDefaultAction('form');
 		}
 
 		public function handleRequest(HttpRequest $request)
@@ -36,11 +36,6 @@
 						$user = User::dao()->save($user);
 
 						LoggedUser::setUser($user);
-
-						UserLog::me()->log(
-							UserActionType::ACTION_TYPE_LOGIN_ID,
-							$user->getUserName()
-						);
 
 						Session::assign(User::LABEL, $user);
 

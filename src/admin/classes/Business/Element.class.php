@@ -169,11 +169,6 @@
 				.$this->getId();
 		}
 
-		public function getAlterName()
-		{
-			return $this->getElementName();
-		}
-
 		public function getShortName()
 		{
 			if($this->shortName !== null) return $this->shortName;
@@ -210,11 +205,6 @@
 			return
 				$element instanceof Element
 				&& $this->getPolymorphicId() == $element->getPolymorphicId();
-		}
-
-		public function isValid()
-		{
-			return $this->getStatus() == 'root';
 		}
 
 		public function property($propertyName)
@@ -330,7 +320,7 @@
 				$propertyList = Property::dao()->getPropertyList($item);
 				foreach($propertyList as $property) {
 					if(
-						$property->getPropertyClass() == Property::ONE_TO_ONE_PROPERTY
+						$property->getPropertyClass() == 'OneToOneProperty'
 						&& $property->getFetchClass() == $this->getClass()
 					) {
 						$childrenItemList[] = $item;
@@ -352,7 +342,7 @@
 			$itemList = Item::dao()->getItemList();
 
 			foreach($itemList as $item) {
-				if($item->isAbstract()) continue;
+				if($item->getClassType() == 'abstract') continue;
 
 				$itemClass = $item->getClass();
 
@@ -360,7 +350,7 @@
 
 				foreach($propertyList as $property) {
 					if(
-						$property->getPropertyClass() == Property::ONE_TO_ONE_PROPERTY
+						$property->getPropertyClass() == 'OneToOneProperty'
 						&& $property->getFetchClass() == $currentItem->getItemName()
 					) {
 						if(
@@ -376,7 +366,7 @@
 			}
 
 			foreach($itemList as $item) {
-				if($item->isAbstract()) continue;
+				if($item->getClassType() == 'abstract') continue;
 
 				$itemClass = $item->getClass();
 
@@ -384,7 +374,7 @@
 
 				foreach($propertyList as $property) {
 					if(
-						$property->getPropertyClass() == Property::ONE_TO_ONE_PROPERTY
+						$property->getPropertyClass() == 'OneToOneProperty'
 						&& $property->getFetchClass() == $currentItem->getItemName()
 					) {
 						if(
@@ -410,67 +400,6 @@
 			}
 
 			return true;
-		}
-
-		public function getPermission(User $user)
-		{
-			$userGroup = $user->getGroup();
-
-			$currentItem = $this->getItem();
-
-			$elementPermission =
-				ElementPermission::dao()->getByGroupAndElement(
-					$userGroup,
-					$this
-				);
-
-			if($elementPermission) {
-
-				$permission = $elementPermission->getPermission();
-
-			} else {
-
-				$itemPermission =
-					ItemPermission::dao()->getByGroupAndItem(
-						$userGroup,
-						$currentItem
-					);
-
-				if($itemPermission) {
-
-					if(
-						$this->getUser()
-						&& $this->getUser()->getId() == $user->getId()
-					) {
-						$permission = $itemPermission->getOwnerPermission();
-					} elseif(
-						$this->getGroup()
-						&& $this->getGroup()->getId() == $userGroup->getId()
-					) {
-						$permission = $itemPermission->getGroupPermission();
-					} else {
-						$permission = $itemPermission->getWorldPermission();
-					}
-
-				} else {
-
-					if(
-						$this->getUser()
-						&& $this->getUser()->getId() == $user->getId()
-					) {
-						$permission = $userGroup->getOwnerPermission();
-					} elseif(
-						$this->getGroup()
-						&& $this->getGroup()->getId() == $userGroup->getId()
-					) {
-						$permission = $userGroup->getGroupPermission();
-					} else {
-						$permission = $userGroup->getWorldPermission();
-					}
-				}
-			}
-
-			return $permission;
 		}
 	}
 ?>

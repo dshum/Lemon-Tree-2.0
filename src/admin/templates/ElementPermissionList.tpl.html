@@ -1,4 +1,18 @@
-<?php $partViewer->view('include/header.small');?>
+<?php $partViewer->view("include/header.small");?>
+
+<?php
+if(isset($form) && $form->getErrors()) {
+	$form->
+	addMissingLabel('groupId', 'Отсутствует идентификатор группы.')->
+	addMissingLabel('elementId', 'Отсутствует идентификатор элемента.')->
+	addWrongLabel('groupId', 'Некорректный идентификатор группы.')->
+	addWrongLabel('elementId', 'Некорректный идентификатор элемента.');
+
+	foreach($form->getTextualErrors() as $label) {
+		echo $label.'<br>';
+	}
+} else {
+?>
 
 <script type="text/javascript">
 $(function() {
@@ -60,12 +74,12 @@ if(sizeof($parentList)) {
 <input type="hidden" name="elementId" value="<?=$currentElement->getPolymorphicId()?>">
 
 <?php
-$empty = true;
-foreach($itemList as $item) {
-	if(!isset($elementList[$item->getId()]) || !isset($pagerList[$item->getId()])) continue;
-	if(!$pagerList[$item->getId()]->getTotal()) continue;
-	$pager = $pagerList[$item->getId()];
-	$empty = false;
+	$empty = true;
+	foreach($itemList as $item) {
+		if(!isset($elementList[$item->getId()]) || !isset($pagerList[$item->getId()])) continue;
+		if(!$pagerList[$item->getId()]->getTotal()) continue;
+		$pager = $pagerList[$item->getId()];
+		$empty = false;
 ?>
 
 <h3><?=$item->getItemDescription()?></h3>
@@ -73,28 +87,28 @@ foreach($itemList as $item) {
 <table class="elements-list setrights">
 <tr valign="top">
 <th width="20"></th>
-<th class="left" width="92%"><?=$item->getMainPropertyDescription()?></th>
+<th class="left" width="50%"><?=$item->getMainPropertyDescription()?></th>
 <?php foreach(Permission::getPermissionTitleList() as $id => $title) {?>
-<th width="2%"><?=$title?></th>
+<th width="10%"><?=$title?></th>
 <?php }?>
 </tr>
 <?php
-	foreach($elementList[$item->getId()] as $element) {
-		if(isset($elementPermissionMap[$element->getPolymorphicId()])) {
-			$permission = $elementPermissionMap[$element->getPolymorphicId()];
-		} else {
-			if($element->getGroup() && $element->getGroup()->getId() == $currentGroup->getId()) {
-				$permission	=
-					isset($itemPermissionMap[$item->getId()])
-					? $itemPermissionMap[$item->getId()]->getGroupPermission()
-					: $currentGroup->getGroupPermission();
+		foreach($elementList[$item->getId()] as $element) {
+			if(isset($elementPermissionMap[$element->getPolymorphicId()])) {
+				$permission = $elementPermissionMap[$element->getPolymorphicId()];
 			} else {
-				$permission	=
-					isset($itemPermissionMap[$item->getId()])
-					? $itemPermissionMap[$item->getId()]->getWorldPermission()
-					: $currentGroup->getWorldPermission();
+				if($element->getGroup() && $element->getGroup()->getId() == $currentGroup->getId()) {
+					$permission	=
+						isset($itemPermissionMap[$item->getId()])
+						? $itemPermissionMap[$item->getId()]->getGroupPermission()
+						: $currentGroup->getGroupPermission();
+				} else {
+					$permission	=
+						isset($itemPermissionMap[$item->getId()])
+						? $itemPermissionMap[$item->getId()]->getWorldPermission()
+						: $currentGroup->getWorldPermission();
+				}
 			}
-		}
 ?>
 <input type="hidden" name="permission[<?=$element->getPolymorphicId()?>]" value="<?=$permission?>">
 <tr>
@@ -105,21 +119,22 @@ foreach($itemList as $item) {
 <?php }?>
 </tr>
 <?php
-	}
+		}
 ?>
 </table>
 <br>
 <?php
-}
-if(!$empty) {
+	}
+	if(!$empty) {
 ?>
 <input class="btn" type="submit" id="save_button" value="Ctrl+S Сохранить">
 </form>
 
 <?php
-} else {
-	echo 'В данном разделе элементы отсутствуют.';
+	} else {
+		echo 'В данном разделе элементы отсутствуют.';
+	}
 }
 ?>
 
-<?php $partViewer->view('include/footer');?>
+<?php $partViewer->view("include/footer");?>
