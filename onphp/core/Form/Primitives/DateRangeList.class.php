@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: DateRangeList.class.php 5104 2008-05-02 10:34:55Z voxus $ */
 
 	/**
 	 * @ingroup Primitives
@@ -29,7 +29,7 @@
 			return $this;
 		}
 		
-		public function import($scope)
+		public function import(array $scope)
 		{
 			if (
 				empty($scope[$this->name])

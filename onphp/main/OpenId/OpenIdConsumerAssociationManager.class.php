@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: OpenIdConsumerAssociationManager.class.php 4680 2007-12-05 09:36:39Z voxus $ */
 
 	/**
 	 * @ingroup OpenId

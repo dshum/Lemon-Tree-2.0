@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: DoctypeDeclaration.class.php 4626 2007-11-25 22:37:39Z voxus $ */
 
 	/**
 	 * Inline DTD:

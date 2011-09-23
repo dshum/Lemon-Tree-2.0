@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: PrimitiveEnumerationList.class.php 5104 2008-05-02 10:34:55Z voxus $ */
 
 	/**
 	 * @ingroup Primitives
@@ -64,7 +64,7 @@
 			return parent::importValue($value);
 		}
 		
-		public function import($scope)
+		public function import(array $scope)
 		{
 			if (!$this->className)
 				throw new WrongStateException(

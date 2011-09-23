@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                        *
  *                                                                          *
  ****************************************************************************/
-/* $Id$ */
+/* $Id: ClassNotFoundException.class.php 3883 2007-07-27 11:20:21Z voxus $ */
 
 	/**
 	 * @ingroup Exceptions

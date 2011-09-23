@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                        *
  *                                                                          *
  ****************************************************************************/
-/* $Id$ */
+/* $Id: Cache.class.php 5289 2008-07-14 23:54:11Z voxus $ */
 	
 	/**
 	 * System-wide access to selected CachePeer and DaoWorker.
@@ -61,7 +61,7 @@
 		
 		/* void */ public static function setDefaultWorker($worker)
 		{
-			Assert::classExists($worker);
+			Assert::isTrue(class_exists($worker, true));
 			
 			self::$worker = $worker;
 		}
@@ -72,14 +72,6 @@
 		public static function setDaoMap($map)
 		{
 			self::$map = $map;
-		}
-		
-		public static function appendDaoMap($map)
-		{
-			if (self::$map)
-				self::$map = array_merge(self::$map, $map);
-			else
-				self::setDaoMap($map);
 		}
 		
 		/**

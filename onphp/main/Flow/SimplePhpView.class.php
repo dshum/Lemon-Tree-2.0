@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: SimplePhpView.class.php 5489 2008-09-04 15:41:32Z voxus $ */
 
 	/**
 	 * @ingroup Flow
@@ -27,10 +27,8 @@
 		/**
 		 * @return SimplePhpView
 		**/
-		public function render(/* Model */ $model = null)
+		public function render(Model $model = null)
 		{
-			Assert::isTrue($model === null || $model instanceof Model);
-			
 			if ($model)
 				extract($model->getList());
 			
@@ -41,6 +39,24 @@
 			include $this->templatePath;
 			
 			$this->postRender();
+			
+			return $this;
+		}
+		
+		/**
+		 * @return ViewResolver
+		**/
+		public function getResolver()
+		{
+			return $this->partViewResolver;
+		}
+		
+		/**
+		 * @return SimplePhpView
+		**/
+		public function setResolver(ViewResolver $resolver)
+		{
+			$this->partViewResolver = $resolver;
 			
 			return $this;
 		}

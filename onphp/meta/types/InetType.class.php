@@ -1,6 +1,6 @@
 <?php
 /***************************************************************************
- *   Copyright (C) 2007-2009 by Konstantin V. Arkhipov                     *
+ *   Copyright (C) 2007 by Konstantin V. Arkhipov                          *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Lesser General Public License as        *
@@ -8,21 +8,16 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: InetType.class.php 5087 2008-05-02 10:33:29Z voxus $ */
 
 	/**
-	 * @ingroup Types
+	 * @ingroup MetaTypes
 	**/
 	final class InetType extends IntegerType
 	{
 		public function getPrimitiveName()
 		{
 			return 'inet';
-		}
-		
-		public function getSize()
-		{
-			return null;
 		}
 		
 		/**

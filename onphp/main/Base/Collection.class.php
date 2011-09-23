@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: Collection.class.php 5434 2008-08-19 17:22:17Z sherman $ */
 
 	interface Collection
 	{
@@ -33,9 +33,5 @@
 		public function retainAll(array /*of CollectionItem*/ $items);
 		
 		public function getList();
-		
-		public function getByName($name);
-		
-		public function has($name);
 	}
 ?>

@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: BusinessClassBuilder.class.php 5009 2008-03-27 16:40:13Z voxus $ */
 
 	/**
 	 * @ingroup Builders

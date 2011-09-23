@@ -7,17 +7,11 @@ $defaultShortname =
 	: '';
 ?>
 
-<script type="text/javascript" src="<?=PATH_WEB_JS?>linktree.js"></script>
-<script type="text/javascript" src="<?=PATH_WEB_JS?>multilinktree.js"></script>
-<script type="text/javascript" src="<?=PATH_WEB_JS?>point.js"></script>
 <script type="text/javascript" src="<?=PATH_WEB_JS?>tinymce/jscripts/tiny_mce/tiny_mce.js"></script>
-<?php if(YandexMapManager::me()->getKey()) {?>
-<script src="http://api-maps.yandex.ru/1.1/index.xml?key=<?=YandexMapManager::me()->getKey()?>" type="text/javascript"></script>
-<?php }?>
-<script type="text/javascript" src="<?=PATH_WEB_JS?>yandexmap.js"></script>
-
 <script type="text/javascript">
 $(function() {
+	var currentControllerName = '';
+	var currentPluginName = '';
 	var currentShortName = '';
 
 	LT.Common.mainForm = $('#ElementEditForm');
@@ -31,17 +25,17 @@ $(function() {
 			if(data.propertyContent && data.propertyContent.length) {
 				for(var i in data.propertyContent) {
 					var content = data.propertyContent[i].propertyContent;
-					content = content.replace(/\[\[\[/g, '<').replace(/\]\]\]/g, '>');
+					content = content.replace(/\[/g, '<').replace(/\]/g, '>');
 					$('#content_'+data.propertyContent[i].propertyName).html(content);
 				}
 			}
-			if(data.elementId && data.elementName && top.tree) {
+			if(data.elementId && data.elementName) {
 				top.tree.LT.Tree.replaceNode(data.elementId, data.elementName);
 			}
 		});
 <?php } else {?>
 		LT.Common.ajaxSubmit(function(data){
-			if(data.tree && data.tree.length && top.tree) {
+			if(data.tree && data.tree.length) {
 				top.tree.LT.Tree.dropTree();
 				for(var i in data.tree) {
 					top.tree.LT.Tree.addElement(data.tree[i].parentId, data.tree[i].elementId, data.tree[i].elementName, data.tree[i].permissionId, data.tree[i].openFolder);
@@ -49,9 +43,9 @@ $(function() {
 				top.tree.LT.Tree.buildTree();
 			}
 			if(data.parentId) {
-				document.location.href = LT.Common.baseUrl+'?module=ViewBrowse&elementId='+data.parentId;
+				document.location.href = LT.Common.baseUrl+'?module=ElementList&elementId='+data.parentId;
 			} else {
-				document.location.href = LT.Common.baseUrl+'?module=ViewBrowse';
+				document.location.href = LT.Common.baseUrl+'?module=ElementList';
 			}
 		});
 <?php }?>
@@ -76,7 +70,6 @@ $(function() {
 		$(this).css({backgroundPosition: '0 -108px'});
 	}).css({backgroundPosition: '0 -108px'});
 
-<?php if(!$currentElement->getId() || $permission >= Permission::PERMISSION_WRITE_ID) {?>
  	$('#browse_save').click(function(){
 		$(LT.Common.mainForm).submit();
 	}).mousedown(function(){
@@ -88,20 +81,18 @@ $(function() {
 	}).mouseout(function(){
 		$(this).css({backgroundPosition: '0 -108px'});
 	}).css({backgroundPosition: '0 -108px'});
-<?php }?>
 
-<?php if($currentElement->getId() && $permission >= Permission::PERMISSION_DROP_ID) {?>
  	$('#browse_drop').click(function(){
 		if(!confirm('Удалить элемент?')) {
 			return false;
 		}
 		var url = LT.Common.selfUrl+'&action=drop&elementId=<?=$currentElement->getPolymorphicId()?>';
 		LT.Common.ajaxPost(url, {}, function(data){
-			if(data.dropped && data.dropped.length && top.tree) {
+			if(data.dropped && data.dropped.length) {
 				top.tree.LT.Tree.dropNode(data.dropped);
 			}
 			if(data.returnElementId) {
-				document.location.href = LT.Common.baseUrl+'?module=ViewBrowse&elementId='+data.returnElementId;
+				document.location.href = LT.Common.baseUrl+'?module=ElementList&elementId='+data.returnElementId;
 			}
 		});
 	}).mousedown(function(){
@@ -115,13 +106,13 @@ $(function() {
 	}).css({backgroundPosition: '0 -108px'});
 
 	$('#browse_move').click(function(){
-<?php 	if($currentElement->getStatus() == 'trash') {?>
+<?php if($currentElement->getStatus() == 'trash') {?>
 		if(!confirm('Восстановить элемент?')) {
 			return false;
 		}
 		var url = LT.Common.selfUrl+'&action=restore&elementId=<?=$currentElement->getPolymorphicId()?>';
 		LT.Common.ajaxPost(url, {}, function(data){
-			if(data.tree && data.tree.length && top.tree) {
+			if(data.tree && data.tree.length) {
 				top.tree.LT.Tree.dropTree();
 				for(var i in data.tree) {
 					top.tree.LT.Tree.addElement(data.tree[i].parentId, data.tree[i].elementId, data.tree[i].elementName, data.tree[i].permissionId, data.tree[i].openFolder);
@@ -129,15 +120,15 @@ $(function() {
 				top.tree.LT.Tree.buildTree();
 			}
 			if(data.returnElementId) {
-				document.location.href = LT.Common.baseUrl+'?module=ViewBrowse&elementId='+data.returnElementId;
+				document.location.href = LT.Common.baseUrl+'?module=ElementList&elementId='+data.returnElementId;
 			}
 		});
-<?php 	} else {?>
+<?php } else {?>
 		LT.Common.mainForm.each(function() {
 			this.action = LT.Common.baseUrl+'?module=ElementMove';
 			this.submit();
 		});
-<?php 	}?>
+<?php }?>
 	}).mousedown(function(){
 		$(this).css({backgroundPosition: '0 -54px'});
 	}).mouseup(function(){
@@ -147,7 +138,38 @@ $(function() {
 	}).mouseout(function(){
 		$(this).css({backgroundPosition: '0 -108px'});
 	}).css({backgroundPosition: '0 -108px'});
-<?php }?>
+
+	$('#checkControllerName').click(function(){
+		if(this.checked) {
+			$('input[name=controllerName]').each(function() {
+				this.value = currentControllerName;
+				this.disabled = false;
+				this.focus();
+			});
+		} else {
+			$('input[name=controllerName]').each(function() {
+				currentControllerName = this.value;
+				this.value = '<?=$currentItem->getControllerName()?>';
+				this.disabled = true;
+			});
+		}
+	});
+
+	$('#checkPluginName').click(function(){
+		if(this.checked) {
+			$('input[name=pluginName]').each(function() {
+				this.value = currentPluginName;
+				this.disabled = false;
+				this.focus();
+			});
+		} else {
+			$('input[name=pluginName]').each(function() {
+				currentPluginName = this.value;
+				this.value = '<?=$currentItem->getPluginName()?>';
+				this.disabled = true;
+			});
+		}
+	});
 
 	$('#checkShortName').click(function(){
 		if(this.checked) {
@@ -165,118 +187,65 @@ $(function() {
 		}
 	});
 
-	$('input:text[timestamp=true]').change(function() {
-		setTimestamp($(this).attr('property'));
-	}).keyup(function() {
-		setTimestamp($(this).attr('property'));
+	$('span[onetoone=span]').click(function() {
+		var propertyName = $(this).attr('propertyname');
+		$('#'+propertyName+'_block').slideToggle('fast');
 	});
-	/*.mousewheel(function(event, delta) {
-		onTimeMousewheel($(this), delta);
-		setTimestamp($(this).attr('property'));
-		return false;
-	})*/
 
-	$('input:text[time=true]').change(function() {
-		setTime($(this).attr('property'));
-	}).keyup(function() {
-		setTime($(this).attr('property'));
+	$('div[onetoone=block]').each(function() {
+		if(this.offsetHeight > 350) {
+			$(this).css('height', '350px');
+		}
 	});
-	/*.mousewheel(function(event, delta) {
-		onTimeMousewheel($(this), delta);
-		setTime($(this).attr('property'));
+
+	$('a[onetoone=link]').click(function() {
+		var elementId = $(this).attr('elementid');
+		var propertyName = $(this).attr('propertyname');
+		var open = $(this).attr('open');
+
+		elementId = LT.Common.escapeElementId(elementId);
+
+		if(open == 'true') {
+			$('#'+propertyName+'_plus_'+elementId).attr('src', 'img/ico_plus.gif');
+			$('#'+propertyName+'_node_'+elementId).slideUp('fast');
+			$(this).attr('open', 'false');
+		} else {
+			$('#'+propertyName+'_plus_'+elementId).attr('src', 'img/ico_minus.gif');
+			$('#'+propertyName+'_node_'+elementId).slideDown('fast');
+			$(this).attr('open', 'true');
+		}
+
 		return false;
-	})*/
+	});
+
+	$('input:radio[onetoone=radio]').click(function() {
+		var propertyName = $(this).attr('name');
+		var elementName = $(this).attr('elementname');
+		$('#'+propertyName+'_block').slideToggle('fast', function() {
+			$('#'+propertyName+'_description').html(elementName);
+		});
+	});
 });
-
-var onTimeMousewheel = function(object, delta) {
-	var max = object.attr('max');
-	var val = object.val();
-
-	val = Math.round(val) + (delta > 0 ? 1 : -1);
-
-	if(val > max) val = 0;
-	if(val < 0) val = max;
-	if(val < 10) val = '0'+val;
-
-	object.val(val);
-}
-
-var setTimestamp = function(propertyName) {
-	$('#'+propertyName).val(
-		$('#'+propertyName+'_date').val()
-		+' '+$('#'+propertyName+'_hour').val()
-		+':'+$('#'+propertyName+'_minute').val()
-		+':'+$('#'+propertyName+'_second').val()
-	);
-}
-
-var setTime = function(propertyName) {
-	if(
-		$('#'+propertyName+'_hour').val()
-		|| $('#'+propertyName+'_minute').val()
-		|| $('#'+propertyName+'_second').val()
-	) {
-		if(!$('#'+propertyName+'_hour').val()) {
-			$('#'+propertyName+'_hour').val('00');
-		}
-		if(!$('#'+propertyName+'_minute').val()) {
-			$('#'+propertyName+'_minute').val('00');
-		}
-		if(!$('#'+propertyName+'_second').val()) {
-			$('#'+propertyName+'_second').val('00');
-		}
-		$('#'+propertyName).val(
-			$('#'+propertyName+'_hour').val()
-			+':'+$('#'+propertyName+'_minute').val()
-			+':'+$('#'+propertyName+'_second').val()
-		);
-	} else {
-		$('#'+propertyName).val(null);
-	}
-}
-
-function fileManagerCallback(propertyName, url, type, window) {
-	tinyMCE.activeEditor.windowManager.open({
-        file : '<?=$baseUrl?>?module=FileManager&url='+url+'&type='+type,
-        title: 'Файловый менеджер',
-        width: 750,
-		height: 500,
-        resizable: 'no',
-		inline: 'yes',
-        close_previous: 'yes'
-    }, {
-        window: window,
-        input: propertyName
-    });
-
-    window.close();
-
-	return false;
-}
 </script>
 
 <!-- path block -->
 <div class="path_top"><div><img src="img/path01.gif" width="5" height="8" alt=""></div></div>
 <div class="path">
 <?php
-if($currentElement->getStatus() == 'trash') {
-?>
-<a href="<?=$baseUrl?>?module=ViewBrowse&elementId=<?=Root::trash()->getPolymorphicId()?>"><?=Root::trash()->getElementName()?></a> &nbsp;<img src="img/path_arr2.gif" alt="">
-<?php
-} else {
+if(sizeof($parentList)) {
 	foreach($parentList as $parent) {
 ?>
-<a href="<?=$baseUrl?>?module=ViewBrowse&elementId=<?=$parent->getPolymorphicId()?>"><?=$parent->getElementName()?></a> &nbsp;<img src="img/path_arr2.gif" alt="">
+<a href="<?=$baseUrl?>?module=ElementList&elementId=<?=$parent->getPolymorphicId()?>"><?=$parent->getElementName()?></a> &nbsp;<img src="img/path_arr2.gif" alt="">
 <?php
 	}
 }
-if($mode == 'edit') {
+if($mode == "edit") {
 ?>
-&nbsp;<a href="<?=$baseUrl?>?module=ViewBrowse&elementId=<?=$currentElement->getPolymorphicId()?>"><?=$currentElement->getElementName()?></a>
+&nbsp;<a href="<?=$baseUrl?>?module=ElementList&elementId=<?=$currentElement->getPolymorphicId()?>"><?=$currentElement->getElementName()?></a>
 <?php
 } else {
 ?>
-<span>Новый элемент</span>
+Новый элемент</span>
 <?php
 }
 ?>
@@ -300,41 +269,28 @@ if($mode == 'edit') {
 
 <br>
 
-<!-- plugin block -->
-<?php
-if(isset($pluginModelAndView) && $pluginModelAndView instanceof ModelAndView) {
-	$pluginModelAndView->getView()->render($pluginModelAndView->getModel());
-}
-?>
-<!-- end of plugin block -->
-
 <?php if($currentElement->getId()) {?>
-<?php 	if($permission >= Permission::PERMISSION_WRITE_ID) {?>
 <form id="ElementEditForm" name="ElementEditForm" action="<?=$selfUrl?>&action=save&elementId=<?=$currentElement->getPolymorphicId()?>" method="post">
 <input type="hidden" name="elementId" value="<?=$currentElement->getPolymorphicId()?>">
 <input type="hidden" name="sourceId" value="<?=$currentElement->getParent()->getPolymorphicId()?>">
 <input type="hidden" name="check[]" value="<?=$currentElement->getPolymorphicId()?>">
-<?php 	}?>
 <?php } else {?>
 <form id="ElementEditForm" name="ElementEditForm" action="<?=$selfUrl?>&action=add&parentId=<?=$currentElement->getParent()->getPolymorphicId()?>&itemId=<?=$currentElement->getItem()->getId()?>" method="post">
 <?php }?>
 
-<?php if($currentElement->getId() && $controllerName != 'error') {?><div class="order_link"><a href="<?=$currentElement->get('href')?>" target="_blank" title="Откроется в новом окне"><img src="img/ico_popup.gif" width="14" height="11" alt="Откроется в новом окне">&nbsp;<em>Смотреть страницу на сайте</em></a></div><?php }?>
+<?php if($currentElement->getId()) {?><div class="order_link"><a href="<?=$currentElement->get('href')?>" target="_blank" title="Откроется в новом окне"><img src="img/ico_popup.gif" width="14" height="11" alt="Откроется в новом окне">&nbsp;<em>Смотреть страницу на сайте</em></a></div><?php }?>
 <h2 class="h2_marg" title="<?=$currentElement->getId() ? "ElementID = ".$currentElement->getId().", " : ""?>ClassName = <?=$currentItem->getItemName()?>"><?=$mode == "create" ? "Добавление" : "Редактирование"?> элемента типа <span class="grey"><?php echo $currentItem->getItemDescription();?></span></h2>
 
 <div class="record_block_top"><div><img src="img/edit01.gif" width="12" height="12" alt=""></div></div>
 
 <div class="record_block">
 <?=$currentItem->getMainPropertyDescription()?>:<br>
-<table class="ie"><tr><td><input type="text" class="prop ename" name="elementName" value="<?=$currentElement ? str_replace('"', '&quot;', $currentElement->getElementName()) : ''?>" maxlength="255"></td></tr></table><br>
+<table class="ie"><tr><td><input type="text" class="prop ename" name="elementName" value="<?=$currentElement ? $currentElement->getElementName() : ""?>" maxlength="255"></td></tr></table><br>
 <?php
 foreach ($propertyList as $property) {
-	$propertyClass = $property->getClass($currentElement)->setParameters();
-	if($propertyClass->getParameterValue('hidden') == false) {
-		echo '<div id="content_'.$property->getPropertyName().'">';
-		echo $propertyClass->getEditElementView();
-		echo '</div>';
-	}
+	echo '<div id="content_'.$property->getPropertyName().'">';
+	echo $property->getClass($currentElement)->editOnElement();
+	echo '</div>';
 }
 ?>
 </div>
@@ -348,22 +304,20 @@ foreach ($propertyList as $property) {
 <div class="record_block">
 <table cellpadding="0" width="90%" cellspacing="0">
 <tr valign="top">
-<td width="50%">
-<span class="grey">
-<?php if($currentElement->getId()) {?>ID элемента: <?=$currentElement->getPolymorphicId()?><br><?php } else {?>Класс элемента: <?=$currentElement->getClass()?><br><?php }?>
-<?php if($currentElement->getElementPath()) {?>Адрес элемента: <?=$currentElement->getElementPath()?><br><?php }?>
-Контроллер: <?=$controllerName?>
-</span>
+<td width="33%">
+<input type="checkbox" id="checkControllerName" name="checkControllerName" value="1" title="Отметить"<?=($currentElement->getControllerName() && $currentElement->getControllerName() != $currentItem->getControllerName()) ? ' checked' : ''?>>
+<label for="checkControllerName">Контроллер:</label><br>
+<input type="text" name="controllerName" value="<?=$currentElement->getControllerName() ? $currentElement->getControllerName() : $currentItem->getControllerName()?>" class="prop"<?=($currentElement->getControllerName() && $currentElement->getControllerName() != $currentItem->getControllerName()) ? '' : ' disabled="disabled"'?>>
 </td>
-<td width="50%">
-<?php if($currentItem->getIsUpdatePath()) {?>
+<td width="33%">
+<input type="checkbox" id="checkPluginName" name="checkPluginName" value="1" title="Отметить"<?=($currentElement->getPluginName() && $currentElement->getPluginName() != $currentItem->getPluginName()) ? ' checked' : ''?>>
+<label for="checkPluginName">Плагин:</label><br>
+<input type="text" name="pluginName" value="<?=$currentElement->getPluginName() ? $currentElement->getPluginName() : $currentItem->getPluginName()?>" class="prop"<?=($currentElement->getPluginName() && $currentElement->getPluginName() != $currentItem->getPluginName()) ? '' : ' disabled="disabled"'?>>
+</td>
+<td width="33%">
 <input type="checkbox" id="checkShortName" name="checkShortName" value="1" title="Отметить"<?=($currentElement->getShortName() != $defaultShortname) ? ' checked' : ''?>>
 <label for="checkShortName">Название в адресной строке:</label><br>
 <input type="text" name="shortName" value="<?=$currentElement->getShortName()?>" class="prop"<?=($currentElement->getShortName() == $defaultShortname) ? ' disabled="disabled"' : ''?>>
-<?php } else {?>
-Название в адресной строке:<br>
-<input type="text" name="shortName" value="" class="prop" disabled="disabled">
-<?php }?>
 </td>
 </tr>
 </table>
@@ -373,13 +327,7 @@ foreach ($propertyList as $property) {
 
 <br>
 
-<?php if($currentElement->getId()) {?>
-<?php 	if($permission >= Permission::PERMISSION_WRITE_ID) {?>
 <input class="btn" type="submit" id="save_button" value="Ctrl+S Сохранить">
 </form>
-<?php 	}?>
-<?php } else {?>
-<input class="btn" type="submit" id="save_button" value="Ctrl+S Добавить">
-<?php }?>
 
 <?php $partViewer->view("include/footer");?>

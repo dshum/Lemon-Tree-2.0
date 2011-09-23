@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: TempDirectory.class.php 3887 2007-07-27 11:20:46Z voxus $ */
 
 	final class TempDirectory
 	{

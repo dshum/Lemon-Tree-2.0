@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: EmptyView.class.php 5212 2008-06-18 16:08:33Z dedmajor $ */
 
 	/**
 	 * @ingroup Flow
@@ -26,7 +26,7 @@
 		/**
 		 * @return EmptyView
 		**/
-		public function render(/* Model */ $model = null)
+		public function render(Model $model = null)
 		{
 			return $this;
 		}

@@ -12,13 +12,15 @@
 			self::PERMISSION_READ_ID => 'Только чтение',
 			self::PERMISSION_WRITE_ID => 'Чтение и запись',
 			self::PERMISSION_DROP_ID => 'Право на удаление',
+			self::PERMISSION_FULL_ID => 'Полный доступ',
 		);
 
 		private static $permissionTitleList = array(
-			self::PERMISSION_DENIED_ID => 'N',
-			self::PERMISSION_READ_ID => 'R',
-			self::PERMISSION_WRITE_ID => 'W',
-			self::PERMISSION_DROP_ID => 'D',
+			self::PERMISSION_DENIED_ID => 'Доступ<br>закрыт',
+			self::PERMISSION_READ_ID => 'Только<br>чтение',
+			self::PERMISSION_WRITE_ID => 'Чтение и<br>запись',
+			self::PERMISSION_DROP_ID => 'Право на<br>удаление',
+			self::PERMISSION_FULL_ID => 'Полный<br>доступ',
 		);
 
 		public static function create()

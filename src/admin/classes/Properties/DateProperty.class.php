@@ -5,12 +5,10 @@
 		{
 			parent::__construct($property, $element);
 
-			$this->value = $this->value ? $this->value : null;
-		}
+			$this->dataType = DataType::create(DataType::DATE);
 
-		public function getDataType()
-		{
-			return DataType::create(DataType::DATE);
+			$getter = $this->property->getter();
+			$this->value = ($this->element && $this->element->$getter()) ? $this->element->$getter() : Date::makeToday();
 		}
 
 		public function meta()
@@ -20,32 +18,26 @@
 
 		public function add2form(Form $form)
 		{
-			return
-				$form->
+			return $form->
 				add(Primitive::date($this->property->getPropertyName()));
 		}
 
 		public function add2search(Form $form)
 		{
-			return
-				$form->
+			return $form->
 				add(Primitive::date($this->property->getPropertyName().'_from'))->
 				add(Primitive::date($this->property->getPropertyName().'_to'));
 		}
 
 		public function add2criteria(Criteria $criteria, Form $form)
 		{
+			return $criteria;
+
 			$from = $form->getValue($this->property->getPropertyName().'_from');
 			$to = $form->getValue($this->property->getPropertyName().'_to');
 
 			$columnName = Property::getColumnName($this->property->getPropertyName());
 			$tableName = $criteria->getDao()->getTable();
-
-			if($from && $to && $from->toString() > $to->toString()) {
-				$tmp = $to;
-				$to = $from;
-				$from = $tmp;
-			}
 
 			if($from) {
 				$criteria->
@@ -57,7 +49,7 @@
 				);
 			}
 
-			if($to) {
+			if($to && $to->toString() >= $from->toString()) {
 				$criteria->
 				add(
 					Expression::ltEq(
@@ -70,109 +62,114 @@
 			return $criteria;
 		}
 
-		public function set(Form $form)
-		{
-			if(
-				$this->getParameterValue('hidden') == false
-				&& $this->getParameterValue('readonly') == false
-				&& $form->primitiveExists($this->property->getPropertyName())
-			) {
-				$setter = $this->property->setter();
-				$dropper = $this->property->dropper();
-				$value = $form->getValue($this->property->getPropertyName());
-				if($value instanceof Date) {
-					$this->element->$setter($value);
-				} else {
-					$this->element->$dropper();
-				}
-			}
-		}
-
 		public function year()
 		{
-			return $this->value ? $this->value->getYear() : null;
+			return $this->value->getYear();
 		}
 
 		public function month()
 		{
-			return $this->value ? $this->doublize($this->value->getMonth()) : null;
+			return $this->doublize($this->value->getMonth());
 		}
 
 		public function day()
 		{
-			return $this->value ? (int)$this->value->getDay() : null;
+			return (int)$this->value->getDay();
 		}
 
 		public function humanMonth()
 		{
-			return $this->value ? RussianTextUtils::getMonthInSubjectiveCase($this->value->getMonth()) : null;
+			return RussianTextUtils::getMonthInSubjectiveCase($this->value->getMonth());
 		}
 
 		public function humanMonth2()
 		{
-			return $this->value ? RussianTextUtils::getMonthInGenitiveCase($this->value->getMonth()) : null;
-		}
-
-		public function humanDate()
-		{
-			if(!$this->value) return null;
-
-			$humanDate =
-				$this->day()
-				.' '.RussianTextUtils::getMonthInGenitiveCase($this->value->getMonth());
-
-			if($this->year() != Date::makeToday()->getYear()) {
-				$humanDate .= ' '.$this->year();
-			}
-
-			return $humanDate;
+			return RussianTextUtils::getMonthInGenitiveCase($this->value->getMonth());
 		}
 
 		public function printf($format = 'Y-m-d')
 		{
-			return $this->value ? date($format, $this->value->toStamp()) : null;
+			return date($format, $this->value->toStamp());
 		}
 
-		public function getElementSearchView(Form $form)
+		public function editOnElement()
 		{
-			$propertyDescription = $this->property->getPropertyDescription();
-			if(mb_strlen($propertyDescription) > 50) {
-				$propertyDescription = mb_substr($propertyDescription, 0, 50).'...';
+			$str = $this->property->getPropertyDescription().':&nbsp;';
+			$str .= '<span id="'.$this->property->getPropertyName().'_show" class="dashed" style="cursor: pointer;">'.sprintf('%d&nbsp;%s %04d года', $this->day(), $this->humanMonth2(), $this->year()).'</span>';
+			$str .= '<input type="hidden" id="'.$this->property->getPropertyName().'" name="'.$this->property->getPropertyName().'" value="'.$this->value->toString().'">';
+			$str .= '<script type="text/javascript">';
+			$str .= 'Calendar.setup({';
+			$str .= 'inputField: "'.$this->property->getPropertyName().'",';
+			$str .= 'ifFormat: "%Y-%m-%d",';
+			$str .= 'displayArea: "'.$this->property->getPropertyName().'_show",';
+			$str .= 'daFormat: "%e %G %Y года",';
+			$str .= 'align: "tR",';
+			$str .= 'weekNumbers: false,';
+			$str .= 'singleClick: true';
+			$str .= '});';
+			$str .= '</script>';
+			$str .= '<br><br>';
+			return $str;
+		}
+
+		public function printOnElementList()
+		{
+			if($this->year() == Date::makeToday()->getYear()) {
+				$str = sprintf('%d&nbsp;%s', $this->day(), $this->humanMonth2());
+			} else {
+				$str = sprintf('%d&nbsp;%s %04d года', $this->day(), $this->humanMonth2(), $this->year());
 			}
+			return $str;
+		}
 
-			$propertyName = $this->property->getPropertyName();
-
+		public function printOnElementSearch(Form $form)
+		{
 			$from =
-				$form->primitiveExists($propertyName.'_from')
-				&& $form->getValue($propertyName.'_from')
-				? $form->getValue($propertyName.'_from')
-				: null;
-
+				$form->primitiveExists($this->property->getPropertyName().'_from')
+				? $form->getValue($this->property->getPropertyName().'_from')
+				: Date::create('2000-01-01');
 			$to =
-				$form->primitiveExists($propertyName.'_to')
-				&& $form->getValue($propertyName.'_to')
-				? $form->getValue($propertyName.'_to')
-				: null;
+				$form->primitiveExists($this->property->getPropertyName().'_to')
+				? $form->getValue($this->property->getPropertyName().'_to')
+				: Date::makeToday();
 
-			if($from && $to && $from->toString() > $to->toString()) {
-				$tmp = $to;
-				$to = $from;
-				$from = $tmp;
-			}
+			$str = '';
 
-			$open = $from || $to;
+			$str .= '<input type="hidden" id="'.$this->property->getPropertyName().'_from" name="'.$this->property->getPropertyName().'_from" value="'.$from->toString().'">';
+			$str .= '<input type="hidden" id="'.$this->property->getPropertyName().'_to" name="'.$this->property->getPropertyName().'_to" value="'.$to->toString().'">';
 
-			$model =
-				Model::create()->
-				set('propertyName', $propertyName)->
-				set('propertyDescription', $propertyDescription)->
-				set('open', $open)->
-				set('from', $from)->
-				set('to', $to);
+			$str .= $this->property->getPropertyDescription().'';
+			$str .= ' от <span id="'.$this->property->getPropertyName().'_from_show" class="dashed" style="cursor: pointer;">'.sprintf('%02d.%02d.%04d', $from->getDay(), $from->getMonth(), $from->getYear()).'</span>';
+			$str .= ' до <span id="'.$this->property->getPropertyName().'_to_show" class="dashed" style="cursor: pointer;">'.sprintf('%02d.%02d.%04d', $to->getDay(), $to->getMonth(), $to->getYear()).'</span>';
 
-			$viewName = 'properties/'.get_class($this).'.search';
 
-			return $this->render($model, $viewName);
+			$str .= '<script type="text/javascript">';
+			$str .= 'Calendar.setup({';
+			$str .= 'inputField: "'.$this->property->getPropertyName().'_from",';
+			$str .= 'ifFormat: "%Y-%m-%d",';
+			$str .= 'displayArea: "'.$this->property->getPropertyName().'_from_show",';
+			$str .= 'daFormat: "%d.%m.%Y",';
+			$str .= 'align: "Tr",';
+			$str .= 'weekNumbers: false,';
+			$str .= 'singleClick: true';
+			$str .= '});';
+			$str .= 'Calendar.setup({';
+			$str .= 'inputField: "'.$this->property->getPropertyName().'_to",';
+			$str .= 'ifFormat: "%Y-%m-%d",';
+			$str .= 'displayArea: "'.$this->property->getPropertyName().'_to_show",';
+			$str .= 'daFormat: "%d.%m.%Y",';
+			$str .= 'align: "Tr",';
+			$str .= 'weekNumbers: false,';
+			$str .= 'singleClick: true';
+			$str .= '});';
+			$str .= '</script>';
+
+			return $str;
+		}
+
+		public function editOnElementList()
+		{
+
 		}
 
 		private function doublize($int)

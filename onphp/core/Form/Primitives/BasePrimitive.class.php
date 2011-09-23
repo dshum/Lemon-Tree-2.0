@@ -8,30 +8,66 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: BasePrimitive.class.php 5460 2008-08-31 18:45:18Z voxus $ */
 
 	/**
 	 * Parent of every Primitive.
 	 * 
 	 * @ingroup Primitives
 	 * @ingroup Module
+	 * 
+	 * Some use cases:
+	 * 
+	 * - rawValue: scope value, as it passed to import()
+	 * 
+	 * - value: 1) object after successful import() or 2) preset
+	 * (hard-default) object for editing (meaning is determined by
+	 * isImported()). Comfortable for business logic.
+	 * 
+	 * - exported value: value, converted back to scope value, possible taking
+	 * into account import filters (see FiltrablePrimitive).
+	 * 
+	 * - formValue: either raw value or exported preset value, possible taking
+	 * into account display filters (see FiltrablePrimitive). Comfortable for
+	 * using in html forms.
+	 * 
+	 * - default: soft-default object, that may be used instead of value when
+	 * import fails (see getSafeValue()). Comfortable for business logic.
+	 * 
+	 * TODO:
+	 * 
+	 * - safe exported value: export(getSafeValue()). Comfortable for
+	 * soft scope correction with valid raw values.
+	 * 
 	**/
 	abstract class BasePrimitive
 	{
+		const WRONG			= 0x0001;
+		const MISSING		= 0x0002;
+		
 		protected $name		= null;
 		protected $default	= null;
 		protected $value	= null;
-
+		
 		protected $required	= false;
 		protected $imported	= false;
-
+		
 		protected $raw		= null;
 		
-		protected $customError	= null;
-
+		protected $error		= null;
+		
 		public function __construct($name)
 		{
 			$this->name = $name;
+		}
+		
+		public function spawn($newName)
+		{
+			$result = clone $this;
+			
+			$result->setName($newName);
+			
+			return $result;
 		}
 		
 		public function getName()
@@ -48,7 +84,7 @@
 			
 			return $this;
 		}
-
+		
 		public function getDefault()
 		{
 			return $this->default;
@@ -74,6 +110,9 @@
 			return $this->raw;
 		}
 		
+		/**
+		 * @deprecated by getFormValue
+		**/
 		public function getActualValue()
 		{
 			if (null !== $this->value)
@@ -90,6 +129,18 @@
 				return $this->value;
 			
 			return $this->default;
+		}
+		
+		public function getFormValue()
+		{
+			if (!$this->imported) {
+				if ($this->value === null)
+					return null;
+				
+				return $this->exportValue();
+			}
+			
+			return $this->raw;
 		}
 		
 		/**
@@ -171,6 +222,7 @@
 		{
 			$this->raw = null;
 			$this->value = null;
+			$this->error = null;
 			$this->imported = false;
 			
 			return $this;
@@ -186,12 +238,34 @@
 			return $this->value;
 		}
 		
-		public function getCustomError()
+		public function getError()
 		{
-			return $this->customError;
+			return $this->error;
 		}
 		
-		protected function import($scope)
+		/**
+		 * @return BasePrimitive
+		**/
+		public function setError($error)
+		{
+			Assert::isPositiveInteger($error);
+			
+			$this->error = $error;
+			
+			return $this;
+		}
+		
+		/**
+		 * @return BasePrimitive
+		**/
+		public function dropError()
+		{
+			$this->error = null;
+			
+			return $this;
+		}
+		
+		protected function import(array $scope)
 		{
 			if (
 				!empty($scope[$this->name])

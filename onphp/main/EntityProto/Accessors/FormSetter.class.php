@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: FormSetter.class.php 4965 2008-03-21 17:12:14Z dedmajor $ */
 
 	final class FormSetter extends FormMutator
 	{

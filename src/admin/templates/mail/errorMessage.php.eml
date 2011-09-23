@@ -1,7 +1,7 @@
 From: <?=$from?>;
 To: <?=$to?>;
-Subject: <?=$uri.' - '.$exception.' - '.nl2br($e->getMessage())?>;
-Content-type: text/html;
+Subject: <?=$uri.' - '.$exception.' - '.$e->getMessage()?>;
+Content-type: text/html; charset=UTF-8;
 
 Class: <?=$exception?><br>
 Message: <?=$e->getMessage()?><br>
@@ -10,28 +10,13 @@ Line: <?=$e->getLine()?><br>
 Code: <?=$e->getCode()?><br>
 Trace: <?=nl2br($e->getTraceAsString())?><br>
 <br>
-
 Server: <?=$server?><br>
 URI: <?=$uri?><br>
 IP: <?=$ip?><br>
-IP2: <?=$ip2?><br>
 UserAgent: <?=$useragent?><br>
 Referer: <?=$referer?><br>
 Request method: <?=$method?><br>
 <br>
-
-GET vars:<br>
-<pre><?=$get?></pre>
-<br>
-
-POST vars:<br>
-<pre><?=$post?></pre>
-<br>
-
-COOKIE vars:<br>
-<pre><?=$cookie?></pre>
-<br>
-
 Сообщение отправлено: <?=$date->toString()?><br>
 <br>
 ---<br>

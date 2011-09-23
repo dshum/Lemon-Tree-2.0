@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                        *
  *                                                                          *
  ****************************************************************************/
-/* $Id$ */
+/* $Id: PrimitiveArray.class.php 5124 2008-05-02 10:36:39Z voxus $ */
 
 	/**
 	 * @ingroup Primitives
@@ -24,6 +24,16 @@
 		**/
 		private $fetchMode = null;
 		
+		public function getTypeName()
+		{
+			return 'HashMap';
+		}
+		
+		public function isObjectType()
+		{
+			return false;
+		}
+		
 		/**
 		 * @return PrimitiveArray
 		**/
@@ -34,28 +44,6 @@
 			$this->fetchMode = $ternary;
 			
 			return $this;
-		}
-		
-		public function import($scope)
-		{
-			if (!BasePrimitive::import($scope))
-				return null;
-			
-			$this->value = $scope[$this->name];
-			
-			$this->selfFilter();
-			
-			if (
-				is_array($this->value)
-				&& !($this->min && count($this->value) < $this->min)
-				&& !($this->max && count($this->value) > $this->max)
-			) {
-				return true;
-			} else {
-				$this->value = null;
-			}
-			
-			return false;
 		}
 		
 		public function importValue($value)

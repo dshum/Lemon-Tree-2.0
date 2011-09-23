@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: IntegerSet.class.php 5085 2008-05-02 10:33:14Z voxus $ */
 
 	/**
 	 * Integer's set.
@@ -18,8 +18,8 @@
 	final class IntegerSet extends Range
 	{
 		public static function create(
-			$min = PrimitiveInteger::SIGNED_MIN,
-			$max = PrimitiveInteger::SIGNED_MAX
+			$min = Integer::SIGNED_MIN,
+			$max = Integer::SIGNED_MAX
 		)
 		{
 			return new IntegerSet($min, $max);

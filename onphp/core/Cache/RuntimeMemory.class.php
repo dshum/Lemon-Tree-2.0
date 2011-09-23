@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: RuntimeMemory.class.php 5288 2008-07-14 22:54:50Z voxus $ */
 
 	/**
 	 * Default process RAM cache.

@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: SimplifiedArrayAccess.class.php 3892 2007-07-27 11:21:02Z voxus $ */
 
 	/**
 	 * @ingroup onSPL

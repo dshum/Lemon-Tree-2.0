@@ -11,8 +11,6 @@
 
 		public function handleRequest(HttpRequest $request)
 		{
-			Item::dao()->setItemList();
-
 			return parent::handleRequest($request);
 		}
 
@@ -32,7 +30,7 @@
 			if(!$form->getErrors()) {
 
 				$property = $form->getValue('propertyId');
-				$propertyClass = $property->getClass(null)->setParameters();
+				$propertyClass = $property->getClass(null);
 				$parameterList = $propertyClass->getParameterList();
 
 				foreach($parameterList as $name => $parameter) {
@@ -43,8 +41,6 @@
 
 				if(!$form->getErrors()) {
 
-					$propertyParameterList = array();
-
 					foreach($parameterList as $name => $parameter) {
 
 						$value = $form->getValue($name);
@@ -52,14 +48,34 @@
 						$rawValue = $parameter->toRaw($value);
 						$rawDefault = $parameter->toRaw($default);
 
-						if($rawValue != $rawDefault) {
-							$propertyParameterList[$name] = $rawValue;
+						$property = $parameter->getProperty();
+
+						try {
+							$propertyParameter = Parameter::dao()->getParameterByName($property, $name);
+						} catch (ObjectNotFoundException $e) {
+							$propertyParameter = null;
 						}
+
+						if($rawValue == $rawDefault) {
+							if($propertyParameter) {
+								Parameter::dao()->dropParameter($propertyParameter);
+							}
+						} else {
+							if($propertyParameter) {
+								$propertyParameter->setParameterValue($rawValue);
+								Parameter::dao()->saveParameter($propertyParameter);
+							} else {
+								$propertyParameter =
+									Parameter::create()->
+									setProperty($property)->
+									setParameterName($name)->
+									setParameterValue($rawValue);
+								Parameter::dao()->addParameter($propertyParameter);
+							}
+						}
+
+						$parameter->setValue($rawValue);
 					}
-
-					$property->setParameterList($propertyParameterList);
-
-					Property::dao()->save($property);
 				}
 			}
 
@@ -88,7 +104,7 @@
 			if(!$form->getErrors()) {
 
 				$property = $form->getValue('propertyId');
-				$propertyClass = $property->getClass(null)->setParameters();
+				$propertyClass = $property->getClass(null);
 				$parameterList = $propertyClass->getParameterList();
 
 				$model->set("property", $property);

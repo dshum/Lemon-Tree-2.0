@@ -8,17 +8,17 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: RubberFileSystem.class.php 5383 2008-08-04 11:19:33Z voxus $ */
 
 	/**
 	 * Simple filesystem cache.
-	 *
+	 * 
 	 * @ingroup Cache
 	**/
 	final class RubberFileSystem extends CachePeer
 	{
 		private $directory	= null;
-
+		
 		/**
 		 * @return RubberFileSystem
 		**/
@@ -30,7 +30,7 @@
 		public function __construct($directory = 'cache/')
 		{
 			$directory = ONPHP_TEMP_PATH.$directory;
-
+			
 			if (!is_writable($directory)) {
 				if (!mkdir($directory, 0700, true)) {
 					throw new WrongArgumentException(
@@ -38,13 +38,13 @@
 					);
 				}
 			}
-
+			
 			if ($directory[strlen($directory) - 1] != DIRECTORY_SEPARATOR)
 				$directory .= DIRECTORY_SEPARATOR;
-
+			
 			$this->directory = $directory;
 		}
-
+		
 		public function isAlive()
 		{
 			if (!is_writable($this->directory))
@@ -52,7 +52,7 @@
 			else
 				return true;
 		}
-
+		
 		/**
 		 * @return RubberFileSystem
 		**/
@@ -60,42 +60,42 @@
 		{
 			// just to return 'true'
 			FileUtils::removeDirectory($this->directory, true);
-
+			
 			return parent::clean();
 		}
-
+		
 		public function increment($key, $value)
 		{
 			$path = $this->makePath($key);
-
+			
 			if (null !== ($current = $this->operate($path))) {
 				$this->operate($path, $current += $value);
-
+				
 				return $current;
 			}
-
+			
 			return null;
 		}
-
+		
 		public function decrement($key, $value)
 		{
 			$path = $this->makePath($key);
-
+			
 			if (null !== ($current = $this->operate($path))) {
 				$this->operate($path, $current -= $value);
-
+				
 				return $current;
 			}
-
+			
 			return null;
 		}
-
+		
 		public function get($key)
 		{
 			$path = $this->makePath($key);
-
+			
 			if (is_readable($path)) {
-
+				
 				if (filemtime($path) <= time()) {
 					try {
 						unlink($path);
@@ -104,13 +104,13 @@
 					}
 					return null;
 				}
-
+				
 				return $this->operate($path);
 			}
-
+			
 			return null;
 		}
-
+		
 		public function delete($key)
 		{
 			try {
@@ -118,16 +118,16 @@
 			} catch (BaseException $e) {
 				return false;
 			}
-
+			
 			return true;
 		}
-
+		
 		public function append($key, $data)
 		{
 			$path = $this->makePath($key);
-
+			
 			$directory = dirname($path);
-
+			
 			if (!file_exists($directory)) {
 				try {
 					mkdir($directory);
@@ -135,30 +135,30 @@
 					// we're in race
 				}
 			}
-
+			
 			if (!is_writable($path))
 				return false;
-
+			
 			try {
 				$fp = fopen($path, 'ab');
 			} catch (BaseException $e) {
 				return false;
 			}
-
+			
 			fwrite($fp, $data);
-
+			
 			fclose($fp);
-
+			
 			return true;
 		}
-
+		
 		protected function store($action, $key, $value, $expires = 0)
 		{
 			$path = $this->makePath($key);
 			$time = time();
-
+			
 			$directory = dirname($path);
-
+			
 			if (!file_exists($directory)) {
 				try {
 					mkdir($directory);
@@ -166,7 +166,7 @@
 					// we're in race
 				}
 			}
-
+			
 			// do not add, if file exist and not expired
 			if (
 				$action == 'add'
@@ -174,10 +174,10 @@
 				&& filemtime($path) > $time
 			)
 				return true;
-
+			
 			// do not replace, when file not exist or expired
 			if ($action == 'replace') {
-
+				
 				if (!is_readable($path)) {
 					return false;
 				} elseif (filemtime($path) <= $time) {
@@ -185,21 +185,21 @@
 					return false;
 				}
 			}
-
+			
 			$this->operate($path, $value, $expires);
-
+			
 			return true;
 		}
-
+		
 		private function operate($path, $value = null, $expires = null)
 		{
 			$key = hexdec(substr(md5($path), 3, 2)) + 1;
 
 			$pool = SemaphorePool::me();
-
+			
 			if (!$pool->get($key))
 				return null;
-
+			
 			try {
 				$old = umask(0077);
 				$fp = fopen($path, $value !== null ? 'wb' : 'rb');
@@ -208,37 +208,37 @@
 				$pool->drop($key);
 				return null;
 			}
-
+			
 			if ($value !== null) {
 				fwrite($fp, $this->prepareData($value));
 				fclose($fp);
-
+				
 				if ($expires < parent::TIME_SWITCH)
 					$expires += time();
-
+				
 				try {
 					touch($path, $expires);
 				} catch (BaseException $e) {
 					// race-removed
 				}
-
+				
 				return $pool->drop($key);
 			} else {
 				if (($size = filesize($path)) > 0)
 					$data = fread($fp, $size);
 				else
 					$data = null;
-
+				
 				fclose($fp);
-
+				
 				$pool->drop($key);
-
+				
 				return $data ? $this->restoreData($data) : null;
 			}
-
+			
 			Assert::isUnreachable();
 		}
-
+		
 		private function makePath($key)
 		{
 			return

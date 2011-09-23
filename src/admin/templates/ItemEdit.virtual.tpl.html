@@ -2,12 +2,26 @@
 <tr>
 	<td width="33%">Название:</td>
 	<td width="33%">Класс объекта:</td>
-	<td width="33%">Наследовать класс:</td>
+	<td width="33%">Наследовать класс объекта:</td>
 </tr>
 <tr>
 	<td><input type="text" name="itemDescription" value="<?=$currentItem->getItemDescription()?>"></td>
 	<td><input type="text" name="itemName" value="<?=$currentItem->getItemName()?>"<?=$mode == 'edit' ? ' disabled="true"' : ''?>></td>
-	<td><input type="text" name="parentClass" value="<?=$currentItem->getParentClass()?>"></td>
+	<td><select name="parentClass" style="width: 90%;"><option value="">Базовый класс (Element)</option><?php foreach($extendableClassList as $item) {?><option value="<?=$item->getItemName()?>"<?=$item->getItemName() == $currentItem->getParentClass() ? ' selected' : ''?>><?=$item->getItemDescription()?> (<?=$item->getItemName()?>)</option><?php }?></select></td>
+</tr>
+</table>
+<br>
+
+<table cellpadding="0" cellspacing="0" width="98%" class="forms">
+<tr>
+	<td width="33%">Источник данных:</td>
+	<td width="33%">Название таблицы:</td>
+	<td width="33%">Контроллер:</td>
+</tr>
+<tr>
+	<td><select name="classSource" style="width: 90%;"><option value="">По умолчанию</option></select></td>
+	<td><input type="text" name="tableName" value="<?=$currentItem->getTableName() ? $currentItem->getTableName() : $currentItem->getDefaultTableName()?>"></td>
+	<td><input type="text" name="controllerName" value="<?=$currentItem->getControllerName()?>"></td>
 </tr>
 </table>
 <br>

@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                        *
  *                                                                          *
  ****************************************************************************/
-/* $Id$ */
+/* $Id: SyntaxErrorException.class.php 5410 2008-08-11 09:23:57Z voxus $ */
 
 	/**
 	 * @ingroup Exceptions

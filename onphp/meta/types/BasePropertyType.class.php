@@ -8,17 +8,16 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: BasePropertyType.class.php 5087 2008-05-02 10:33:29Z voxus $ */
 
 	/**
-	 * @ingroup Types
+	 * @ingroup MetaTypes
 	**/
 	abstract class BasePropertyType
 	{
 		abstract public function getDeclaration();
 		abstract public function isMeasurable();
 		abstract public function toColumnType();
-		abstract public function getPrimitiveName();
 		
 		protected $default = null;
 		

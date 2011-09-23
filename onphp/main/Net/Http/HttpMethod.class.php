@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: HttpMethod.class.php 3987 2007-08-07 13:03:14Z voxus $ */
 
 	/**
 	 * @ingroup Http

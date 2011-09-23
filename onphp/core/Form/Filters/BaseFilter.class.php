@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: BaseFilter.class.php 4520 2007-11-06 02:30:22Z voxus $ */
 
 	/**
 	 * Filter's template.

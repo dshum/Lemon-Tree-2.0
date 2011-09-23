@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: HttpUrlType.class.php 5400 2008-08-07 14:02:08Z dedmajor $ */
 
 	/**
 	 * @ingroup Types

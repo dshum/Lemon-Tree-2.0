@@ -18,30 +18,8 @@
 			return TABLE_PREFIX.parent::getSequence();
 		}
 
-		public function getByGroupAndElement(Group $group, Element $element)
-		{
-			return
-				Criteria::create($this)->
-				add(
-					Expression::eq(
-						new DBField('group_id', $this->getTable()),
-						new DBValue($group->getId())
-					)
-				)->
-				add(
-					Expression::eq(
-						new DBField('element_id', $this->getTable()),
-						new DBValue($element->getPolymorphicId())
-					)
-				)->
-				setLimit(1)->
-				get();
-		}
-
 		public function dropByElement(Element $element)
 		{
-			$db = DBPool::me()->getByDao($this);
-
 			$query =
 				OSQL::delete()->
 				from($this->getTable())->
@@ -52,28 +30,7 @@
 					)
 				);
 
-			$db->query($query);
-
-			$this->uncacheLists();
-		}
-
-		public function dropByGroup(Group $group)
-		{
-			$db = DBPool::me()->getByDao($this);
-
-			$query =
-				OSQL::delete()->
-				from($this->getTable())->
-				where(
-					Expression::eqId(
-						new DBField('group_id', $this->getTable()),
-						$group
-					)
-				);
-
-			$db->query($query);
-
-			$this->uncacheLists();
+			DBPool::me()->getByDao($this)->query($query);
 		}
 	}
 ?>

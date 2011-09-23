@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: MetaConfiguration.class.php 5514 2008-09-22 11:32:58Z voxus $ */
 
 	/**
 	 * @ingroup MetaBase
@@ -28,7 +28,7 @@
 		private $forcedGeneration	= false;
 		private $dryRun				= false;
 		
-		private $checkEnumerationRefIntegrity = false;
+		private $checkEnumerations	= false;
 		
 		/**
 		 * @return MetaConfiguration
@@ -79,9 +79,9 @@
 		/**
 		 * @return MetaConfiguration
 		**/
-		public function setWithEnumerationRefIntegrityCheck($orly)
+		public function checkEnumerations($orly)
 		{
-			$this->checkEnumerationRefIntegrity = $orly;
+			$this->checkEnumerations = $orly;
 			
 			return $this;
 		}
@@ -201,13 +201,7 @@
 							)
 						) {
 							$property->setFetchStrategy(FetchStrategy::cascade());
-						} elseif (
-							!$property->getFetchStrategy()
-							|| (
-								$property->getFetchStrategy()->getId()
-								== FetchStrategy::JOIN
-							)
-						) {
+						} else {
 							$this->checkRecursion($property, $class);
 						}
 					}
@@ -501,7 +495,7 @@
 						
 						$out->info(', ');
 						
-						if ($this->checkEnumerationRefIntegrity)
+						if ($this->checkEnumerations)
 							$this->checkEnumerationReferentialIntegrity(
 								$object,
 								$class->getTableName()
@@ -565,16 +559,6 @@
 						.'/'
 					);
 					
-					$clone = clone $object;
-					
-					if (serialize($clone) == serialize($object))
-						$out->info('C', true);
-					else {
-						$out->error('C', true);
-					}
-					
-					$out->warning('/');
-					
 					try {
 						$object = $dao->getByQuery($query);
 						$form = $object->proto()->makeForm();
@@ -592,6 +576,15 @@
 					
 					$out->warning('/');
 					
+					$clone = clone $object;
+					
+					if (serialize($clone) === serialize($object))
+						$out->info('C', true);
+					else
+						$out->error('C', true);
+					
+					$out->warning('/');
+					
 					if (
 						Criteria::create($dao)->
 						setFetchStrategy(FetchStrategy::cascade())->
@@ -604,9 +597,6 @@
 					}
 					
 					$out->warning('/');
-					
-					// cloning once again
-					$clone = clone $object;
 					
 					FormUtils::object2form($object, $form);
 					FormUtils::form2object($form, $object);
@@ -633,7 +623,7 @@
 						$out->errorLine(
 							"\t\t".$name.' - '
 							.(
-								$error == Form::WRONG
+								$error == BasePrimitive::WRONG
 									? ' wrong'
 									: ' missing'
 							)

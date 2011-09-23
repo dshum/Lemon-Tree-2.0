@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: RussianTextUtils.class.php 4909 2008-03-15 15:08:23Z dedmajor $ */
 
 	/**
 	 * @ingroup Utils

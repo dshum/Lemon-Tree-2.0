@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: DebugUtils.class.php 4671 2007-12-04 20:57:45Z dedmajor $ */
 
 	/**
 	 * @ingroup Utils

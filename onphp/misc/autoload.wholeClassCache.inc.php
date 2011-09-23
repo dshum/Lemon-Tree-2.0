@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: autoload.wholeClassCache.inc.php 5497 2008-09-09 15:21:54Z voxus $ */
 
 	// we must duplicate this one here, otherwise any fail will be silent
 	class BaseException extends Exception

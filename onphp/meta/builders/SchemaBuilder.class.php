@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: SchemaBuilder.class.php 5350 2008-07-29 10:36:55Z voxus $ */
 
 	/**
 	 * @ingroup Builders

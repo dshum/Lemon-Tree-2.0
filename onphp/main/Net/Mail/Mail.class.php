@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: Mail.class.php 4924 2008-03-18 13:23:50Z voxus $ */
 
 	/**
 	 * @ingroup Exceptions

@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: CommonDoctypeDeclaration.class.php 4624 2007-11-25 22:37:35Z voxus $ */
 
 	/**
 	 * Parses common doctype FPI (Formal Public Identifier) in form:

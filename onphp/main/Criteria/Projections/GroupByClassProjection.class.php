@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: GroupByClassProjection.class.php 4243 2007-09-26 15:57:19Z voxus $ */
 
 	/**
 	 * @ingroup Projections
@@ -23,9 +23,7 @@
 			return new self($class);
 		}
 		
-		/* void */ protected function subProcess(
-			JoinCapableQuery $query, DBField $field
-		)
+		/* void */ protected function subProcess(JoinCapableQuery $query, $field)
 		{
 			$query->groupBy($field);
 		}

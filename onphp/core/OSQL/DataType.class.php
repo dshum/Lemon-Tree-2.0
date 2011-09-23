@@ -8,11 +8,11 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: DataType.class.php 5390 2008-08-04 11:50:26Z voxus $ */
 
 	/**
 	 * Generic SQL data types.
-	 *
+	 * 
 	 * @ingroup OSQL
 	**/
 	final class DataType extends Enumeration implements DialectString
@@ -34,12 +34,11 @@
 		const DATE				= 0x00000B;
 		const TIME				= 0x000A0C;
 		const TIMESTAMP			= 0x000A0D;
-		const INTERVAL			= 0x00000F;
+		const INTERVAL			= 0x00000E;
 		
-		const BINARY			= 0x00000E;
+		const BINARY			= 0x00000F;
 		
-		// postgresql specific
-		const PGHSTORE			= 0x002001;
+		// NEXT					= 0x00000H;
 		
 		const HAVE_SIZE			= 0x000100;
 		const HAVE_PRECISION	= 0x000200;
@@ -75,9 +74,7 @@
 			self::TIMESTAMP		=> 'TIMESTAMP',
 			self::INTERVAL		=> 'INTERVAL',
 			
-			self::BINARY		=> 'BINARY',
-			
-			self::PGHSTORE		=> 'HSTORE',
+			self::BINARY		=> 'BINARY'
 		);
 		
 		/**

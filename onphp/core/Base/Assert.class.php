@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: Assert.class.php 5472 2008-09-01 08:39:48Z voxus $ */
 
 	/**
 	 * Widely used assertions.
@@ -52,14 +52,6 @@
 		public static function isEmpty($variable, $message = null)
 		{
 			if (!empty($variable))
-				throw new WrongArgumentException(
-					$message.', '.self::dumpArgument($variable)
-				);
-		}
-		
-		public static function isNotEmpty($variable, $message = null)
-		{
-			if (empty($variable))
 				throw new WrongArgumentException(
 					$message.', '.self::dumpArgument($variable)
 				);
@@ -109,12 +101,7 @@
 		
 		public static function isInteger($variable, $message = null)
 		{
-			if (
-				!(
-					is_numeric($variable)
-					&& $variable == (int) $variable
-				)
-			)
+			if (!self::checkInteger($variable))
 				throw new WrongArgumentException(
 					$message.', '.self::dumpArgument($variable)
 				);
@@ -265,14 +252,6 @@
 				);
 		}
 		
-		public static function methodExists($object, $method, $message = null)
-		{
-			if (!method_exists($object, $method))
-				throw new WrongArgumentException(
-					$message.', method "'.get_class($object).'::'.$method.'()" does not exists'
-				);
-		}
-
 		public static function isUnreachable($message = 'unreachable code reached')
 		{
 			throw new WrongArgumentException($message);
@@ -285,7 +264,6 @@
 			return (
 				is_numeric($value)
 				&& ($value == (int) $value)
-				&& (strlen($value) == strlen((int) $value))
 			);
 		}
 		

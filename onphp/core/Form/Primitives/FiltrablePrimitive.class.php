@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                        *
  *                                                                          *
  ****************************************************************************/
-/* $Id$ */
+/* $Id: FiltrablePrimitive.class.php 5127 2008-05-02 10:36:56Z voxus $ */
 
 	/**
 	 * Basis for Primitives which can be filtered.
@@ -20,7 +20,7 @@
 	{
 		private $importFilter	= null;
 		private $displayFilter 	= null;
-
+		
 		public function __construct($name)
 		{
 			parent::__construct($name);
@@ -28,7 +28,7 @@
 			$this->displayFilter = new FilterChain();
 			$this->importFilter = new FilterChain();
 		}
-
+		
 		/**
 		 * @return FiltrablePrimitive
 		**/
@@ -48,7 +48,7 @@
 			
 			return $this;
 		}
-
+		
 		/**
 		 * @return FiltrablePrimitive
 		**/
@@ -59,6 +59,9 @@
 			return $this;
 		}
 		
+		/**
+		 * @deprecated by getFormValue
+		**/
 		public function getDisplayValue()
 		{
 			if (is_array($value = $this->getActualValue())) {
@@ -69,6 +72,13 @@
 			}
 			
 			return $this->displayFilter->apply($value);
+		}
+		
+		public function getFormValue()
+		{
+			return $this->displayFilter->apply(
+				parent::getFormValue()
+			);
 		}
 		
 		/**
@@ -90,7 +100,7 @@
 			
 			return $this;
 		}
-
+		
 		/**
 		 * @return FiltrablePrimitive
 		**/
@@ -108,7 +118,7 @@
 		{
 			return $this->importFilter;
 		}
-
+		
 		/**
 		 * @return FilterChain
 		**/
@@ -116,18 +126,34 @@
 		{
 			return $this->displayFilter;
 		}
-
+		
+		public function import(array $scope)
+		{
+			if (!BasePrimitive::import($scope))
+				return null;
+			
+			if (!is_array($scope[$this->name])) {
+				$value = (string) $scope[$this->name];
+				$this->applyImportFilters($value);
+				$scope[$this->name] = $value;
+			} else {
+				$this->applyImportFilters($scope[$this->name]);
+			}
+			
+			return parent::import($scope);
+		}
+		
 		/**
 		 * @return FiltrablePrimitive
 		**/
-		protected function selfFilter()
+		protected function applyImportFilters(&$value)
 		{
-			if (is_array($this->value))
-				foreach ($this->value as &$value)
-					$value = $this->importFilter->apply($value);
+			if (is_array($value))
+				foreach ($value as &$element)
+					$element = $this->importFilter->apply($element);
 			else
-				$this->value = $this->importFilter->apply($this->value);
-
+				$value = $this->importFilter->apply($value);
+			
 			return $this;
 		}
 	}

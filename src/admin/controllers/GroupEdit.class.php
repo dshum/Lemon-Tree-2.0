@@ -4,46 +4,23 @@
 		public function __construct()
 		{
 			$this->
-			setMethodMapping('drop', 'drop')->
-			setMethodMapping('add', 'add')->
-			setMethodMapping('save', 'save')->
-			setMethodMapping('create', 'create')->
-			setMethodMapping('edit', 'edit')->
-			setDefaultAction('edit');
+				setMethodMapping('add', 'addGroup')->
+				setMethodMapping('save', 'saveGroup')->
+				setMethodMapping('create', 'createGroup')->
+				setMethodMapping('edit', 'editGroup')->
+				setDefaultAction('edit');
 		}
 
 		public function handleRequest(HttpRequest $request)
 		{
-			$loggedUser = LoggedUser::getUser();
-
-			if(!$loggedUser->getGroup()->getIsAdmin()) {
-				return
-					ModelAndView::create()->
-					setModel(
-						Model::create()->
-						set('userId', $loggedUser->getId())
-					)->
-					setView(new RedirectToView('UserEdit'));
-			}
-
 			return parent::handleRequest($request);
 		}
 
-		public function drop(HttpRequest $request)
+		public function addGroup(HttpRequest $request)
 		{
-			$loggedUser = LoggedUser::getUser();
-			$loggedUserGroup = $loggedUser->getGroup();
-
 			$model = Model::create();
 
-			$form =
-				Form::create()->
-				add(
-					Primitive::identifier('groupId')->
-					of('Group')->
-					required()
-				)->
-				import($request->getPost());
+			$form = $this->makeAddForm();
 
 			if($form->getErrors()) {
 
@@ -51,117 +28,59 @@
 
 			} else {
 
-				$currentGroup = $form->getValue('groupId');
-
-				if($currentGroup->isAllowed()) {
-
-					$countGroup = Group::dao()->getCountByParent($currentGroup);
-					$countUser = User::dao()->getCountByGroup($currentGroup);
-
-					if($countGroup || $countUser) {
-						$model->set('notEmptyGroupError', true);
-					} else {
-						try {
-							Group::dao()->dropGroup($currentGroup);
-						} catch (DatabaseException $e) {
-							$model->set('dropGroupError', true);
-						}
-					}
-
-				} else {
-
-					$model->set('deniedDropGroupError', true);
-
-				}
-			}
-
-			return
-				ModelAndView::create()->
-				setModel($model)->
-				setView('request/GroupEdit');
-		}
-
-		public function add(HttpRequest $request)
-		{
-			$model = Model::create();
-
-			$form = $this->makeAddForm($request);
-
-			if($form->getErrors()) {
-
-				$model->set('form', $form);
-
-			} else {
-
-				$parentGroup = $form->getValue('parentId');
-
-				if($parentGroup->isAddAllowed()) {
-
-					$currentGroup =
-						Group::create()->
-						setParent($parentGroup)->
-						setGroupDescription($form->getValue('groupDescription'))->
-						setOwnerPermission($form->getValue('ownerPermission'))->
-						setGroupPermission($form->getValue('groupPermission'))->
-						setWorldPermission($form->getValue('worldPermission'))->
-						setIsSearch($form->getValue('isSearch'))->
-						setIsDeveloper($form->getValue('isDeveloper'))->
-						setIsAdmin($form->getValue('isAdmin'));
-
-					try {
-						$currentGroup = Group::dao()->add($currentGroup);
-						$model->set('parentId', $currentGroup->getParent()->getId());
-					} catch (DatabaseException $e) {
-						$model->set('addGroupError', true);
-					}
-
-				} else {
-
-					$model->set('deniedAddGroupError', true);
-
-				}
-			}
-
-			return
-				ModelAndView::create()->
-				setModel($model)->
-				setView('request/GroupEdit');
-		}
-
-		public function save(HttpRequest $request)
-		{
-			$model = Model::create();
-
-			$form = $this->makeSaveForm($request);
-
-			if($form->getErrors()) {
-
-				$model->set('form', $form);
-
-			} else {
-
-				$currentGroup = $form->getValue('groupId');
-
-				if($currentGroup->isAllowed()) {
-
-					$currentGroup->
+				$currentGroup =
+					Group::create()->
+					setParent($form->getValue('parentId'))->
 					setGroupDescription($form->getValue('groupDescription'))->
 					setOwnerPermission($form->getValue('ownerPermission'))->
 					setGroupPermission($form->getValue('groupPermission'))->
 					setWorldPermission($form->getValue('worldPermission'))->
-					setIsSearch($form->getValue('isSearch'))->
 					setIsDeveloper($form->getValue('isDeveloper'))->
 					setIsAdmin($form->getValue('isAdmin'));
 
-					try {
-						$currentGroup = Group::dao()->save($currentGroup);
-					} catch (DatabaseException $e) {
-						$model->set('saveGroupError', true);
-					}
+				try {
+					# Add group
+					$currentGroup = Group::dao()->add($currentGroup);
+				} catch (DatabaseException $e) {
+					$model->set('addGroupError', true);
+				}
 
-				} else {
+				$model->set('parentId', $currentGroup->getParent()->getId());
+			}
 
-					$model->set('deniedSaveGroupError', true);
+			return
+				ModelAndView::create()->
+				setModel($model)->
+				setView('request/GroupEdit');
+		}
+
+		public function saveGroup(HttpRequest $request)
+		{
+			$model = Model::create();
+
+			$form = $this->makeSaveForm();
+
+			if($form->getErrors()) {
+
+				$model->set('form', $form);
+
+			} else {
+
+				$currentGroup = $form->getValue('groupId');
+
+				$currentGroup->
+				setGroupDescription($form->getValue('groupDescription'))->
+				setOwnerPermission($form->getValue('ownerPermission'))->
+				setGroupPermission($form->getValue('groupPermission'))->
+				setWorldPermission($form->getValue('worldPermission'))->
+				setIsDeveloper($form->getValue('isDeveloper'))->
+				setIsAdmin($form->getValue('isAdmin'));
+
+				try {
+					# Save group
+					$currentGroup = Group::dao()->save($currentGroup);
+				} catch (DatabaseException $e) {
+					$model->set('saveGroupError', true);
 				}
 			}
 
@@ -171,7 +90,7 @@
 				setView('request/GroupEdit');
 		}
 
-		public function create(HttpRequest $request)
+		public function createGroup(HttpRequest $request)
 		{
 			$model = Model::create();
 
@@ -185,45 +104,34 @@
 				import($_GET);
 
 			if($form->getErrors()) {
+
 				return
 					ModelAndView::create()->
 					setModel(Model::create())->
 					setView(new RedirectToView('GroupList'));
-			}
 
-			$parentGroup = $form->getValue('parentId');
+			} else {
 
-			if(!$parentGroup->isAddAllowed()) {
+				$parentGroup = $form->getValue('parentId');
+				$currentGroup =
+					Group::create()->
+					setParent($parentGroup);
+				$parentList = $currentGroup->getParentList();
+
+				$model->set('parentGroup', $parentGroup);
+				$model->set('currentGroup', $currentGroup);
+				$model->set('parentList', $parentList);
+
 				return
 					ModelAndView::create()->
-					setModel(Model::create())->
-					setView(new RedirectToView('GroupList'));
+					setModel($model)->
+					setView('GroupEdit');
 			}
-
-			$currentGroup =
-				Group::create()->
-				setParent($parentGroup);
-
-			$parentList = $currentGroup->getParentList();
-
-			$model->set('parentGroup', $parentGroup);
-			$model->set('currentGroup', $currentGroup);
-			$model->set('parentList', $parentList);
-
-			return
-				ModelAndView::create()->
-				setModel($model)->
-				setView('GroupEdit');
 		}
 
-		public function edit(HttpRequest $request)
+		public function editGroup(HttpRequest $request)
 		{
-			$loggedUser = LoggedUser::getUser();
-
 			$model = Model::create();
-
-			$requestUri = $request->getServerVar('REQUEST_URI');
-			Session::assign('browseLastUrl', $requestUri);
 
 			$form =
 				Form::create()->
@@ -235,33 +143,28 @@
 				import($_GET);
 
 			if($form->getErrors()) {
+
 				return
 					ModelAndView::create()->
 					setModel(Model::create())->
 					setView(new RedirectToView('GroupList'));
-			}
 
-			$currentGroup = $form->getValue('groupId');
+			} else {
 
-			if(!$currentGroup->isAllowed()) {
+				$currentGroup = $form->getValue('groupId');
+				$parentList = $currentGroup->getParentList();
+
+				$model->set('currentGroup', $currentGroup);
+				$model->set('parentList', $parentList);
+
 				return
 					ModelAndView::create()->
-					setModel(Model::create())->
-					setView(new RedirectToView('GroupList'));
+					setModel($model)->
+					setView('GroupEdit');
 			}
-
-			$parentList = $currentGroup->getParentList();
-
-			$model->set('currentGroup', $currentGroup);
-			$model->set('parentList', $parentList);
-
-			return
-				ModelAndView::create()->
-				setModel($model)->
-				setView('GroupEdit');
 		}
 
-		private function makeAddForm(HttpRequest $request)
+		private function makeAddForm()
 		{
 			$form = Form::create();
 
@@ -294,20 +197,17 @@
 				required()
 			)->
 			add(
-				Primitive::boolean('isSearch')
-			)->
-			add(
 				Primitive::boolean('isDeveloper')
 			)->
 			add(
 				Primitive::boolean('isAdmin')
 			)->
-			import($request->getPost());
+			import($_POST);
 
 			return $form;
 		}
 
-		private function makeSaveForm(HttpRequest $request)
+		private function makeSaveForm()
 		{
 			$form = Form::create();
 
@@ -340,15 +240,12 @@
 				required()
 			)->
 			add(
-				Primitive::boolean('isSearch')
-			)->
-			add(
 				Primitive::boolean('isDeveloper')
 			)->
 			add(
 				Primitive::boolean('isAdmin')
 			)->
-			import($request->getPost());
+			import($_POST);
 
 			return $form;
 		}

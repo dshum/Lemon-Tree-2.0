@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: Prototyped.class.php 4871 2008-02-29 15:20:32Z voxus $ */
 
 	/**
 	 * @ingroup Base

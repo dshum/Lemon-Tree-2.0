@@ -1,6 +1,6 @@
 <?php
 /***************************************************************************
- *   Copyright (C) 2007-2009 by Ivan Y. Khvostishkov                       *
+ *   Copyright (C) 2007 by Ivan Y. Khvostishkov                            *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Lesser General Public License as        *
@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: FileInputStream.class.php 4180 2007-09-09 18:27:40Z voxus $ */
 
 	/**
 	 * @ingroup Utils
@@ -63,14 +63,9 @@
 		**/
 		public function mark()
 		{
-			$this->mark = $this->getOffset();
+			$this->mark = ftell($this->fd);
 			
 			return $this;
-		}
-		
-		public function getOffset()
-		{
-			return ftell($this->fd);
 		}
 		
 		public function markSupported()
@@ -83,15 +78,7 @@
 		**/
 		public function reset()
 		{
-			return $this->seek($this->mark);
-		}
-		
-		/**
-		 * @return FileInputStream
-		**/
-		public function seek($offset)
-		{
-			if (fseek($this->fd, $offset) < 0)
+			if (fseek($this->fd, $this->mark) < 0)
 				throw new IOException(
 					'mark has been invalidated'
 				);
@@ -109,36 +96,17 @@
 			
 			return $this;
 		}
-
+		
 		public function read($length)
 		{
-			return $this->realRead($length);
-		}
-
-		public function readString($length = null)
-		{
-			return $this->realRead($length, true);
-		}
-
-		public function realRead($length, $string = false)
-		{
-			$result = $string
-				? (
-					$length === null
-					? fgets($this->fd)
-					: fgets($this->fd, $length)
-				)
-				: fread($this->fd, $length);
-
-			if ($string && $result === false && feof($this->fd))
-				$result = null; // fgets returns false on eof
-
+			$result = fread($this->fd, $length);
+			
 			if ($result === false)
-				throw new IOException('failed to read from file');
-
+				throw new IOException('failer to read from file');
+			
 			if ($result === '')
 				$result = null; // eof
-
+			
 			return $result;
 		}
 	}

@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: PrimitiveClass.class.php 5456 2008-08-27 09:12:13Z vlad $ */
 
 	/**
 	 * @ingroup Primitives
@@ -17,7 +17,7 @@
 	{
 		private $ofClassName = null;
 		
-		public function import($scope)
+		public function import(array $scope)
 		{
 			if (!($result = parent::import($scope)))
 				return $result;

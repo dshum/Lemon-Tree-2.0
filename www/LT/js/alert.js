@@ -44,7 +44,6 @@ LT.Alert = function() {
 
 	object.block = function () {
 		$(document.body).css({overflowX: 'hidden'});
-
 		$('<div class="blocker"></div>').css({
 			width: $(document).width(),
 			height: $(document).height(),
@@ -53,25 +52,13 @@ LT.Alert = function() {
 			left: 0,
 			zIndex: 90,
 			overflow: 'hidden',
-			backgroundColor: '#FFFFFF',
+			backgroundColor: '#AAB5AA',
 			display: 'none'
 		}).appendTo(document.body).insertBefore(document.body.firstChild).css({
 			filter: 'alpha(opacity=1)',
 			opacity: '0.01',
 			display: 'block'
-		}).fadeTo(200, 0.6);
-
-		$('<div class="blocker-image"></div>').css({
-			width: $(window).width(),
-			height: $(window).height(),
-			position: 'absolute',
-			top: $(window).scrollTop()+'px',
-			left: 0,
-			zIndex: 95,
-			overflow: 'hidden',
-			background: 'url(/LT/img/loader3.gif) no-repeat center',
-			display: 'block'
-		}).appendTo(document.body).insertAfter(document.body.firstChild);
+		}).fadeTo(200, 0.5);
 
 		$('<textarea></textarea>').css({
 			filter: 'alpha(opacity=0)',
@@ -79,7 +66,7 @@ LT.Alert = function() {
 			width: '1px',
 			height: '1px',
 			position: 'absolute',
-			top: ($(window).scrollTop() + 100)+'px',
+			top: $(window).scrollTop()+'px',
 			left: 0
 		 }).appendTo(document.body).focus().css({
 			display: 'none'
@@ -87,8 +74,7 @@ LT.Alert = function() {
 	};
 
 	object.unblock = function() {
-		$('.blocker-image').remove();
-		$('.blocker').fadeOut(100, function() {
+		 $('.blocker').fadeOut(100, function() {
 		 	$(document.body).css({overflowX: 'auto'});
 			$(this).remove();
 		});

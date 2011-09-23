@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: PostgresDialect.class.php 4912 2008-03-17 08:04:26Z voxus $ */
 
 	/**
 	 * PostgreSQL dialect.

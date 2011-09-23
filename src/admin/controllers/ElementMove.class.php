@@ -11,13 +11,10 @@
 
 		public function handleRequest(HttpRequest $request)
 		{
-			Item::dao()->setItemList();
-			Property::dao()->setPropertyList();
-
 			return parent::handleRequest($request);
 		}
 
-		public function moveList(HttpRequest $request)
+		public function moveList($request)
 		{
 			$model = Model::create();
 
@@ -32,8 +29,8 @@
 			add(
 				Primitive::set('check')
 			)->
-			import($request->getGet())->
-			importMore($request->getPost());
+			import($_GET)->
+			importMore($_POST);
 
 			if($form->getErrors()) {
 
@@ -46,59 +43,22 @@
 
 				$itemList = Item::dao()->getItemList();
 
-				$moved = array();
 				$refreshTree = false;
 
 				# Move element list
 				$moveElementList = Element::getListByPolymorphicIds($check);
 
 				foreach($moveElementList as $element) {
-
 					$item = $element->getItem();
-
-					# Before move action
-					try {
-						$actionName = PluginManager::me()->getBeforeUpdateAction(
-							$item->getItemName()
-						);
-						if($actionName && ClassUtils::isClassName($actionName)) {
-							$action = new $actionName($original);
-						}
-					} catch (BaseException $e) {
-						ErrorMessageUtils::sendMessage($e);
+					if($item->getIsFolder()) {
+						$refreshTree = true;
 					}
-
 					try {
-
-						$element = $element->dao()->moveElement($element, $target);
-
-						# After move action
-						try {
-							$actionName = PluginManager::me()->getAfterUpdateAction(
-								$item->getItemName()
-							);
-							if($actionName && ClassUtils::isClassName($actionName)) {
-								$action = new $actionName($element, $original);
-							}
-						} catch (BaseException $e) {
-							ErrorMessageUtils::sendMessage($e);
-						}
-
-						if($item->getIsFolder()) {
-							$refreshTree = true;
-						}
-						$moved[] = $element->getPolymorphicId();
-
+						$element->dao()->moveElement($element, $target);
 					} catch (BaseException $e) {
 						ErrorMessageUtils::sendMessage($e);
 					}
 				}
-
-				# User log
-				UserLog::me()->log(
-					UserActionType::ACTION_TYPE_MOVE_ELEMENT_LIST_ID,
-					implode(', ', $moved)
-				);
 
 				# Refresh tree
 				if($refreshTree) {
@@ -114,7 +74,7 @@
 				setView('request/ElementMove');
 		}
 
-		public function showList(HttpRequest $request)
+		public function showList($request)
 		{
 			$model = Model::create();
 
@@ -129,13 +89,13 @@
 			add(
 				Primitive::set('check')
 			)->
-			import($request->getPost());
+			import($_POST);
 
 			if($form->getErrors()) {
 				return
 					ModelAndView::create()->
 					setModel(Model::create())->
-					setView(new RedirectToView('ViewBrowse'));
+					setView(new RedirectToView('ElementList'));
 			}
 
 			$sourceElement = $form->getValue('sourceId');
@@ -146,7 +106,7 @@
 				return
 					ModelAndView::create()->
 					setModel(Model::create())->
-					setView(new RedirectToView('ViewBrowse'));
+					setView(new RedirectToView('ElementList'));
 
 			}
 

@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: SharedMemorySegmentHandler.class.php 4798 2008-01-22 03:44:18Z voxus $ */
 
 	/**
 	 * @ingroup DAOs

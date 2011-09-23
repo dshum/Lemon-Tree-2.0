@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: MessageSegmentHandler.class.php 5035 2008-04-02 13:58:46Z sherman $ */
 
 	/**
 	 * @ingroup DAOs

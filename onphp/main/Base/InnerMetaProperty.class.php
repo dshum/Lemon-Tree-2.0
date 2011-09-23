@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: InnerMetaProperty.class.php 5504 2008-09-18 12:20:22Z sherman $ */
 
 	/**
 	 * @see LightMetaProperty

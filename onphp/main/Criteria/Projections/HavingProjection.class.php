@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: HavingProjection.class.php 4315 2007-10-01 18:54:01Z sloory $ */
 
 	/**
 	 * @ingroup Projections

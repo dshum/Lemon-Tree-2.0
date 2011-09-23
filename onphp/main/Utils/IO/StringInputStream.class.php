@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: StringInputStream.class.php 5051 2008-04-07 20:49:54Z sherman $ */
 
 	/**
 	 * @ingroup Utils
@@ -91,6 +91,11 @@
 			$this->position += $count;
 			
 			return $result;
+		}
+		
+		public function getPosition()
+		{
+			return $this->position;
 		}
 	}
 ?>

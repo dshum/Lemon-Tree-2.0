@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: PrototypedBuilder.class.php 5057 2008-04-10 14:48:35Z dedmajor $ */
 
 	abstract class PrototypedBuilder
 	{
@@ -87,22 +87,7 @@
 			
 			return $result;
 		}
-
-		public function makeListItemBuilder($object)
-		{
-			return $this;
-		}
 		
-		/**
-		 * @return PrototypedBuilder
-		**/
-		public function makeReverseBuilder()
-		{
-			throw new UnimplementedFeatureException(
-				'reverse builder is not provided yet'
-			);
-		}
-
 		/**
 		 * Also try using plain limitedPropertiesList instead of limited
 		 * hierarchy recursing.
@@ -150,13 +135,11 @@
 		public function compile($object, $recursive = true)
 		{
 			$result = $this->createEmpty();
-
-			$this->initialize($object, $result);
-
+			
 			if ($recursive)
 				$result = $this->upperMake($object, $result);
 			else
-				$result = $this->fillOwn($object, $result);
+				$result = $this->makeOwn($object, $result);
 			
 			return $result;
 		}
@@ -168,10 +151,10 @@
 					upperMake($object, $result);
 			}
 			
-			return $this->fillOwn($object, $result);
+			return $this->makeOwn($object, $result);
 		}
 		
-		public function makeList($objectsList, $recursive = true)
+		public function makeList($objectsList)
 		{
 			if ($objectsList === null)
 				return null;
@@ -180,17 +163,13 @@
 			
 			$result = array();
 			
-			foreach ($objectsList as $id => $object) {
-				$result[$id] = $this->makeListItemBuilder($object)->
-					make($object, $recursive);
+			foreach ($objectsList as $object) {
+				$result[] = $this->make($object);
 			}
 			
 			return $result;
 		}
 		
-		/**
-		 * @deprecated in favour of fillOwn()
-		**/
 		public function makeOwn($object, &$result)
 		{
 			return $this->fillOwn($object, $result);
@@ -215,7 +194,7 @@
 			$setter = $this->getSetter($result);
 			
 			foreach ($this->getFormMapping() as $id => $primitive) {
-
+				
 				$value = $getter->get($id);
 				
 				if ($primitive instanceof PrimitiveFormsList) {
@@ -253,11 +232,6 @@
 			return $result;
 		}
 		
-		protected function initialize($object, &$result)
-		{
-			return $this;
-		}
-
 		protected function getFormMapping()
 		{
 			$protoMapping = $this->proto->getFormMapping();

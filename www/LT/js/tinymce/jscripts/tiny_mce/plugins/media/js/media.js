@@ -183,7 +183,7 @@ function insertMedia() {
 	tinyMCEPopup.restoreSelection();
 
 	if (!AutoValidator.validate(f)) {
-		tinyMCEPopup.alert(ed.getLang('invalid_data'));
+		alert(ed.getLang('invalid_data'));
 		return false;
 	}
 
@@ -218,7 +218,7 @@ function insertMedia() {
 				break;
 		}
 
-		if (fe.width != f.width.value || fe.height != f.height.value)
+		if (fe.width != f.width.value || fe.height != f.height.height)
 			ed.execCommand('mceRepaint');
 
 		fe.title = serializeParameters();
@@ -359,9 +359,7 @@ function changedType(t) {
 	d.getElementById('shockwave_options').style.display = 'none';
 	d.getElementById('wmp_options').style.display = 'none';
 	d.getElementById('rmp_options').style.display = 'none';
-
-	if (t)
-		d.getElementById(t + '_options').style.display = 'block';
+	d.getElementById(t + '_options').style.display = 'block';
 }
 
 function serializeParameters() {
@@ -469,7 +467,7 @@ function setBool(pl, p, n) {
 	if (typeof(pl[n]) == "undefined")
 		return;
 
-	document.forms[0].elements[p + "_" + n].checked = pl[n] != 'false';
+	document.forms[0].elements[p + "_" + n].checked = pl[n];
 }
 
 function setStr(pl, p, n) {
@@ -490,7 +488,7 @@ function getBool(p, n, d, tv, fv) {
 	tv = typeof(tv) == 'undefined' ? 'true' : "'" + jsEncode(tv) + "'";
 	fv = typeof(fv) == 'undefined' ? 'false' : "'" + jsEncode(fv) + "'";
 
-	return (v == d) ? '' : n + (v ? ':' + tv + ',' : ":\'" + fv + "\',");
+	return (v == d) ? '' : n + (v ? ':' + tv + ',' : ':' + fv + ',');
 }
 
 function getStr(p, n, d) {
@@ -602,7 +600,7 @@ function generatePreview(c) {
 
 	// Avoid annoying warning about insecure items
 	if (!tinymce.isIE || document.location.protocol != 'https:') {
-		h += '<object classid="' + cls + '" codebase="' + codebase + '" width="' + pl.width + '" height="' + pl.height + '" id="' + pl.id + '" name="' + pl.name + '" align="' + pl.align + '">';
+		h += '<object classid="clsid:' + cls + '" codebase="' + codebase + '" width="' + pl.width + '" height="' + pl.height + '" id="' + pl.id + '" name="' + pl.name + '" align="' + pl.align + '">';
 
 		for (n in pl) {
 			h += '<param name="' + n + '" value="' + pl[n] + '">';

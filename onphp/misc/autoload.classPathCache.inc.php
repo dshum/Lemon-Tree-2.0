@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: autoload.classPathCache.inc.php 5497 2008-09-09 15:21:54Z voxus $ */
 
 	define('ONPHP_CLASS_CACHE_CHECKSUM', '__occc');
 	

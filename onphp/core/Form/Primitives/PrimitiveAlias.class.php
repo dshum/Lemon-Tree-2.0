@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                        *
  *                                                                          *
  ****************************************************************************/
-/* $Id$ */
+/* $Id: PrimitiveAlias.class.php 5241 2008-06-29 12:22:12Z voxus $ */
 
 	/**
 	 * @ingroup Primitives
@@ -21,11 +21,6 @@
 		{
 			$this->name = $name;
 			$this->primitive = $prm;
-		}
-		
-		public function getInner()
-		{
-			return $this->primitive;
 		}
 		
 		public function getName()
@@ -146,10 +141,15 @@
 			return $this->primitive->exportValue();
 		}
 		
-		public function import($scope)
+		public function import(array $scope)
 		{
-			if (array_key_exists($this->name, $scope))
-				return $this->primitive->importValue($scope[$this->name]);
+			if (array_key_exists($this->name, $scope)) {
+				if ($result = $this->primitive->importValue($scope[$this->name])) {
+					$this->primitive->dropError();
+				}
+				
+				return $result;
+			}
 			
 			return null;
 		}

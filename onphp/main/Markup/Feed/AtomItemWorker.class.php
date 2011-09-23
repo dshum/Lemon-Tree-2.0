@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: AtomItemWorker.class.php 4438 2007-11-01 09:45:25Z sirvantos $ */
 
 	/**
 	 * @ingroup Feed

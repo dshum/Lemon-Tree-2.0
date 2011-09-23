@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: MetaClassType.class.php 4599 2007-11-25 22:36:24Z voxus $ */
 
 	/**
 	 * @ingroup MetaBase

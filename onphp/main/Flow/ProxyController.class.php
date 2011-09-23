@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                        *
  *                                                                          *
  ****************************************************************************/
-/* $Id$ */
+/* $Id: ProxyController.class.php 5493 2008-09-05 10:49:20Z dedmajor $ */
 
 	// TODO: add action => requestType mapper
 	/**

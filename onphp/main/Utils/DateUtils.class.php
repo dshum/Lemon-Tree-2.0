@@ -1,6 +1,6 @@
 <?php
 /***************************************************************************
- *   Copyright (C) 2007-2009 by Ivan Y. Khvostishkov                       *
+ *   Copyright (C) 2007 by Ivan Y. Khvostishkov                            *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Lesser General Public License as        *
@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: DateUtils.class.php 5479 2008-09-02 16:27:53Z sherman $ */
 
 	/**
 	 * Utilities for playing with dates and time
@@ -57,43 +57,6 @@
 				Timestamp::create(
 					mktime(0, 0, 0, $date->getMonth() + 1, 0, $date->getYear())
 				);
-		}
-		
-		public static function makeDatesListByRange(
-			DateRange $range, IntervalUnit $unit, $hash = true
-		)
-		{
-			$date = $unit->truncate($range->getStart());
-			
-			if ('Date' == get_class($range->getStart()))
-				$date = Date::create($date->toStamp());
-			
-			$dates = array();
-			
-			do {
-				if ($hash)
-					$dates[$date->toString()] = $date;
-				else
-					$dates[] = $date;
-				
-				$date = $date->spawn('+ 1'.$unit->getName());
-			} while (
-				$range->getEnd()->toStamp() >= $date->toStamp()
-			);
-			
-			return $dates;
-		}
-		
-		/**
-		 * @return Timestamp
-		**/
-		public static function alignToSeconds(Timestamp $stamp, $seconds)
-		{
-			$rawStamp = $stamp->toStamp();
-			
-			$align = floor($rawStamp / $seconds);
-			
-			return Timestamp::create($align * $seconds);
 		}
 	}
 ?>

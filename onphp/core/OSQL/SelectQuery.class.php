@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                        *
  *                                                                          *
  ****************************************************************************/
-/* $Id$ */
+/* $Id: SelectQuery.class.php 5390 2008-08-04 11:50:26Z voxus $ */
 
 	/**
 	 * @ingroup OSQL
@@ -204,15 +204,6 @@
 				$this->group[] =
 					new DBField($field, $this->getLastTable($table));
 			
-			return $this;
-		}
-		
-		/**
-		 * @return SelectQuery
-		**/
-		public function dropGroupBy()
-		{
-			$this->group = array();
 			return $this;
 		}
 		
@@ -471,15 +462,6 @@
 		public function dropOrder()
 		{
 			$this->order = new OrderChain();
-			return $this;
-		}
-		
-		/**
-		 * @return SelectQuery
-		**/
-		public function dropLimit()
-		{
-			$this->limit = $this->offset = null;
 			return $this;
 		}
 		

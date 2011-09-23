@@ -9,9 +9,27 @@
 			addWrongLabel('groupId', 'Некорректный идентификатор группы.');
 		}
 
+		if($form->primitiveExists('userId')) {
+			$form->
+			addMissingLabel('userId', 'Отсутствует идентификатор пользователя.')->
+			addWrongLabel('userId', 'Некорректный идентификатор пользователя.');
+		}
+
 		foreach($form->getTextualErrors() as $label) {
 			$error[] = $label;
 		}
+	}
+
+	if(isset($selfGroup)) {
+		$error[] = 'Недостаточно прав для удаления данной группы.';
+	}
+
+	if(isset($selfUser)) {
+		$error[] = 'Недостаточно прав для удаления данного пользователя.';
+	}
+
+	if(isset($notEmpty)) {
+		$error[] = 'Данная группа содержит группы или пользователей и не может быть удалена.';
 	}
 
 	$json['error'] = $error;

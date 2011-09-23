@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: Sequenceless.class.php 4684 2007-12-07 13:25:49Z voxus $ */
 
 	/**
 	 * Workaround for sequenceless DB's.

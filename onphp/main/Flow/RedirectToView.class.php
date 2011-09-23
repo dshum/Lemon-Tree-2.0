@@ -1,6 +1,6 @@
 <?php
 /***************************************************************************
- *   Copyright (C) 2006-2008 by Konstantin V. Arkhipov                     *
+ *   Copyright (C) 2006-2007 by Konstantin V. Arkhipov                     *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Lesser General Public License as        *
@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: RedirectToView.class.php 4399 2007-10-25 09:48:36Z sherman $ */
 
 	/**
 	 * @ingroup Flow
@@ -28,7 +28,9 @@
 		
 		public function __construct($controllerName)
 		{
-			Assert::classExists($controllerName);
+			Assert::isTrue(
+				class_exists($controllerName, true)
+			);
 			
 			$this->url = $controllerName;
 		}

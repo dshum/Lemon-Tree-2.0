@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: BadRequestException.class.php 4995 2008-03-26 12:10:56Z voxus $ */
 
 	/**
 	 * Example:

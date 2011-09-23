@@ -40,25 +40,5 @@
 
 			return null;
 		}
-
-		public function getQueryStringWithoutParameter()
-		{
-			$args = func_get_args();
-
-			if(strlen($this->url)) {
-				$queryArray = explode('&', $this->url);
-				foreach($queryArray as $k => $param) {
-					$paramArray = explode('=', $param);
-					$name = array_shift($paramArray);
-					if(in_array($name, $args)) {
-						unset($queryArray[$k]);
-					}
-				}
-
-				return implode('&', $queryArray);
-			}
-
-			return null;
-		}
 	}
 ?>

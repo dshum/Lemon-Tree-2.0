@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: FileUtils.class.php 5435 2008-08-19 18:51:50Z sherman $ */
 
 	/**
 	 * Utilities for file handling.

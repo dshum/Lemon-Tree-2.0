@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: FeedReader.class.php 4554 2007-11-13 17:43:11Z voxus $ */
 
 	/**
 	 * @ingroup Feed

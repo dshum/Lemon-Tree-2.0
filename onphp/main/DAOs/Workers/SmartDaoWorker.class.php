@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: SmartDaoWorker.class.php 5317 2008-07-18 17:24:20Z voxus $ */
 
 	/**
 	 * Transparent caching DAO worker.
@@ -21,10 +21,17 @@
 	final class SmartDaoWorker extends TransparentDaoWorker
 	{
 		private $indexKey	= null;
+		private $watermark	= null;
 		
 		public function __construct(GenericDAO $dao)
 		{
 			parent::__construct($dao);
+			
+			if (($cache = Cache::me()) instanceof WatermarkedPeer)
+				$this->watermark =
+					$cache->mark($this->className)->getActualWatermark();
+			else
+				$this->watermark = null;
 			
 			$this->indexKey =
 				$this->watermark
@@ -44,10 +51,10 @@
 			
 			$semKey = $this->keyToInt($this->indexKey);
 			
-			$key = $this->makeQueryKey($query, self::SUFFIX_QUERY);
+			$key = $this->watermark.$this->className.self::SUFFIX_QUERY.$queryId;
 			
 			$pool = SemaphorePool::me();
-			
+
 			if ($pool->get($semKey)) {
 				$this->syncMap($key);
 				
@@ -72,14 +79,18 @@
 			
 			$cache = Cache::me();
 			
-			$listKey = $this->makeQueryKey($query, self::SUFFIX_LIST);
+			$listKey =
+				$this->watermark
+				.$this->className
+				.self::SUFFIX_LIST
+				.$query->getId();
 			
 			$semKey = $this->keyToInt($this->indexKey);
 			
 			$pool = SemaphorePool::me();
 			
 			if ($pool->get($semKey)) {
-				
+			
 				$this->syncMap($listKey);
 				
 				$cache->mark($this->className)->
@@ -91,7 +102,7 @@
 				
 				$pool->free($semKey);
 			}
-			
+
 			return $array;
 		}
 		//@}
@@ -108,7 +119,7 @@
 			if ($pool->get($intKey)) {
 				$indexList = $cache->mark($this->className)->get($this->indexKey);
 				$cache->mark($this->className)->delete($this->indexKey);
-					
+	
 				if ($indexList) {
 					foreach (array_keys($indexList) as $key)
 						$cache->mark($this->className)->delete($key);

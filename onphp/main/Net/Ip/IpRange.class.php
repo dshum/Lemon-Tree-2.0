@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: IpRange.class.php 4696 2007-12-11 11:57:47Z voxus $ */
 
 	/**
 	 * @ingroup Ip

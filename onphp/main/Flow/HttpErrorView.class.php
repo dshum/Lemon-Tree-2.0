@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: HttpErrorView.class.php 5218 2008-06-18 16:23:36Z dedmajor $ */
 
 	/**
 	 * @ingroup Flow
@@ -28,7 +28,7 @@
 			$this->postfix = $postfix;
 		}
 		
-		/* void */ public function render($model = null)
+		/* void */ public function render(Model $model = null)
 		{
 			header($this->status->toString());
 			include $this->prefix.$this->status->getId().$this->postfix;

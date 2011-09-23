@@ -8,8 +8,8 @@
 
 	final class ItemDAO extends AutoItemDAO
 	{
-		private $itemList = array();
-		private $itemMap = array();
+		private static $itemList = array();
+		private static $itemReferenceList = array();
 
 		public function getTable()
 		{
@@ -21,55 +21,24 @@
 			return TABLE_PREFIX.parent::getSequence();
 		}
 
-		public function setItemList()
+		public static function setItemList()
 		{
 			$itemList =
 				Criteria::create(Item::dao())->
-				addOrder(new DBField('item_order', Item::dao()->getTable()))->
+				addOrder(new DBField("item_order", Item::dao()->getTable()))->
+				addOrder(new DBField("id", Item::dao()->getTable()))->
 				getList();
 
 			foreach($itemList as $item) {
-				$this->itemList[$item->getId()] = $item;
-				$this->itemMap[$item->getItemName()] = $item;
+				self::$itemList[$item->getId()] = $item;
+				self::$itemReferenceList[$item->getItemName()] = $item;
 			}
 		}
 
-		public function setSimpleItemList()
-		{
-			$query =
-				OSQL::select()->
-				get(new DBField('id', $this->getTable()))->
-				get(new DBField('item_name', $this->getTable()))->
-				get(new DBField('class_type', $this->getTable()))->
-				get(new DBField('parent_class', $this->getTable()))->
-				get(new DBField('path_prefix', $this->getTable()))->
-				get(new DBField('is_update_path', $this->getTable()))->
-				from($this->getTable())->
-				orderBy(new DBField('item_order', $this->getTable()));
-
-			try {
-				$customList = $this->getCustomList($query);
-
-				foreach($customList as $custom) {
-					$item =
-						Item::create()->
-						setId($custom['id'])->
-						setItemName($custom['item_name'])->
-						setClassType($custom['class_type'])->
-						setParentClass($custom['parent_class'])->
-						setPathPrefix($custom['path_prefix'])->
-						setIsUpdatePath((bool)$custom['is_update_path']);
-
-					$this->itemList[$item->getId()] = $item;
-					$this->itemMap[$item->getItemName()] = $item;
-				}
-			} catch (ObjectNotFoundException $e) {}
-		}
-
-		public function getItemList()
+		public static function getItemList()
 		{
 			$itemList = array();
-			foreach($this->itemList as $item) {
+			foreach(self::$itemList as $item) {
 				$itemList[] = $item;
 			}
 
@@ -78,11 +47,11 @@
 
 		public function getDefaultItemList()
 		{
-			$itemList = $this->getItemList();
+			$itemList = self::getItemList();
 
 			$defaultItemList = array();
 			foreach($itemList as $item) {
-				if($item->isDefault()) {
+				if(!in_array($item->getClassType(), array('abstract', 'virtual'))) {
 					$defaultItemList[] = $item;
 				}
 			}
@@ -90,73 +59,58 @@
 			return $defaultItemList;
 		}
 
+		public function getDAOConnectedItemList()
+		{
+			$itemList = self::getItemList();
+
+			$DAOConnectedItemList = array();
+			foreach($itemList as $item) {
+				$itemClass = $item->getClass();
+				if($itemClass instanceof DAOConnected) {
+					$DAOConnectedItemList[] = $item;
+				}
+			}
+
+			return $DAOConnectedItemList;
+		}
+
 		public function getExtendableItemList(Item $currentItem)
 		{
+			$itemList = self::getItemList();
+
 			$extendableItemList = array();
-
-			$itemList = $this->getItemList();
-
-			foreach($itemList as $item) {
-				if($currentItem->isExtendable($item)) {
-					$extendableItemList[] = $item;
+			if(!$currentItem) {
+				foreach($itemList as $item) {
+					if(
+						$item->getClassType() != 'final'
+						&& !sizeof(Property::dao()->getPropertyList($item))
+					) {
+						$extendableItemList[] = $item;
+					}
+				}
+			} else {
+				foreach($itemList as $item) {
+					if(
+						$item->getClassType() != 'final'
+						&& $currentItem->isExtendable($item)
+					) {
+						$extendableItemList[] = $item;
+					}
 				}
 			}
 
 			return $extendableItemList;
 		}
 
-		public function getOffspringItemList(Item $currentItem)
-		{
-			$offspringItemList = array();
-
-			$tree = array();
-			$tmpItemList = array();
-
-			$itemList = Item::dao()->getDefaultItemList();
-
-			foreach($itemList as $item) {
-				if(!$item->getIsUpdatePath()) continue;
-				$propertyList = Property::dao()->getPropertyList($item);
-				foreach($propertyList as $property) {
-					if($property->getPropertyClass() == Property::ONE_TO_ONE_PROPERTY) {
-						$tree[$property->getFetchClass()][$item->getItemName()] = $item;
-					}
-				}
-			}
-
-			$tmpItemList[$currentItem->getItemName()] = $currentItem;
-
-			while(true) {
-				foreach($tmpItemList as $tmpItemName => $tmpItem) {
-					if(isset($tree[$tmpItemName])) {
-						foreach($tree[$tmpItemName] as $itemName => $item) {
-							if(!isset($offspringItemList[$itemName])) {
-								$tmpItemList[$itemName] = $item;
-								$offspringItemList[$itemName] = $item;
-							}
-						}
-					}
-					unset($tmpItemList[$tmpItemName]);
-				}
-				if(empty($tmpItemList)) break;
-			}
-
-			return $offspringItemList;
-		}
-
 		public function getItemById($itemId)
 		{
-			if(isset($this->itemList[$itemId])) {
-				return $this->itemList[$itemId];
-			} else {
-				throw new ObjectNotFoundException('Item with id '.$itemId.' is not found.');
-			}
+			return Item::dao()->getById($itemId);
 		}
 
 		public function getItemByName($itemName)
 		{
-			if(isset($this->itemMap[$itemName])) {
-				return $this->itemMap[$itemName];
+			if(isset(self::$itemReferenceList[$itemName])) {
+				return self::$itemReferenceList[$itemName];
 			} else {
 				throw new ObjectNotFoundException('Item with name '.$itemName.' is not found.');
 			}
@@ -167,9 +121,12 @@
 			$db = DBPool::me()->getByDao(Item::dao());
 
 			# Create table
-			if($newItem->isDefault()) {
+			if($newItem->getClassType() == 'default') {
 
-				$tableName = $newItem->getDefaultTableName();
+				$tableName =
+					$newItem->getTableName()
+					? $newItem->getTableName()
+					: $newItem->getDefaultTableName();
 
 				$table =
 					DBTable::create($tableName)->
@@ -194,14 +151,32 @@
 					)->
 					addColumn(
 						DBColumn::create(
+							DataType::create(DataType::VARCHAR)->setNull(false)->setSize(255),
+							'short_name'
+						)
+					)->
+					addColumn(
+						DBColumn::create(
 							DataType::create(DataType::VARCHAR)->setNull(false)->setSize(50),
 							'status'
 						)
 					)->
 					addColumn(
 						DBColumn::create(
-							DataType::create(DataType::VARCHAR)->setSize(255),
+							DataType::create(DataType::VARCHAR)->setNull(false)->setSize(255),
 							'element_path'
+						)
+					)->
+					addColumn(
+						DBColumn::create(
+							DataType::create(DataType::VARCHAR)->setSize(50),
+							'controller_name'
+						)
+					)->
+					addColumn(
+						DBColumn::create(
+							DataType::create(DataType::VARCHAR)->setSize(50),
+							'plugin_name'
 						)
 					)->
 					addColumn(
@@ -238,64 +213,65 @@
 			# Add item
 			$newItem = Item::dao()->add($newItem);
 
-			$this->itemList[$newItem->getId()] = $newItem;
-			$this->itemMap[$newItem->getItemName()] = $newItem;
+			self::$itemList[$item->getId()] = $newItem;
+			self::$itemReferenceList[$item->getItemName()] = $newItem;
 
 			return $newItem;
 		}
 
-		public function saveItem(Item $item)
+		public static function saveItem(Item $item)
 		{
 			# Save item
 			$item = Item::dao()->save($item);
 
-			$this->itemList[$item->getId()] = $item;
-			$this->itemMap[$item->getItemName()] = $item;
+			self::$itemList[$item->getId()] = $item;
+			self::$itemReferenceList[$item->getItemName()] = $item;
 
 			return $item;
 		}
 
-		public function dropItem(Item $item)
+		public static function dropItem(Item $item)
 		{
-			if(isset($this->itemList[$item->getId()])) {
+			$itemId = $item->getId();
+			$itemName = $item->getItemName();
 
-				if($item->isDefault()) {
+			if(isset(self::$itemList[$itemId])) {
+
+				# Drop table
+				if($item->getClassType() == 'default') {
 					$itemClass = $item->getClass();
+					$linkName = $itemClass->dao()->getLinkName();
+					$db = DBPool::me()->getLink($linkName);
+					$dialect = $db->getDialect();
 
-					# Drop table
-					if($itemClass) {
-						$db = DBPool::me()->getByDao($itemClass->dao());
-						$dialect = $db->getDialect();
-						$tableName = $itemClass->dao()->getTable();
-						$query = 'DROP TABLE '.$dialect->quoteTable($tableName);
-						try {
-							$db->queryRaw($query);
-						} catch (DatabaseException $e) {}
-					}
+					$query =
+						'DROP TABLE '
+						.$dialect->quoteTable($itemClass->dao()->getTable())
+						.'';
 
-					# Drop properties
-					Property::dao()->dropByItem($item);
+					try {
 
-					# Drop binds
-					Bind2Item::dao()->dropByItem($item);
-					Bind2Item::dao()->dropByBindItem($item);
-					Bind2Element::dao()->dropByItem($item);
+						$db->queryRaw($query);
 
-					# Drop item
-					Item::dao()->drop($item);
+						# Drop properties
+						Property::dao()->dropPropertyList($item);
 
-					if(isset($this->itemList[$item->getId()])) {
-						unset($this->itemList[$item->getId()]);
-					}
-					if(isset($this->itemMap[$item->getItemName()])) {
-						unset($this->itemMap[$item->getItemName()]);
-					}
+						# Drop binds
+						Bind2Item::dao()->dropByItem($item);
 
-					# Drop auto files
-					Site::dropAuto($item);
+						# Drop item
+						Item::dao()->dropById($itemId);
 
-					# Drop data folder
-					// ...todo
+						unset(self::$itemList[$itemId]);
+						unset(self::$itemReferenceList[$itemName]);
+
+						# Drop auto files
+						Site::dropAuto($item);
+
+						# Drop data folder
+						// ...todo
+
+					} catch (DatabaseException $e) {}
 				}
 			}
 		}

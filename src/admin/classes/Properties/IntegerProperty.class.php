@@ -1,18 +1,13 @@
 <?php
 	final class IntegerProperty extends BaseProperty
 	{
-		public function setParameters()
+		public function __construct($property, $element)
 		{
-			parent::setParameters();
+			parent::__construct($property, $element);
+
+			$this->dataType = DataType::create(DataType::INTEGER);
 
 			$this->addParameter('editable', 'boolean', 'Редактировать в списке', false);
-
-			return $this;
-		}
-
-		public function getDataType()
-		{
-			return DataType::create(DataType::INTEGER);
 		}
 
 		public function meta()
@@ -69,34 +64,37 @@
 			return $criteria;
 		}
 
-		public function getElementSearchView(Form $form)
+		public function editOnElement()
 		{
-			$propertyDescription = $this->property->getPropertyDescription();
-			if(mb_strlen($propertyDescription) > 50) {
-				$propertyDescription = mb_substr($propertyDescription, 0, 50).'...';
-			}
+			$str = $this->property->getPropertyDescription().':&nbsp; ';
+			$str .= '<input type="text" name="'.$this->property->getPropertyName().'" value="'.$this->value.'" class="prop-mini"><br><br>';
+			return $str;
+		}
 
-			$propertyName = $this->property->getPropertyName();
-
+		public function printOnElementSearch(Form $form)
+		{
 			$from =
-				$form->primitiveExists($propertyName.'_from')
-				? $form->getValue($propertyName.'_from')
+				$form->primitiveExists($this->property->getPropertyName().'_from')
+				? $form->getValue($this->property->getPropertyName().'_from')
 				: null;
 			$to =
-				$form->primitiveExists($propertyName.'_to')
-				? $form->getValue($propertyName.'_to')
+				$form->primitiveExists($this->property->getPropertyName().'_to')
+				? $form->getValue($this->property->getPropertyName().'_to')
 				: null;
 
-			$model =
-				Model::create()->
-				set('propertyName', $propertyName)->
-				set('propertyDescription', $propertyDescription)->
-				set('from', $from)->
-				set('to', $to);
+			$str = $this->property->getPropertyDescription().' ';
+			$str .= 'от <input type="text" class="prop-mini" name="'.$this->property->getPropertyName().'_from" value="'.$from.'" style="width: 75px;">';
+			$str .= ' до <input type="text" class="prop-mini" name="'.$this->property->getPropertyName().'_to" value="'.$to.'" style="width: 75px;">';
+			return $str;
+		}
 
-			$viewName = 'properties/'.get_class($this).'.search';
-
-			return $this->render($model, $viewName);
+		public function editOnElementList()
+		{
+			$str = '';
+			$str .= '<input type="hidden" id="edited['.$this->element->getPolymorphicId().']['.$this->property->getPropertyName().']" name="edited['.$this->element->getPolymorphicId().']['.$this->property->getPropertyName().']" value="0">';
+			$str .= '<div id="show['.$this->element->getPolymorphicId().']['.$this->property->getPropertyName().']"><span class="dh">'.$this->value.'</span></div>';
+			$str .= '<input type="text" id="edit['.$this->element->getPolymorphicId().']['.$this->property->getPropertyName().']" name="edit_'.$this->element->getClass().'_'.$this->element->getId().'_'.$this->property->getPropertyName().'" default="'.$this->value.'" value="'.$this->value.'" class="prop-number" maxlength="32">';
+			return $str;
 		}
 	}
 ?>

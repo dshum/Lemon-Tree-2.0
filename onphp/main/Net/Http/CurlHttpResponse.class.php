@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: CurlHttpResponse.class.php 4194 2007-09-18 12:30:10Z voxus $ */
 
 	/**
 	 * @ingroup Http

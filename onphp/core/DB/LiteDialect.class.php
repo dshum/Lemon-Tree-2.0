@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: LiteDialect.class.php 4461 2007-11-04 20:41:33Z voxus $ */
 
 	/**
 	 * SQLite dialect.

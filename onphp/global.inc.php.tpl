@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: global.inc.php.tpl 5497 2008-09-09 15:21:54Z voxus $ */
 
 	// sample system-wide configuration file
 	
@@ -58,7 +58,9 @@
 	error_reporting(E_ALL | E_STRICT);
 	set_error_handler('error2Exception', E_ALL | E_STRICT);
 	ignore_user_abort(true);
-	define('ONPHP_VERSION', '1.0.8.99');
+	define('ONPHP_VERSION', '1.1');
+	define('ONPHP_HOST_INT_MAX', PHP_INT_MAX);
+	define('ONPHP_HOST_INT_MIN', -PHP_INT_MAX - 1);
 	
 	if (!defined('ONPHP_IPC_PERMS'))
 		define('ONPHP_IPC_PERMS', 0660);
@@ -101,6 +103,7 @@
 		
 		.ONPHP_CORE_PATH.'Logic'		.PATH_SEPARATOR
 		.ONPHP_CORE_PATH.'OSQL'			.PATH_SEPARATOR
+		.ONPHP_CORE_PATH.'Types'		.PATH_SEPARATOR
 		
 		// main framework
 		.ONPHP_MAIN_PATH.'Base'			.PATH_SEPARATOR
@@ -130,10 +133,6 @@
 		.ONPHP_MAIN_PATH.'Markup'.DIRECTORY_SEPARATOR.'Html'.PATH_SEPARATOR
 		
 		.ONPHP_MAIN_PATH.'OQL'			.PATH_SEPARATOR
-		.ONPHP_MAIN_PATH.'OQL'.DIRECTORY_SEPARATOR.'Expressions'.PATH_SEPARATOR
-		.ONPHP_MAIN_PATH.'OQL'.DIRECTORY_SEPARATOR.'Parsers'.PATH_SEPARATOR
-		.ONPHP_MAIN_PATH.'OQL'.DIRECTORY_SEPARATOR.'Statements'.PATH_SEPARATOR
-		
 		.ONPHP_MAIN_PATH.'OpenId'		.PATH_SEPARATOR
 		
 		.ONPHP_MAIN_PATH.'EntityProto'.PATH_SEPARATOR
@@ -147,17 +146,8 @@
 		.ONPHP_MAIN_PATH.'Utils'.DIRECTORY_SEPARATOR.'Archivers'.PATH_SEPARATOR
 		.ONPHP_MAIN_PATH.'Utils'.DIRECTORY_SEPARATOR.'IO'.PATH_SEPARATOR
 		.ONPHP_MAIN_PATH.'Utils'.DIRECTORY_SEPARATOR.'Logging'.PATH_SEPARATOR
-		.ONPHP_MAIN_PATH.'Utils'.DIRECTORY_SEPARATOR.'Mobile'.PATH_SEPARATOR
-		.ONPHP_MAIN_PATH.'Utils'.DIRECTORY_SEPARATOR.'CommandLine'.PATH_SEPARATOR
-		.ONPHP_MAIN_PATH.'Utils'.DIRECTORY_SEPARATOR.'Routers'.PATH_SEPARATOR
 		
-		.ONPHP_MAIN_PATH.'Messages'		.PATH_SEPARATOR
-		.ONPHP_MAIN_PATH.'Messages'.DIRECTORY_SEPARATOR.'Interface'.PATH_SEPARATOR
-
 		.ONPHP_MAIN_PATH.'Application'	.PATH_SEPARATOR
-		
-		.ONPHP_MAIN_PATH.'Charts'.PATH_SEPARATOR
-		.ONPHP_MAIN_PATH.'Charts'.DIRECTORY_SEPARATOR.'Google'.PATH_SEPARATOR
 		
 		.ONPHP_META_CLASSES.PATH_SEPARATOR
 		
@@ -176,6 +166,15 @@
 		.'Application'.DIRECTORY_SEPARATOR
 		.'Markups'.DIRECTORY_SEPARATOR
 		.'Documents'.DIRECTORY_SEPARATOR.PATH_SEPARATOR
+		
+		.ONPHP_INCUBATOR_PATH
+		.'classes'.DIRECTORY_SEPARATOR
+		.'Charts'.PATH_SEPARATOR
+		
+		.ONPHP_INCUBATOR_PATH
+		.'classes'.DIRECTORY_SEPARATOR
+		.'Charts'.DIRECTORY_SEPARATOR
+		.'Google'.PATH_SEPARATOR
 	*/
 	);
 ?>

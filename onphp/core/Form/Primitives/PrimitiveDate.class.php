@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: PrimitiveDate.class.php 5124 2008-05-02 10:36:39Z voxus $ */
 
 	/**
 	 * @ingroup Primitives
@@ -18,7 +18,17 @@
 		const DAY		= 'day';
 		const MONTH		= 'month';
 		const YEAR		= 'year';
-
+		
+		public function getTypeName()
+		{
+			return 'Date';
+		}
+		
+		public function isObjectType()
+		{
+			return true;
+		}
+		
 		/**
 		 * @throws WrongArgumentException
 		 * @return PrimitiveDate
@@ -26,7 +36,7 @@
 		public function setValue(/* Date */ $object)
 		{
 			$this->checkType($object);
-
+			
 			$this->value = $object;
 			
 			return $this;
@@ -39,8 +49,8 @@
 		public function setMin(/* Date */ $object)
 		{
 			$this->checkType($object);
-
-			$this->min = $object;
+			
+			$this->atom->setMin($object);
 			
 			return $this;
 		}
@@ -53,7 +63,7 @@
 		{
 			$this->checkType($object);
 			
-			$this->max = $object;
+			$this->atom->setMax($object);
 			
 			return $this;
 		}
@@ -71,60 +81,25 @@
 			return $this;
 		}
 		
-		public function importSingle($scope)
+		public function importSingle(array $scope)
 		{
-			if (
-				BasePrimitive::import($scope)
-				&& (
-					is_string($scope[$this->name])
-					|| is_numeric($scope[$this->name])
-				)
-			) {
-				try {
-					$class = $this->getObjectName();
-					$ts = new $class($scope[$this->name]);
-				} catch (WrongArgumentException $e) {
-					return false;
-				}
-				
-				if ($this->checkRanges($ts)) {
-					$this->value = $ts;
-					return true;
-				}
-			} elseif ($this->isEmpty($scope)) {
-				return null;
-			}
-			
-			return false;
-		}
-
-		public function isEmpty($scope)
-		{
-			if (
-				$this->getState()->isFalse()
-				|| $this->getState()->isNull()
-			) {
-				return empty($scope[$this->name][self::DAY])
-					&& empty($scope[$this->name][self::MONTH])
-					&& empty($scope[$this->name][self::YEAR]);
-			} else
-				return empty($scope[$this->name]);
+			return RangedPrimitive::import($scope);
 		}
 		
-		public function importMarried($scope)
+		public function importMarried(array $scope)
 		{
 			if (
 				BasePrimitive::import($scope)
+				&& is_array($scope[$this->name])
 				&& isset(
 					$scope[$this->name][self::DAY],
 					$scope[$this->name][self::MONTH],
 					$scope[$this->name][self::YEAR]
 				)
-				&& is_array($scope[$this->name])
 			) {
 				if ($this->isEmpty($scope))
 					return !$this->isRequired();
-
+				
 				$year = (int) $scope[$this->name][self::YEAR];
 				$month = (int) $scope[$this->name][self::MONTH];
 				$day = (int) $scope[$this->name][self::DAY];
@@ -132,21 +107,11 @@
 				if (!checkdate($month, $day, $year))
 					return false;
 				
-				try {
-					$date = new Date(
-						$year.'-'.$month.'-'.$day
-					);
-				} catch (WrongArgumentException $e) {
-					// fsck wrong dates
-					return false;
-				}
+				$scope[$this->name] = $year.'-'.$month.'-'.$day;
 				
-				if ($this->checkRanges($date)) {
-					$this->value = $date;
-					return true;
-				}
+				return RangedPrimitive::import($scope);
 			}
-
+			
 			return false;
 		}
 		
@@ -159,7 +124,7 @@
 			
 			$singleScope = array($this->getName() => $value->toString());
 			$marriedRaw =
-				array (
+				array(
 					self::DAY => $value->getDay(),
 					self::MONTH => $value->getMonth(),
 					self::YEAR => $value->getYear(),
@@ -208,23 +173,21 @@
 				);
 		}
 		
-		protected function checkRanges(Date $date)
-		{
-			return
-				(!$this->min || ($this->min->toStamp() <= $date->toStamp()))
-				&& (!$this->max || ($this->max->toStamp() >= $date->toStamp()));
-		}
-		
-		protected function getObjectName()
-		{
-			return 'Date';
-		}
-		
 		/* void */ protected function checkType($object)
 		{
 			Assert::isTrue(
-				ClassUtils::isInstanceOf($object, $this->getObjectName())
+				ClassUtils::isInstanceOf($object, $this->getTypeName())
 			);
+		}
+		
+		protected function isEmpty($scope)
+		{
+			if ($this->getState()->isFalse()) {
+				return empty($scope[$this->name][self::DAY])
+					&& empty($scope[$this->name][self::MONTH])
+					&& empty($scope[$this->name][self::YEAR]);
+			} else
+				return empty($scope[$this->name]);
 		}
 	}
 ?>

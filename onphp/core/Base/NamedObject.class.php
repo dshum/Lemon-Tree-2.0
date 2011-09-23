@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: NamedObject.class.php 3880 2007-07-27 11:20:09Z voxus $ */
 
 	/**
 	 * @see Named

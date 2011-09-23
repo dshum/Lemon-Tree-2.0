@@ -1,42 +1,28 @@
 <?php
 	final class FileProperty extends BaseProperty
 	{
+		private $folder = null;
 		private static $allowedMimeTypes = array(
 			'text/plain',
 			'application/pdf',
-			'application/vnd.ms-excel', 'application/octet-stream', 'application/x-excel',
-			'application/vnd.ms-powerpoint', 'application/msword',
-			'image/gif', 'image/jpeg', 'image/pjpeg', 'image/png', 'image/tiff', 'image/vnd.microsoft.icon',
+			'application/vnd.ms-excel', 'application/vnd.ms-powerpoint', 'application/msword',
+			'image/gif', 'image/jpeg', 'image/png', 'image/tiff', 'image/vnd.microsoft.icon',
 			'application/x-shockwave-flash',
 			'audio/mpeg', 'audio/x-ms-wma', 'audio/vnd.rn-realaudio', 'audio/x-wav',
 			'video/mpeg', 'video/mp4', 'video/quicktime', 'video/x-ms-wmv',
 			'application/zip', 'application/x-rar-compressed', 'application/x-tar',
 		);
 
-		private $folder = null;
-
 		public function __construct($property, $element)
 		{
 			parent::__construct($property, $element);
 
-			$item = $property->getItem();
-			$itemClass = $item->getClass();
-			$this->folder = $itemClass->dao()->getTable();
-		}
+			$this->dataType = DataType::create(DataType::VARCHAR)->setSize(255);
 
-		public function setParameters()
-		{
-			parent::setParameters();
+			$this->folder = $this->property->getItem()->getDefaultTableName().DIRECTORY_SEPARATOR;
 
 			$this->addParameter('maxFilesizeKb', 'integer', 'Максимальный размер файла (Кб)', 2048);
 			$this->addParameter('keepOriginalName', 'boolean', 'Не изменять название файла', false);
-
-			return $this;
-		}
-
-		public function getDataType()
-		{
-			return DataType::create(DataType::VARCHAR)->setSize(255);
 		}
 
 		public function meta()
@@ -67,12 +53,12 @@
 
 		public function path()
 		{
-			return PATH_WEB_LTDATA.$this->folder.'/'.$this->value;
+			return PATH_WEB_LTDATA.$this->folder.$this->value;
 		}
 
 		public function abspath()
 		{
-			return PATH_LTDATA.$this->folder.DIRECTORY_SEPARATOR.$this->value;
+			return PATH_LTDATA.$this->folder.$this->value;
 		}
 
 		public function filename()
@@ -100,34 +86,43 @@
 			return $this->value && file_exists($this->abspath());
 		}
 
-		public function getElementListView()
+		public function editOnElement()
 		{
-			$model =
-				Model::create()->
-				set('value', $this->value)->
-				set('path', $this->path());
-
-			$viewName = 'properties/'.get_class($this).'.elementList';
-
-			return $this->render($model, $viewName);
+			$str = $this->property->getPropertyDescription().':<br>';
+			if($this->exists()) {
+				$str .= '<span class="mini">Загружен файл: <a class="dark_grey" href="'.$this->path().'" target="_blank">'.$this->value.'</a>, '.$this->filesize_kb(1).' Кб</span><br>';
+			}
+			$str .= '<script type="text/javascript">';
+			$str .= '$(function() {';
+			$str .= '$(\'input:file[name='.$this->property->getPropertyName().']\').change(function() {';
+			$str .= '$(\'input:checkbox[name='.$this->property->getPropertyName().'_drop]\').each(function() {this.checked = false;});';
+			$str .= '});';
+			$str .= '$(\'input:checkbox[name='.$this->property->getPropertyName().'_drop]\').click(function() {';
+			$str .= 'if(this.checked) {';
+			$str .= '$(\'input:file[name='.$this->property->getPropertyName().']\').val(\'\');';
+			$str .= '}';
+			$str .= '});';
+			$str .= '});';
+			$str .= '</script>';
+			$str .= '<input type="file" name="'.$this->property->getPropertyName().'" value="'.$this->value.'" class="file-field"><br>';
+			if($this->getParameterValue('maxFilesizeKb') > 0) {
+				$str .= '<small class="red">Максимальный размер файла '.$this->getParameterValue('maxFilesizeKb').' Кб</small><br>';
+			}
+			if($this->exists()) {
+				$str .= '<div class="file_del_check"><input type="checkbox" id="'.$this->property->getPropertyName().'_drop" name="'.$this->property->getPropertyName().'_drop" value="1" title="Удалить"><label for="'.$this->property->getPropertyName().'_drop">Удалить</label></div>';
+			}
+			$str .= '<br>';
+			return $str;
 		}
 
-		public function getEditElementView()
+		public function printOnElementList()
 		{
-			$model =
-				Model::create()->
-				set('propertyName', $this->property->getPropertyName())->
-				set('propertyDescription', $this->property->getPropertyDescription())->
-				set('value', $this->value)->
-				set('exists', $this->exists())->
-				set('path', $this->path())->
-				set('filesize_kb', $this->filesize_kb(1))->
-				set('filename', $this->filename())->
-				set('maxFilesizeKb', $this->getParameterValue('maxFilesizeKb'));
-
-			$viewName = 'properties/'.get_class($this).'.editElement';
-
-			return $this->render($model, $viewName);
+			if($this->value) {
+				$str = '<a href="'.$this->path().'" target="_blank">'.$this->value.'</a>';
+				return $str;
+			} else {
+				return null;
+			}
 		}
 
 		public function set(Form $form)
@@ -151,7 +146,7 @@
 				if($this->getParameterValue('keepOriginalName')) {
 					$filename = RussianTextUtils::toTranslit($name);
 				} elseif($this->value) {
-					$array = explode('.', $this->value);
+					$array = explode(".", $this->value);
 					$filename = array_shift($array).'.'.$ext;
 				} else {
 					$filename = sprintf(
@@ -179,9 +174,9 @@
 
 		public function drop()
 		{
-			if(file_exists(PATH_LTDATA.$this->folder.DIRECTORY_SEPARATOR.$this->value)) {
+			if(file_exists(PATH_LTDATA.$this->folder.$this->value)) {
 				try {
-					unlink(PATH_LTDATA.$this->folder.DIRECTORY_SEPARATOR.$this->value);
+					unlink(PATH_LTDATA.$this->folder.$this->value);
 				} catch (BaseException $e) {}
 			}
 		}

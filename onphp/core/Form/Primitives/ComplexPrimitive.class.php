@@ -1,6 +1,6 @@
 <?php
 /***************************************************************************
- *   Copyright (C) 2004-2007 by Konstantin V. Arkhipov                     *
+ *   Copyright (C) 2004-2008 by Konstantin V. Arkhipov                     *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Lesser General Public License as        *
@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: ComplexPrimitive.class.php 5124 2008-05-02 10:36:39Z voxus $ */
 
 	/**
 	 * Basis for primitives which can be scattered across import scope.
@@ -19,13 +19,13 @@
 	abstract class ComplexPrimitive extends RangedPrimitive
 	{
 		private $single = null;	// single, not single or fsck it
-
+		
 		public function __construct($name)
 		{
 			$this->single = new Ternary(null);
 			parent::__construct($name);
 		}
-
+		
 		/**
 		 * @return Ternary
 		**/
@@ -33,52 +33,52 @@
 		{
 			return $this->single;
 		}
-
+		
 		/**
 		 * @return ComplexPrimitive
 		**/
 		public function setState(Ternary $ternary)
 		{
 			$this->single->setValue($ternary->getValue());
-
+			
 			return $this;
 		}
-
+		
 		/**
 		 * @return ComplexPrimitive
 		**/
 		public function setSingle()
 		{
 			$this->single->setTrue();
-
+			
 			return $this;
 		}
-
+		
 		/**
 		 * @return ComplexPrimitive
 		**/
 		public function setComplex()
 		{
 			$this->single->setFalse();
-
+			
 			return $this;
 		}
-
+		
 		/**
 		 * @return ComplexPrimitive
 		**/
 		public function setAnyState()
 		{
 			$this->single->setNull();
-
+			
 			return $this;
 		}
-
+		
 		// implement me, child :-)
-		abstract protected function importSingle($scope);
-		abstract protected function importMarried($scope);
-
-		public function import($scope)
+		abstract protected function importSingle(array $scope);
+		abstract protected function importMarried(array $scope);
+		
+		public function import(array $scope)
 		{
 			if (!BasePrimitive::import($scope))
 				return null;
@@ -90,10 +90,10 @@
 			else {
 				if (!$this->importMarried($scope))
 					return $this->importSingle($scope);
-
+				
 				return true;
 			}
-
+			
 			Assert::isUnreachable();
 		}
 		

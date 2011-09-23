@@ -1,6 +1,6 @@
 <?php
 /***************************************************************************
- *   Copyright (C) 2007-2009 by Ivan Y. Khvostishkov                       *
+ *   Copyright (C) 2007 by Ivan Y. Khvostishkov                            *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Lesser General Public License as        *
@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: FileOutputStream.class.php 4795 2008-01-21 12:55:47Z sherman $ */
 
 	/**
 	 * @ingroup Utils

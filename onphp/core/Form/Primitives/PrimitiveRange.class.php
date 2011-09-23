@@ -1,6 +1,6 @@
 <?php
 /***************************************************************************
- *   Copyright (C) 2004-2007 by Konstantin V. Arkhipov                     *
+ *   Copyright (C) 2004-2008 by Konstantin V. Arkhipov                     *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Lesser General Public License as        *
@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: PrimitiveRange.class.php 5124 2008-05-02 10:36:39Z voxus $ */
 
 	/**
 	 * @ingroup Primitives
@@ -17,65 +17,61 @@
 	{
 		const MIN	= 'min';
 		const MAX	= 'max';
+		
+		public function getTypeName()
+		{
+			return 'Range';
+		}
+		
+		public function isObjectType()
+		{
+			return true;
+		}
 
 		/**
 		 * @throws WrongArgumentException
 		 * @return PrimitiveRange
 		**/
-		public function setValue(/* BaseRange */ $range)
+		public function setValue(/* Range */ $range)
 		{
 			Assert::isTrue(
-				$range instanceof BaseRange,
+				$range instanceof Range,
 				'only ranges accepted today'
 			);
-			
+
 			$this->value = $range;
-			
+
 			return $this;
 		}
 		
-		public function getMax()
+		public function getStart()
 		{
 			if ($this->value)
-				return $this->value->getMax();
+				return $this->value->getStart();
 			
 			return null;
 		}
 		
-		public function getMin()
+		public function getEnd()
 		{
 			if ($this->value)
-				return $this->value->getMin();
+				return $this->value->getEnd();
 			
 			return null;
 		}
 
-		public function getActualMax()
+		public function importSingle(array $scope)
 		{
-			if ($range = $this->getActualValue())
-				return $range->getMax();
-			
-			return null;
-		}
-		
-		public function getActualMin()
-		{
-			if ($range = $this->getActualValue())
-				return $range->getMin();
-			
-			return null;
-		}
-		
-		public function importSingle($scope)
-		{
-			if (!BasePrimitive::import($scope) || is_array($scope[$this->name]))
+			if (!BasePrimitive::import($scope))
 				return null;
+			elseif (is_array($scope[$this->name]))
+				return false;
 			
 			if (isset($scope[$this->name]) && is_string($scope[$this->name])) {
 				$array = explode('-', $scope[$this->name], 2);
 				
 				$range =
-					BaseRange::lazyCreate(
+					Range::lazyCreate(
 						ArrayUtils::getArrayVar($array, 0),
 						ArrayUtils::getArrayVar($array, 1)
 					);
@@ -93,19 +89,15 @@
 			return false;
 		}
 
-		public function importMarried($scope) // ;-)
+		public function importMarried(array $scope) // ;-)
 		{
-			if (
-				($this->safeGet($scope, $this->name, self::MIN) === null)
-				&& ($this->safeGet($scope, $this->name, self::MAX) === null)
-			)
+			$min = $this->safeGet($scope, $this->name, self::MIN);
+			$max = $this->safeGet($scope, $this->name, self::MAX);
+			
+			if ((null === $min) && (null === $max))
 				return null;
 			
-			$range =
-				BaseRange::lazyCreate(
-					$this->safeGet($scope, $this->name, self::MIN),
-					$this->safeGet($scope, $this->name, self::MAX)
-				);
+			$range = Range::lazyCreate($min, $max);
 			
 			if (
 				$range
@@ -120,7 +112,7 @@
 			return false;
 		}
 		
-		private function checkLimits(BaseRange $range)
+		private function checkLimits(Range $range)
 		{
 			if (
 				!(
@@ -137,7 +129,7 @@
 			
 			return false;
 		}
-		
+
 		private function safeGet($scope, $firstDimension, $secondDimension)
 		{
 			if (isset($scope[$firstDimension]) && is_array($scope[$firstDimension])) {
@@ -148,7 +140,7 @@
 					return $scope[$firstDimension][$secondDimension];
 				}
 			}
-			
+
 			return null;
 		}
 	}

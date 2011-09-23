@@ -1,6 +1,6 @@
 <?php
 /***************************************************************************
- *   Copyright (C) 2006-2008 by Konstantin V. Arkhipov                     *
+ *   Copyright (C) 2006-2007 by Konstantin V. Arkhipov                     *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Lesser General Public License as        *
@@ -8,33 +8,16 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: IdentifiablePrimitive.class.php 4961 2008-03-21 16:40:15Z dedmajor $ */
 
 	/**
 	 * @ingroup Primitives
 	**/
-	abstract class IdentifiablePrimitive
-		extends PrimitiveInteger // parent class doesn't really matter here
+	abstract class IdentifiablePrimitive extends PrimitiveInteger
 	{
 		protected $className = null;
 		
-		/**
-		 * due to historical reasons, by default we're dealing only with
-		 * integer identifiers, this problem correctly fixed in master branch
-		*/
-		protected $scalar = false;
-		
 		abstract public function of($className);
-		
-		/**
-		 * @return IdentifiablePrimitive
-		**/
-		public function setScalar($orly = false)
-		{
-			$this->scalar = ($orly === true);
-			
-			return $this;
-		}
 		
 		/**
 		 * @throws WrongArgumentException
@@ -71,22 +54,6 @@
 				return null;
 			
 			return $this->value->getId();
-		}
-		
-		/* void */ protected function checkNumber($number)
-		{
-			if ($this->scalar)
-				Assert::isScalar($number);
-			else
-				Assert::isInteger($number);
-		}
-		
-		protected function castNumber($number)
-		{
-			if (!$this->scalar && Assert::checkInteger($number))
-				return (int) $number;
-			
-			return $number;
 		}
 	}
 ?>

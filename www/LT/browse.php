@@ -1,10 +1,6 @@
 <?php
 	require $_SERVER['DOCUMENT_ROOT'].'/../src/config.inc.php';
 
-	ob_start('fatalErrorHandler');
-
-	define('PATH_IMG', DOCUMENT_ROOT.FOLDER_LT.'img/');
-
 	define('PATH_WEB_CSS', PATH_ADMIN.'css/');
 	define('PATH_WEB_IMG', PATH_ADMIN.'img/');
 	define('PATH_WEB_JS', PATH_ADMIN.'js/');
@@ -33,20 +29,24 @@
 			LoggedUser::setClass('User');
 			LoggedUser::setUser($loggedUser);
 
-			$module = $request->hasGetVar('module') ? $request->getGetVar('module') : 'ViewBrowse';
+			$module = $request->hasGetVar('module') ? $request->getGetVar('module') : 'ElementList';
 
 			$controllerName =
 				ClassUtils::isClassName($module)
 				&& defined('PATH_ADMIN_CONTROLLERS')
 				&& is_readable(PATH_ADMIN_CONTROLLERS.$module.EXT_CLASS)
 				? $module
-				: 'ViewBrowse';
+				: 'ElementList';
+
+			Site::init();
 
 		} else {
 
 			$loggedUser = null;
 
-			$controllerName = 'Prompt';
+			$module = $request->hasGetVar('module') ? $request->getGetVar('module') : 'Prompt';
+
+			$controllerName = $module == 'Restore' ? 'Restore' : 'Prompt';
 
 		}
 
@@ -61,15 +61,11 @@
 		if(!$view) {
 			$view = $controllerName;
 		} elseif(is_string($view)) {
-			if(strpos($view, 'redirect:') !== false) {
+			if($view == 'error') {
+				$view = new RedirectView($prefix);
+			} elseif(strpos($view, 'redirect:') !== false) {
 				list(, $module) = explode(':', $view, 2);
 				$view = new RedirectView(PATH_ADMIN.'?module='.$module);
-			} elseif($view == 'redirectBack') {
-				$href =
-					isset($_SERVER['HTTP_REFERER'])
-					? $_SERVER['HTTP_REFERER']
-					: PATH_ADMIN_BROWSE;
-				$view = new RedirectView($href);
 			}
 		} elseif($view instanceof RedirectToView) {
 			$view->setPrefix($prefix);
@@ -91,6 +87,7 @@
 			$model->
 			set('selfUrl', PATH_ADMIN_BROWSE.'?module='.$controllerName)->
 			set('baseUrl', PATH_ADMIN_BROWSE)->
+			set('controllerName', $controllerName)->
 			set('loggedUser', $loggedUser);
 		}
 

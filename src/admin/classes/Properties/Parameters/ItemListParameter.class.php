@@ -37,11 +37,9 @@
 			$ids = explode(',', $raw);
 
 			foreach($ids as $id) {
-				if($id) {
-					try {
-						$this->value[] = Item::dao()->getById($id);
-					} catch (ObjectNotFoundException $e) {}
-				}
+				try {
+					$this->value[] = Item::dao()->getById($id);
+				} catch (ObjectNotFoundException $e) {}
 			}
 
 			return $this;

@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: OpenIdConsumer.class.php 4793 2008-01-21 08:18:14Z voxus $ */
 
 	/**
 	 * openId consumer library entry point

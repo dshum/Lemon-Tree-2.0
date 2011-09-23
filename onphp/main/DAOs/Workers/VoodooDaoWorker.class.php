@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: VoodooDaoWorker.class.php 5294 2008-07-15 10:16:53Z voxus $ */
 
 	/**
 	 * Transparent though quite obscure and greedy DAO worker.
@@ -37,7 +37,7 @@
 		
 		public static function setDefaultHandler($handler)
 		{
-			Assert::classExists($handler);
+			Assert::isTrue(class_exists($handler, true));
 			
 			self::$defaultHandler = $handler;
 		}
@@ -45,7 +45,7 @@
 		public function __construct(GenericDAO $dao)
 		{
 			parent::__construct($dao);
-			
+
 			if (($cache = Cache::me()) instanceof WatermarkedPeer)
 				$watermark = $cache->mark($this->className)->getActualWatermark();
 			else
@@ -64,7 +64,7 @@
 			$expires = Cache::EXPIRES_FOREVER
 		)
 		{
-			$key = $this->makeQueryKey($query, self::SUFFIX_QUERY);
+			$key = $this->className.self::SUFFIX_QUERY.$query->getId();
 			
 			if ($this->handler->touch($this->keyToInt($key)))
 				Cache::me()->mark($this->className)->
@@ -85,7 +85,7 @@
 			
 			$cache = Cache::me();
 			
-			$key = $this->makeQueryKey($query, self::SUFFIX_LIST);
+			$key = $this->className.self::SUFFIX_LIST.$query->getId();
 			
 			if ($this->handler->touch($this->keyToInt($key))) {
 				$cache->mark($this->className)->
@@ -95,7 +95,7 @@
 			return $array;
 		}
 		//@}
-		
+
 		/// uncachers
 		//@{
 		public function uncacheLists()

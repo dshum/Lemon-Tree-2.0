@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: FormGetter.class.php 5063 2008-04-15 14:43:09Z dedmajor $ */
 
 	final class FormGetter extends PrototypedGetter
 	{

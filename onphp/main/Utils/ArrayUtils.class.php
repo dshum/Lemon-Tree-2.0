@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: ArrayUtils.class.php 5492 2008-09-05 10:22:04Z dedmajor $ */
 
 	/**
 	 * @ingroup Utils
@@ -63,7 +63,7 @@
 			return $out;
 		}
 		
-		public static function &convertToPlainList($list, $key)
+		public static function convertToPlainList($list, $key)
 		{
 			$out = array();
 			
@@ -81,6 +81,16 @@
 			}
 			
 			return null;
+		}
+		
+		/**
+		 * Example:
+		 * 
+		 * ArrayUtils::getArrayValue(array('key1' => 'value1', ...), $key)
+		**/
+		public static function getArrayValue($array, $var)
+		{
+			return self::getArrayVar($array, $var);
 		}
 		
 		public static function columnFromSet($column, $array)
@@ -119,15 +129,6 @@
 					++$result;
 			
 			return $result;
-		}
-		
-		public static function isEmpty(array $array)
-		{
-			foreach ($array as $key => $value)
-				if ($value !== null)
-					return false;
-			
-			return true;
 		}
 		
 		/**

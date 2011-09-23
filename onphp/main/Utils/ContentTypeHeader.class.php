@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: ContentTypeHeader.class.php 4625 2007-11-25 22:37:37Z voxus $ */
 
 	/**
 	 * @ingroup Utils

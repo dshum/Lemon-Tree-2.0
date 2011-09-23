@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: RemoveNewlineFilter.class.php 4457 2007-11-04 20:39:40Z voxus $ */
 
 	/**
 	 * Replaces \n and \r by whitespace

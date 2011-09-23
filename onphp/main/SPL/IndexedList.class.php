@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: IndexedList.class.php 3892 2007-07-27 11:21:02Z voxus $ */
 
 	/**
 	 * Unordered indexed list of Identifiable objects.

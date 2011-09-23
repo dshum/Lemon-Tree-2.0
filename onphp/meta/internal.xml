@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE metaconfiguration SYSTEM "meta.dtd">
 
-<!-- $Id$ -->
+<!-- $Id: internal.xml 2980 2007-04-02 10:35:46Z voxus $ -->
 
 <metaconfiguration><classes>
 	<class name="Range">

@@ -1,6 +1,6 @@
 <?php
 /***************************************************************************
- *   Copyright (C) 2004-2009 by Konstantin V. Arkhipov                     *
+ *   Copyright (C) 2004-2007 by Konstantin V. Arkhipov                     *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Lesser General Public License as        *
@@ -8,13 +8,13 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: PgSQL.class.php 5254 2008-07-01 13:58:19Z voxus $ */
 
 	/**
 	 * PostgreSQL DB connector.
-	 *
+	 * 
 	 * @see http://www.postgresql.org/
-	 *
+	 * 
 	 * @ingroup DB
 	**/
 	final class PgSQL extends DB
@@ -108,13 +108,12 @@
 				list($error, ) = explode("\n", pg_errormessage($this->link));
 				$code = substr($error, 8, 5);
 				
-				if ($code == PostgresError::UNIQUE_VIOLATION) {
+				if ($code == PostgresError::UNIQUE_VIOLATION)
 					$e = 'DuplicateObjectException';
-					$code = null;
-				} else
-					$e = 'PostgresDatabaseException';
-				
-				throw new $e($error.' - '.$queryString, $code);
+				else
+					$e = 'DatabaseException';
+					
+				throw new $e($error.' - '.$queryString);
 			}
 		}
 
@@ -203,8 +202,6 @@
 				
 				'bytea'			=> DataType::BINARY,
 				
-				'hstore'		=> DataType::PGHSTORE,
-			
 				// unhandled types, not ours anyway
 				'tsvector'		=> null,
 				'inet'			=> null,

@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: DictionaryClassPattern.class.php 3895 2007-07-27 11:21:22Z voxus $ */
 
 	/**
 	 * @ingroup Patterns

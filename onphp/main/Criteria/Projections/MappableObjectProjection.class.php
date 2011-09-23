@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: MappableObjectProjection.class.php 4181 2007-09-12 06:32:11Z myserg $ */
 
 	/**
 	 * @ingroup Projections

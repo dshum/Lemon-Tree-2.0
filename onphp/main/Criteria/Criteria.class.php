@@ -8,14 +8,14 @@
  *   License, or (at your option) any later version.                        *
  *                                                                          *
  ****************************************************************************/
-/* $Id$ */
+/* $Id: Criteria.class.php 5513 2008-09-22 11:25:13Z voxus $ */
 
 	/**
 	 * @see http://www.hibernate.org/hib_docs/v3/reference/en/html/querycriteria.html
 	 * 
 	 * @ingroup Criteria
 	**/
-	final class Criteria extends QueryIdentification
+	final class Criteria implements Stringable, DialectString
 	{
 		private $dao		= null;
 		private $daoClass	= null;
@@ -51,7 +51,6 @@
 			$this->logic = Expression::andBlock();
 			$this->order = new OrderChain();
 			$this->strategy = FetchStrategy::join();
-			$this->projection = Projection::chain();
 		}
 		
 		public function __clone()
@@ -59,7 +58,6 @@
 			$this->logic = clone $this->logic;
 			$this->order = clone $this->order;
 			$this->strategy = clone $this->strategy;
-			$this->projection = clone $this->projection;
 		}
 		
 		public function __sleep()
@@ -209,24 +207,7 @@
 		**/
 		public function setProjection(ObjectProjection $chain)
 		{
-			if ($chain instanceof ProjectionChain)
-				$this->projection = $chain;
-			else
-				$this->projection = Projection::chain()->add($chain);
-			
-			return $this;
-		}
-		
-		/**
-		 * @return Criteria
-		**/
-		public function addProjection(ObjectProjection $projection)
-		{
-			if (
-				!$projection instanceof ProjectionChain
-				|| !$projection->isEmpty()
-			)
-				$this->projection->add($projection);
+			$this->projection = $chain;
 			
 			return $this;
 		}
@@ -244,7 +225,7 @@
 		**/
 		public function dropProjection()
 		{
-			$this->projection = Projection::chain();
+			$this->projection = null;
 			
 			return $this;
 		}
@@ -367,9 +348,7 @@
 					if (isset($result[$index]))
 						return $result[$index];
 					
-					throw new MissingElementException(
-						'No such key: "'.$index.'" in result set.'
-					);
+					throw new MissingElementException();
 				}
 				
 				return $result;
@@ -426,7 +405,7 @@
 		{
 			Assert::isNotNull($this->dao, 'DAO not set');
 			
-			if (!$this->projection->isEmpty()) {
+			if ($this->projection) {
 				$query =
 					$this->getProjection()->process(
 						$this,
@@ -465,7 +444,7 @@
 			}
 			
 			if (
-				$this->projection->isEmpty()
+				!$this->projection
 				&& (
 					$this->strategy->getId() <> FetchStrategy::CASCADE
 				)
@@ -474,18 +453,6 @@
 			}
 			
 			return $query;
-		}
-		
-		/**
-		 * @return Criteria
-		**/
-		public function dropProjectionByType(/* array */ $dropTypes)
-		{
-			Assert::isInstance($this->projection, 'ProjectionChain');
-			
-			$this->projection->dropByType($dropTypes);
-			
-			return $this;
 		}
 		
 		private function joinProperties(

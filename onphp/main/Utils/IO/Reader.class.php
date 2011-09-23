@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: Reader.class.php 4463 2007-11-04 20:42:03Z voxus $ */
 
 	/**
 	 * @ingroup Utils

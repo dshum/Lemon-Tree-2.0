@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: OneToManyLinkedWorker.class.php 5303 2008-07-17 09:07:31Z voxus $ */
 
 	/**
 	 * @ingroup Containers

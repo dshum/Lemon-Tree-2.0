@@ -8,11 +8,8 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: FileArchive.class.php 3894 2007-07-27 11:21:13Z voxus $ */
 
-	/**
-	 * @ingroup Utils
-	**/
 	abstract class FileArchive
 	{
 		protected $cmdBinPath	= null;

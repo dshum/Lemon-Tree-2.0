@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: TuringImage.class.php 5339 2008-07-26 20:59:38Z voxus $ */
 
 	/**
 	 * @ingroup Turing

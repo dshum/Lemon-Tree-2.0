@@ -21,13 +21,6 @@
 			$this->query = $query;
 		}
 
-		public function getCountOnly($expires = Cache::DO_NOT_CACHE)
-		{
-			$this->process($expires);
-
-			return $this->total;
-		}
-
 		public function getList($expires = Cache::DO_NOT_CACHE)
 		{
 			$this->process($expires);
@@ -60,6 +53,11 @@
 
 		private function process($expires = Cache::DO_NOT_CACHE)
 		{
+			$offset =
+				$this->currentPage > 1
+				? ($this->currentPage - 1) * $this->perpage
+				: 0;
+
 			$query = clone $this->query;
 
 			$query->
@@ -80,10 +78,6 @@
 
 				$this->pageCount = ceil($this->total / $this->perpage);
 
-				if($this->currentPage > $this->pageCount) {
-					$this->currentPage = 1;
-				}
-
 				for($i = 1; $i <= $this->pageCount; $i++) {
 					$this->pageList[] = $i;
 				}
@@ -91,18 +85,13 @@
 				$this->prevPage =
 					$this->currentPage > 1
 					? $this->currentPage - 1
-					: 1;
+					: 0;
 
 				$this->nextPage = $this->currentPage + 1;
 
 				$this->hasPrevPage = $this->currentPage > 1 ? true : false;
 
 				$this->hasNextPage = $this->currentPage < $this->pageCount ? true : false;
-
-				$offset =
-					$this->currentPage > 1
-					? ($this->currentPage - 1) * $this->perpage
-					: 0;
 
 				$this->query->limit($this->perpage, $offset);
 			}

@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: IpAddress.class.php 5276 2008-07-09 18:08:13Z voxus $ */
 
 	/**
 	 * @ingroup Ip
@@ -35,12 +35,10 @@
 		**/
 		public function setIp($ip)
 		{
-			$long = ip2long($ip);
-			
-			if ($long === false)
+			if (ip2long($ip) === false)
 				throw new WrongArgumentException('wrong ip given');
 			
-			$this->longIp = $long;
+			$this->longIp = ip2long($ip);
 			
 			return $this;
 		}
@@ -57,7 +55,13 @@
 		
 		public function toSignedInt()
 		{
-			return TypesUtils::unsignedToSigned($this->longIp);
+			$unsignedMax = 4294967295;
+			$signedMax = 2147483647;
+			
+			if ($this->longIp > $signedMax)
+				return $this->longIp - $unsignedMax - 1;
+			else
+				return $this->longIp;
 		}
 	}
 ?>

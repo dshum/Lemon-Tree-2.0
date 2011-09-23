@@ -8,15 +8,21 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: RedirectView.class.php 5218 2008-06-18 16:23:36Z dedmajor $ */
 
 	/**
 	 * @ingroup Flow
 	**/
-	class RedirectView extends CleanRedirectView
+	class RedirectView implements View
 	{
-		private $falseAsUnset = null;
-		private $buildArrays = null;
+		protected $url = null;
+		
+		private $falseAsUnset = false;
+		
+		public function __construct($url)
+		{
+			$this->url = $url;
+		}
 		
 		/**
 		 * @return RedirectView
@@ -26,41 +32,7 @@
 			return new self($url);
 		}
 		
-		public function isFalseAsUnset()
-		{
-			return $this->falseAsUnset;
-		}
-		
-		/**
-		 * @return RedirectView
-		**/
-		public function setFalseAsUnset($really)
-		{
-			Assert::isBoolean($really);
-			
-			$this->falseAsUnset = $really;
-			
-			return $this;
-		}
-		
-		public function isBuildArrays()
-		{
-			return $this->buildArrays;
-		}
-		
-		/**
-		 * @return RedirectView
-		**/
-		public function setBuildArrays($really)
-		{
-			Assert::isBoolean($really);
-			
-			$this->buildArrays = $really;
-			
-			return $this;
-		}
-		
-		protected function getLocationUrl($model = null)
+		public function render(Model $model = null)
 		{
 			$postfix = null;
 			
@@ -71,17 +43,9 @@
 					if (
 						(null === $val)
 						|| is_object($val)
+						|| is_array($val)
 					) {
 						continue;
-					} elseif (is_array($val)) {
-						if ($this->buildArrays) {
-							$qs[] = http_build_query(
-								array($key => $val), null, '&'
-							);
-						}
-						
-						continue;
-						
 					} elseif (is_bool($val)) {
 						if ($this->isFalseAsUnset() && (false === $val))
 							continue;
@@ -101,7 +65,29 @@
 					$postfix = $first.implode('&', $qs);
 			}
 			
-			return $this->getUrl().$postfix;
+			HeaderUtils::redirectRaw($this->getUrl().$postfix);
+		}
+		
+		public function getUrl()
+		{
+			return $this->url;
+		}
+		
+		public function isFalseAsUnset()
+		{
+			return $this->falseAsUnset;
+		}
+		
+		/**
+		 * @return RedirectView
+		**/
+		public function setFalseAsUnset($really)
+		{
+			Assert::isBoolean($really);
+			
+			$this->falseAsUnset = $really;
+			
+			return $this;
 		}
 	}
 ?>

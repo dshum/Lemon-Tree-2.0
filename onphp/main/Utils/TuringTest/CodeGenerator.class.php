@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: CodeGenerator.class.php 5339 2008-07-26 20:59:38Z voxus $ */
 
 	/**
 	 * @ingroup Turing
@@ -34,6 +34,8 @@
 		
 		public function generate()
 		{
+			mt_srand(microtime(true) * 1000000);
+			
 			$code = null;
 			
 			for ($i = 0; $i < $this->length; ++$i)

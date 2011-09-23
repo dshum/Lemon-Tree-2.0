@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: InputStream.class.php 4472 2007-11-04 20:43:03Z voxus $ */
 
 	/**
 	 * @ingroup Utils

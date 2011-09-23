@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: LowerCaseFilter.class.php 3994 2007-08-08 10:11:04Z voxus $ */
 
 	/**
 	  * @ingroup Filters

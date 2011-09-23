@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: RssItemWorker.class.php 4736 2007-12-27 11:56:50Z sirvantos $ */
 
 	/**
 	 * @ingroup Feed

@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: ScopeSetter.class.php 4972 2008-03-24 13:18:34Z voxus $ */
 
 	final class ScopeSetter extends PrototypedSetter
 	{

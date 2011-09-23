@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: Joiner.class.php 5390 2008-08-04 11:50:26Z voxus $ */
 
 	/**
 	 * @ingroup OSQL

@@ -4,15 +4,13 @@
 		public function __construct()
 		{
 			$this->
-			setMethodMapping('save', 'saveList')->
-			setMethodMapping('show', 'showList')->
-			setDefaultAction('show');
+				setMethodMapping('save', 'saveList')->
+				setMethodMapping('show', 'showList')->
+				setDefaultAction('show');
 		}
 
 		public function handleRequest(HttpRequest $request)
 		{
-			Item::dao()->setItemList();
-
 			return parent::handleRequest($request);
 		}
 

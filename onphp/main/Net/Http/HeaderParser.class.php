@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: HeaderParser.class.php 4617 2007-11-25 22:37:19Z voxus $ */
 
 	/**
 	 * @ingroup Http

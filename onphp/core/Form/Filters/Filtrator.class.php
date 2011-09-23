@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: Filtrator.class.php 4516 2007-11-06 02:30:06Z voxus $ */
 
 	/**
 	 * Interface for primitive's filters.

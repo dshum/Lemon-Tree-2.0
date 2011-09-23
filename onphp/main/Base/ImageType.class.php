@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: ImageType.class.php 5486 2008-09-04 10:17:58Z voxus $ */
 
 	/**
 	 * PHP's image type constants.

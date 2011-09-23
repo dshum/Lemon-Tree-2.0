@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: DaoMoveHelper.class.php 4583 2007-11-22 08:11:39Z lifter $ */
 
 	/**
 	 * @ingroup Utils

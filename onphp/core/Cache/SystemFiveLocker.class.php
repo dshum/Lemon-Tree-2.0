@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: SystemFiveLocker.class.php 4853 2008-02-26 11:04:01Z voxus $ */
 
 	/**
 	 * System-V semaphores based locking.

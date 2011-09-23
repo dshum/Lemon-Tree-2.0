@@ -1,6 +1,6 @@
 <?php
 /***************************************************************************
- *   Copyright (C) 2007-2009 by Ivan Y. Khvostishkov                       *
+ *   Copyright (C) 2007 by Ivan Y. Khvostishkov                            *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Lesser General Public License as        *
@@ -8,26 +8,20 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: ApplicationUrl.class.php 5062 2008-04-15 13:50:30Z dedmajor $ */
 
-	/**
-	 * TODO: hierarchical scopes,
-	 * not only path/query - subdomains may be involved too,
-	 * ex: username.example.com
-	**/
-	final class ApplicationUrl
+	class ApplicationUrl implements Stringable
 	{
-		private $base				= null;
+		private $rewriter		= null;
 		
-		private $applicationScope	= array();
-		private $userScope			= array();
-		private $navigationScope	= array();
+		private $globalScope	= null;
+		private $scope			= null;
 		
-		private $argSeparator		= null;
-		
-		private $navigationSchema	= null;
-		
-		private $absolute			= false;
+		public function __construct()
+		{
+			$this->globalScope = Scope::create();
+			$this->scope = Scope::create();
+		}
 		
 		/**
 		 * @return ApplicationUrl
@@ -40,117 +34,72 @@
 		/**
 		 * @return ApplicationUrl
 		**/
-		public function setBase(HttpUrl $base)
+		public function setRewriter(HttpRewriter $rewriter)
 		{
-			$this->base = $base;
+			$this->rewriter = $rewriter;
 			
 			return $this;
 		}
 		
 		/**
-		 * @return HttpUrl
+		 * @return HttpRewriter
 		**/
-		public function getBase()
+		public function getRewriter()
 		{
-			return $this->base;
+			return $this->rewriter;
 		}
+		
 		
 		/**
 		 * @return ApplicationUrl
 		**/
-		public function setAbsolute($absolute)
+		public function setRequestScope(Scope $scope)
 		{
-			$this->absolute = $absolute;
-			
-			return $this;
-		}
-		
-		public function isAbsolute()
-		{
-			return $this->absolute;
-		}
-		
-		/**
-		 * @return ApplicationUrl
-		**/
-		public function setNavigationSchema(ScopeNavigationSchema $schema)
-		{
-			$this->navigationSchema = $schema;
+			$this->scope = $scope;
 			
 			return $this;
 		}
 		
 		/**
-		 * @return ScopeNavigationSchema
+		 * @return Scope
 		**/
-		public function getNavigationSchema()
+		public function getRequestScope()
 		{
-			return $this->navigationSchema;
+			return $this->scope;
 		}
 		
 		/**
 		 * @return ApplicationUrl
 		**/
-		public function addApplicationScope($scope)
+		public function setApplicationScope(Scope $scope)
 		{
-			Assert::isArray($scope);
-			
-			$this->applicationScope = ArrayUtils::mergeRecursiveUnique(
-				$this->applicationScope, $scope
-			);
+			$this->globalScope = $scope;
 			
 			return $this;
 		}
 		
 		/**
-		 * @return ApplicationUrl
+		 * @return Scope
 		**/
-		public function addUserScope($userScope)
+		public function getApplicationScope()
 		{
-			Assert::isArray($userScope);
-			
-			$this->userScope = ArrayUtils::mergeRecursiveUnique(
-				$this->userScope, $userScope
-			);
-			
-			return $this;
-		}
-
-		/**
-		 * @return ApplicationUrl
-		**/
-		public function dropFromUserScope($key)
-		{
-			if (isset($this->userScope[$key]))
-				$this->userScope[$key] = null;
-
-			return $this;
+			return $this->globalScope;
 		}
 		
-		public function getUserScope()
+		/**
+		 * @return array
+		**/
+		public function getWholeScopeVars()
 		{
-			return $this->userScope;
+			return $this->scope->getScope() + $this->globalScope->getScope();
 		}
 		
 		/**
 		 * @return ApplicationUrl
 		**/
-		public function setPath($path)
+		public function addApplicationScope(array $scope)
 		{
-			if (!$this->navigationSchema)
-				throw new WrongStateException(
-					'charly says always set navigation schema'
-					.' before you go off somewhere'
-				);
-			
-			$scope = $this->navigationSchema->getScope($path);
-			
-			if ($scope === null)
-				throw new WrongArgumentException(
-					'404: not found'
-				);
-			
-			$this->navigationScope = $scope;
+			$this->globalScope->merge($scope);
 			
 			return $this;
 		}
@@ -158,179 +107,86 @@
 		/**
 		 * @return ApplicationUrl
 		**/
-		public function setPathByRequestUri($requestUri, $normalize = true)
+		public function addUserScope(array $scope)
 		{
-			if (!$this->base)
-				throw new WrongStateException(
-					'base url must be set first'
-				);
-			
-			$currentUrl = GenericUri::create()->
-				parse($requestUri);
-			
-			if (!$currentUrl->isValid())
-				throw new WrongArgumentException(
-					'wtf? request uri is invalid'
-				);
-			
-			if ($normalize)
-				$currentUrl->normalize();
-			
-			$path = $currentUrl->getPath();
-			
-			// paranoia
-			if (!$path || ($path[0] !== '/'))
-				$path = '/'.$path;
-			
-			if (strpos($path, $this->base->getPath()) !== 0)
-				throw new WrongArgumentException(
-					'left parts of path and base url does not match: '
-					."$path vs. ".$this->base->getPath()
-				);
-			
-			$actualPath = substr($path, strlen($this->base->getPath()));
-			
-			return $this->setPath($actualPath);
-		}
-		
-		public function getNavigationScope()
-		{
-			return $this->navigationScope;
-		}
-		
-		public function getArgSeparator()
-		{
-			if (!$this->argSeparator)
-				return ini_get('arg_separator.output');
-			else
-				return $this->argSeparator;
-		}
-		
-		/**
-		 * @return ApplicationUrl
-		**/
-		public function setArgSeparator($argSeparator)
-		{
-			$this->argSeparator = $argSeparator;
+			$this->scope->merge($scope);
 			
 			return $this;
 		}
 		
-		public function currentHref(
-			$additionalScope = array(),
-			$absolute = null
-		)
+		
+		/**
+		 * @return ApplicationUrl
+		**/
+		public function currentHref(array $additionalScope = array())
 		{
-			return $this->scopeHref(
-				ArrayUtils::mergeRecursiveUnique(
-					$this->userScope, $additionalScope
-				),
-				$absolute
+			return $this->transform(
+				$this->scope->transform($additionalScope)
 			);
 		}
 		
-		public function scopeHref($scope, $absolute = null)
+		/**
+		 * @return ApplicationUrl
+		**/
+		public function scopeHref(array $scope)
 		{
-			Assert::isArray($scope);
-			
-			// href scope may override navigation scope
-			$actualScope = ArrayUtils::mergeRecursiveUnique(
-				$this->navigationScope, $scope
+			return $this->transform(
+				Scope::create()->setScope($scope)
 			);
-			
-			return $this->cleanHref($actualScope, $absolute);
 		}
 		
-		public function cleanHref($scope, $absolute = null)
+		/**
+		 * @return ApplicationUrl
+		**/
+		public function baseHref()
 		{
-			Assert::isArray($scope);
-			
-			$path = $this->navigationSchema
-				? $this->navigationSchema->extractPath($scope)
-				: null;
-			
-			return $this->href($path.'?'.$this->buildQuery($scope), $absolute);
+			return $this->transform(Scope::create());
 		}
 		
-		public function baseHref($absolute = null)
+		/**
+		 * @return ApplicationUrl
+		**/
+		public function transform(Scope $newScope)
 		{
-			return $this->href(null, $absolute);
-		}
-		
-		public function poorReference($url)
-		{
-			Assert::isNotNull($this->base, 'set base url first');
+			$result = clone $this;
 			
-			$parsedUrl = HttpUrl::create()->parse($url);
-			
-			return $this->base->transform($parsedUrl);
-		}
-		
-		public function href($url, $absolute = null)
-		{
-			if ($absolute === null)
-				$absolute = $this->absolute;
-			
-			$result = $this->poorReference($url);
-			
-			if ($this->applicationScope)
-				$result->appendQuery(
-					$this->buildQuery($this->applicationScope),
-					$this->getArgSeparator()
-				);
-			
-			$result->normalize();
-			
-			if ($result->getQuery() === '')
-				$result->setQuery(null);
-			
-			if ($absolute)
-				return $result->toString();
-			else
-				return $result->toStringFromRoot();
-		}
-		
-		public function absoluteHref($url)
-		{
-			return $this->href($url, true);
-		}
-		
-		public function getUserQueryVars()
-		{
-			return $this->getQueryVars($this->userScope);
-		}
-		
-		public function getApplicationQueryVars()
-		{
-			return $this->getQueryVars($this->applicationScope);
-		}
-		
-		private function getQueryVars($scope)
-		{
-			$queryParts = explode(
-				$this->getArgSeparator(),
-				$this->buildQuery($scope)
-			);
-			
-			$result = array();
-			
-			foreach ($queryParts as $queryPart) {
-				if (!$queryPart)
-					continue;
-				
-				list($key, $value) = explode('=', $queryPart, 2);
-				
-				$result[$key] = $value;
-			}
+			$result->setRequestScope($newScope);
 			
 			return $result;
 		}
 		
-		private function buildQuery($scope)
+		/**
+		 * @return ApplicationUrl
+		**/
+		public function href($rawUrl)
 		{
-			return http_build_query(
-				$scope, null, $this->getArgSeparator()
+			$url = HttpUrl::create()->parse($rawUrl);
+			
+			Assert::isTrue($url->isValid());
+			
+			return $this->scopeHref(
+				$this->rewriter->getScope(
+					$this->rewriter->getBase()->
+						transform($url)
+				)
 			);
+		}
+		
+		public function toHttpUrl()
+		{
+			Assert::isNotNull($this->rewriter);
+			
+			return
+				$this->rewriter->
+					getUrl(
+						$this->scope->getScope()
+						+ $this->globalScope->getScope()
+					);
+		}
+		
+		public function toString()
+		{
+			return $this->toHttpUrl()->toString();
 		}
 	}
 ?>

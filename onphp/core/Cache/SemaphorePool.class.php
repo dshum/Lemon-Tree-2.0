@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: SemaphorePool.class.php 5061 2008-04-13 12:09:05Z voxus $ */
 
 	/**
 	 * Single access point to application-wide locker implementation.
@@ -32,7 +32,7 @@
 		
 		public static function setDefaultLocker($name)
 		{
-			Assert::classExists($name);
+			Assert::isTrue(class_exists($name, true));
 			
 			self::$lockerName = $name;
 			self::$locker = Singleton::getInstance($name);

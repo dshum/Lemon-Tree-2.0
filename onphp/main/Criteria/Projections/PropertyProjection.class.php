@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: PropertyProjection.class.php 3888 2007-07-27 11:20:49Z voxus $ */
 
 	/**
 	 * @ingroup Projections

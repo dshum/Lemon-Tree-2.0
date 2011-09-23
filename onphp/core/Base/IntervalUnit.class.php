@@ -1,6 +1,6 @@
 <?php
 /***************************************************************************
- *   Copyright (C) 2008-2009 by Ivan Y. Khvostishkov                       *
+ *   Copyright (C) 2008 by Ivan Y. Khvostishkov                            *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Lesser General Public License as        *
@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: IntervalUnit.class.php 5473 2008-09-01 08:40:56Z voxus $ */
 
 	/**
 	 * @ingroup Base
@@ -34,13 +34,11 @@
 		/**
 		 * @return Timestamp
 		 * 
-		 * Emulates PostgreSQL's date_trunc() function
+		 * Emulates PostgreSQL's date_tunc() function
 		 * 
 		**/
-		public function truncate(Date $time, $ceil = false)
+		public function truncate(Timestamp $time, $ceil = false)
 		{
-			$time = $time->toTimestamp();
-			
 			$function = $ceil ? 'ceil' : 'floor';
 			
 			if ($this->seconds) {
@@ -48,7 +46,7 @@
 				if ($this->seconds < 1)
 					return $time->spawn();
 				
-				$truncated = (int) (
+				$truncated = (int)(
 					$function($time->toStamp() / $this->seconds) * $this->seconds
 				);
 				
@@ -58,21 +56,16 @@
 				
 				$epochStartTruncated = Date::create('1970-01-05');
 				
-				$truncatedDate = Date::create($time->toDate());
-				
-				if ($ceil && $truncatedDate->toStamp() < $time->toStamp())
-					$truncatedDate->modify('+1 day');
-				
 				$difference = Date::dayDifference(
-					$epochStartTruncated, $truncatedDate
+					$epochStartTruncated, Date::create($time->toDate())
 				);
 				
-				$truncated = (int) (
+				$truncated = (int)(
 					$function($difference / $this->days) * $this->days
 				);
 				
 				return Timestamp::create(
-					$epochStartTruncated->spawn($truncated.' days')->toStamp()
+					$epochStartTruncated->spawn("$truncated days")->toStamp()
 				);
 				
 			} elseif ($this->months) {
@@ -88,7 +81,7 @@
 				)
 					$monthsCount += 0.1; // delta
 				
-				$truncated = (int) (
+				$truncated = (int)(
 					$function($monthsCount / $this->months) *
 						($this->months)
 				);
@@ -97,25 +90,23 @@
 				
 				$years = ($truncated - $months) / 12;
 				
-				Assert::isEqual($years, (int) $years);
+				Assert::isEqual($years, (int)$years);
 				
-				$years = (int) $years;
+				$years = (int)$years;
 				
 				$months = $months + 1;
 				
-				return Timestamp::create("{$years}-{$months}-01 00:00:00");
+				return Timestamp::create("$years-$months-01 00:00:00");
 			}
 			
 			Assert::isUnreachable();
 		}
 		
 		public function countInRange(
-			DateRange $range,
+			TimestampRange $range,
 			$overlappedBounds = true
 		)
 		{
-			$range = $range->toTimestampRange();
-			
 			$start = $this->truncate(
 				$range->getStart(), !$overlappedBounds
 			);
@@ -161,27 +152,7 @@
 				.'result: '.var_export($result, true)
 			);
 			
-			return (int) $result;
-		}
-
-		public function compareTo(IntervalUnit $unit)
-		{
-			$monthsDiffer = $this->months - $unit->months;
-			
-			if ($monthsDiffer)
-				return $monthsDiffer;
-			
-			$daysDiffer = $this->days - $unit->days;
-
-			if ($daysDiffer)
-				return $daysDiffer;
-			
-			$secondsDiffer = $this->seconds - $unit->seconds;
-
-			if ($secondsDiffer)
-				return $secondsDiffer;
-			
-			return 0;
+			return (int)$result;
 		}
 		
 		private function __construct($name)

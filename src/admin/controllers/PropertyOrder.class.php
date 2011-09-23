@@ -4,9 +4,9 @@
 		public function __construct()
 		{
 			$this->
-			setMethodMapping('save', 'saveList')->
-			setMethodMapping('show', 'showList')->
-			setDefaultAction('show');
+				setMethodMapping('save', 'saveList')->
+				setMethodMapping('show', 'showList')->
+				setDefaultAction('show');
 		}
 
 		public function handleRequest(HttpRequest $request)
@@ -58,12 +58,12 @@
 
 			if(!$form->getErrors()) {
 
-				$item = $form->getValue('itemId');
+				$item = $form->getValue("itemId");
 
 				$propertyList = Property::dao()->getPropertyList($item);
 
-				$model->set('item', $item);
-				$model->set('propertyList', $propertyList);
+				$model->set("item", $item);
+				$model->set("propertyList", $propertyList);
 
 			}
 

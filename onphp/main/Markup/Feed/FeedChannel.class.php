@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: FeedChannel.class.php 3985 2007-08-07 13:02:56Z voxus $ */
 
 	/**
 	 * @ingroup Feed

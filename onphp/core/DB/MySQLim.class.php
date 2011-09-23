@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: MySQLim.class.php 5257 2008-07-01 13:59:05Z voxus $ */
 
 	/**
 	 * MySQL DB connector.

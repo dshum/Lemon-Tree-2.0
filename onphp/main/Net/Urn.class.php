@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: Urn.class.php 4009 2007-08-09 15:26:05Z dedmajor $ */
 
 	/**
 	 * URN is an absolute URI without authority part.

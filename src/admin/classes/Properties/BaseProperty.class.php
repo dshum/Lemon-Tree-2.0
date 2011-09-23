@@ -1,16 +1,20 @@
 <?php
 	abstract class BaseProperty
 	{
+		protected $item = null;
 		protected $property = null;
 		protected $element = null;
 		protected $value = null;
+		protected $dataType = null;
 		protected $parameters = array();
 
 		public function __construct($property, $element)
 		{
 			$this->property = $property;
+			$this->item = $this->property->getItem();
 			$this->element = $element;
 
+			$this->value = null;
 			if($element instanceof Element) {
 				$getter = $property->getter();
 				if(method_exists($element, $getter)) {
@@ -19,6 +23,8 @@
 					} catch (BaseException $e) {}
 				}
 			}
+
+			$this->addParameter('readonly', 'boolean', 'Только чтение', false);
 		}
 
 		public function __toString()
@@ -26,29 +32,28 @@
 			return $this->value ? $this->value : null;
 		}
 
-		public function setParameters()
-		{
-			$this->
-			addParameter('readonly', 'boolean', 'Только чтение', false)->
-			addParameter('hidden', 'boolean', 'Скрыть поле', false);
-
-			return $this;
-		}
-
-		public function getDataType() {}
-
-		public function meta() {}
-
 		public function getColumnName()
 		{
 			return Property::getColumnName($this->property->getPropertyName());
 		}
 
-		public function fixValue() {}
+		public function isUpdate()
+		{
+			return false;
+		}
+
+		public function set(Form $form)
+		{
+			if($form->primitiveExists($this->property->getPropertyName())) {
+				$setter = $this->property->setter();
+				$value = $form->getValue($this->property->getPropertyName());
+				$this->element->$setter($value);
+			}
+		}
 
 		public function addParameter($name, $type, $description, $default)
 		{
-			$parameterClass = Property::getParameterClass($type);
+			$parameterClass = Parameter::getParameterClass($type);
 			$parameter = new $parameterClass(
 				$this->property,
 				$name,
@@ -62,44 +67,27 @@
 
 		public function getParameter($name)
 		{
-			return
-				isset($this->parameters[$name])
-				? $this->parameters[$name]
-				: null;
+			if(isset($this->parameters[$name])) {
+				return $this->parameters[$name];
+			} else {
+				throw new ObjectNotFoundException('Parameter '.$name.' is not found.');
+			}
 		}
 
 		public function getParameterValue($name)
 		{
-			$parameter = $this->getParameter($name);
-			return $parameter ? $parameter->getValue() : null;
+			try {
+				$parameter = $this->getParameter($name);
+				return $parameter->getValue();
+			} catch (ObjectNotFoundException $e) {
+				return null;
+			}
 		}
 
 		public function getParameterList()
 		{
 			return $this->parameters;
 		}
-
-		public function isUpdate()
-		{
-			return false;
-		}
-
-		public function set(Form $form)
-		{
-			if(
-				$this->getParameterValue('hidden') == false
-				&& $this->getParameterValue('readonly') == false
-				&& $form->primitiveExists($this->property->getPropertyName())
-			) {
-				$setter = $this->property->setter();
-				$value = $form->getValue($this->property->getPropertyName());
-				$this->element->$setter($value);
-			}
-		}
-
-		public function setAfter(Form $form) {}
-
-		public function drop() {}
 
 		public function value()
 		{
@@ -108,13 +96,10 @@
 
 		public function column()
 		{
-			$dataType = $this->getDataType();
-
 			if($this->property->getIsRequired()) {
-				$dataType->setNull(false);
+				$this->dataType->setNull(false);
 			}
-
-			return DBColumn::create($dataType, $this->getColumnName());
+			return DBColumn::create($this->dataType, $this->getColumnName());
 		}
 
 		public function add2form(Form $form)
@@ -158,84 +143,31 @@
 			return $criteria;
 		}
 
-		public function getElementListView()
+		public function printOnElementSearch(Form $form)
 		{
-			$model =
-				Model::create()->
-				set('value', $this->value);
-
-			$viewName = 'properties/'.get_class($this).'.elementList';
-
-			return $this->render($model, $viewName);
-		}
-
-		public function getEditElementListView()
-		{
-			$model =
-				Model::create()->
-				set('propertyName', $this->property->getPropertyName())->
-				set('element', $this->element)->
-				set('value', $this->value);
-
-			$viewName = 'properties/'.get_class($this).'.editElementList';
-
-			return $this->render($model, $viewName);
-		}
-
-		public function getEditElementView()
-		{
-			$readonly = $this->getParameterValue('readonly');
-
-			$model =
-				Model::create()->
-				set('propertyName', $this->property->getPropertyName())->
-				set('propertyDescription', $this->property->getPropertyDescription())->
-				set('readonly', $readonly)->
-				set('value', $this->value);
-
-			$viewName = 'properties/'.get_class($this).'.editElement';
-
-			return $this->render($model, $viewName);
-		}
-
-		public function getElementSearchView(Form $form)
-		{
-			$propertyDescription = $this->property->getPropertyDescription();
-			if(mb_strlen($propertyDescription) > 50) {
-				$propertyDescription = mb_substr($propertyDescription, 0, 50).'...';
-			}
-
-			$propertyName = $this->property->getPropertyName();
-
 			$value =
-				$form->primitiveExists($propertyName)
-				? $form->getValue($propertyName)
+				$form->primitiveExists($this->property->getPropertyName())
+				? $form->getValue($this->property->getPropertyName())
 				: null;
-
-			$model =
-				Model::create()->
-				set('propertyName', $propertyName)->
-				set('propertyDescription', $propertyDescription)->
-				set('value', $value);
-
-			$viewName = 'properties/'.get_class($this).'.search';
-
-			return $this->render($model, $viewName);
+			$str = $this->property->getPropertyDescription().': ';
+			$str .= '<input type="text" class="prop" name="'.$this->property->getPropertyName().'" value="'.$value.'" style="width: 50%;">';
+			return $str;
 		}
 
-		protected function render($model, $viewName)
+		public function printOnElementList()
 		{
-			$viewResolver =
-				MultiPrefixPhpViewResolver::create()->
-				setViewClassName('SimplePhpView')->
-				addPrefix(PATH_ADMIN_TEMPLATES);
-
-			try {
-				$view = $viewResolver->resolveViewName($viewName);
-				return $view->toString($model);
-			} catch (WrongArgumentException $e) {
-				return null;
-			}
+			$str = $this->value;
+			return $str;
 		}
+
+		public function editOnElementList()
+		{
+			$str = $this->value;
+			return $str;
+		}
+
+		public function meta() {}
+		public function editOnElement() {}
+		public function drop() {}
 	}
 ?>

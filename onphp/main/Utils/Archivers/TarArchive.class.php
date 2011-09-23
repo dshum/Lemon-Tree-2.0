@@ -8,14 +8,12 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: TarArchive.class.php 3894 2007-07-27 11:21:13Z voxus $ */
 
 	/**
 	 * GNU Tar wrapper.
 	 * 
 	 * @see http://www.gnu.org/software/tar/
-	 *
-	 * @ingroup Utils
 	**/
 	final class TarArchive extends FileArchive
 	{

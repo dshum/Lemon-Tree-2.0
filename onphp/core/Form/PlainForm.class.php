@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                        *
  *                                                                          *
  ****************************************************************************/
-/* $Id$ */
+/* $Id: PlainForm.class.php 5478 2008-09-02 15:14:41Z voxus $ */
 
 	/**
 	 * Common Primitive-handling.
@@ -31,17 +31,9 @@
 			return $this;
 		}
 		
-		public function exists($name)
-		{
-			return isset($this->primitives[$name]);
-		}
-
-		/**
-		 * @deprecated, use exists()
-		**/
 		public function primitiveExists($name)
 		{
-			return $this->exists($name);
+			return isset($this->primitives[$name]);
 		}
 		
 		/**
@@ -63,7 +55,7 @@
 		}
 		
 		/**
-		 * @return Form
+		 * @return PlainForm
 		**/
 		public function set(BasePrimitive $prm)
 		{
@@ -100,6 +92,96 @@
 			throw new MissingElementException("knows nothing about '{$name}'");
 		}
 		
+		/**
+		 * ex:
+		 * array('superFormsList', 5, 'subForm', 'primitiveName') =>
+		 * 'superFormsList[5][subForm][primitiveName]'
+		**/
+		public function getFormName($path)
+		{
+			// just checking for existence:
+			$this->getInner($path);
+			
+			$path = $this->getInnerPath($path);
+			
+			$result = array_shift($path);
+			
+			Assert::isScalar($result);
+			
+			foreach ($path as $key) {
+				Assert::isScalar($key);
+				
+				$result .= '['.$key.']';
+			}
+			
+			return $result;
+		}
+		
+		/**
+		 * ex:
+		 * array('superFormsList', 5, 'subForm', 'primitiveName') =>
+		 * 'superFormsList:5:subForm:primitiveName'
+		**/
+		public function getFormId($path)
+		{
+			$this->getInner($path);
+			
+			$path = $this->getInnerPath($path);
+			
+			return join(':', $path);
+		}
+		
+		/**
+		 * @throws MissingElementException
+		 * @return BasePrimitive
+		**/
+		public function getInner($path)
+		{
+			return $this->getInnerForm($path)->
+				get($this->getInnerName($path));
+		}
+		
+		public function getInnerName($path)
+		{
+			$path = $this->getInnerPath($path);
+			
+			return array_pop($path);
+		}
+		
+		public function getInnerForm($path)
+		{
+			$path = $this->getInnerPath($path);
+			
+			$subForm = array_shift($path);
+			
+			if (!$path) {
+				// last element is a name
+				return $this;
+			}
+			
+			Assert::isScalar($subForm);
+			
+			$primitive = $this->get($subForm);
+			
+			Assert::isInstance($primitive, 'PrimitiveForm');
+			
+			$subForm = $primitive->getValue();
+			
+			Assert::isNotNull($subForm);
+			
+			if ($primitive instanceof PrimitiveFormsList) {
+				Assert::isNotEmptyArray($path, 'you must specify index');
+				
+				$subIndex = array_shift($path);
+				
+				Assert::isIndexExists($subForm, $subIndex, 'index does not exist');
+				
+				$subForm = $subForm[$subIndex];
+			}
+			
+			return $subForm->getInnerForm($path);
+		}
+		
 		public function getValue($name)
 		{
 			return $this->get($name)->getValue();
@@ -117,15 +199,24 @@
 			return $this->get($name)->getRawValue();
 		}
 		
+		/**
+		 * @deprecated by getFormValue
+		**/
 		public function getActualValue($name)
 		{
 			return $this->get($name)->getActualValue();
+		}
+		
+		public function getFormValue($name)
+		{
+			return $this->get($name)->getFormValue();
 		}
 		
 		public function getSafeValue($name)
 		{
 			return $this->get($name)->getSafeValue();
 		}
+		
 		
 		public function getChoiceValue($name)
 		{
@@ -140,7 +231,10 @@
 			
 			return $prm->getActualChoiceValue();
 		}
-		
+
+		/**
+		 * @deprecated by getFormValue
+		**/
 		public function getDisplayValue($name)
 		{
 			$primitive = $this->get($name);
@@ -148,7 +242,7 @@
 			if ($primitive instanceof FiltrablePrimitive)
 				return $primitive->getDisplayValue();
 			else
-				return $primitive->getActualValue();
+				return $primitive->getActualValue();		
 		}
 		
 		public function getPrimitiveNames()
@@ -159,6 +253,18 @@
 		public function getPrimitiveList()
 		{
 			return $this->primitives;
+		}
+		
+		private function getInnerPath($path)
+		{
+			if (is_scalar($path))
+				$path = array($path);
+			
+			Assert::isArray($path, 'path must be an array');
+			
+			Assert::isNotEmptyArray($path, 'empty path is erroneous');
+			
+			return $path;
 		}
 	}
 ?>

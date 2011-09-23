@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: ProtoDAO.class.php 5513 2008-09-22 11:25:13Z voxus $ */
 
 	/**
 	 * @ingroup DAOs
@@ -86,10 +86,7 @@
 					
 					$alias = 'cid'; // childId, collectionId, whatever
 					
-					$field = DBField::create(
-						$childId,
-						$self->$getter()->getHelperTable()
-					);
+					$field = DBField::create($childId);
 					
 					$query->get($field, $alias);
 					

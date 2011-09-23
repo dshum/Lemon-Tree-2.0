@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: ObjectBuilder.class.php 4965 2008-03-21 17:12:14Z dedmajor $ */
 
 	abstract class ObjectBuilder extends PrototypedBuilder
 	{

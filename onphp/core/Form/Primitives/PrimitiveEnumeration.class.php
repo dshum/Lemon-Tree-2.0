@@ -8,13 +8,18 @@
  *   License, or (at your option) any later version.                         *
  *                                                                           *
  *****************************************************************************/
-/* $Id$ */
+/* $Id: PrimitiveEnumeration.class.php 5475 2008-09-02 07:52:11Z vlad $ */
 
 	/**
 	 * @ingroup Primitives
 	**/
 	class PrimitiveEnumeration extends IdentifiablePrimitive
 	{
+		public function getTypeName()
+		{
+			return 'Scalar';
+		}
+		
 		public function getList()
 		{
 			if ($this->value)
@@ -40,9 +45,15 @@
 		{
 			$className = $this->guessClassName($class);
 			
-			Assert::classExists($className);
+			Assert::isTrue(
+				class_exists($className, true),
+				"knows nothing about '{$className}' class"
+			);
 			
-			Assert::isInstance($className, 'Enumeration');
+			Assert::isTrue(
+				is_subclass_of($className, 'Enumeration'),
+				'non-enumeration child given'
+			);
 			
 			$this->className = $className;
 			
@@ -52,20 +63,20 @@
 		public function importValue(/* Identifiable */ $value)
 		{
 			if ($value)
-				Assert::isEqual(get_class($value), $this->className);
+				Assert::isTrue(get_class($value) == $this->className);
 			else
 				return parent::importValue(null);
 			
 			return $this->import(array($this->getName() => $value->getId()));
 		}
 		
-		public function import($scope)
+		public function import(array $scope)
 		{
 			if (!$this->className)
 				throw new WrongStateException(
 					"no class defined for PrimitiveEnumeration '{$this->name}'"
 				);
-			
+				
 			$result = parent::import($scope);
 			
 			if ($result === true) {

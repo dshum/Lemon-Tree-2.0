@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: ApcSegmentHandler.class.php 3889 2007-07-27 11:20:54Z voxus $ */
 
 	/**
 	 * @see http://pecl.php.net/package/APC

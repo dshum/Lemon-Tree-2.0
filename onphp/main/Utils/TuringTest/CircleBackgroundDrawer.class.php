@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: CircleBackgroundDrawer.class.php 3894 2007-07-27 11:21:13Z voxus $ */
 
 	/**
 	 * @ingroup Turing

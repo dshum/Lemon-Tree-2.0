@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: BaseDAO.class.php 5106 2008-05-02 10:35:05Z voxus $ */
 
 	/**
 	 * @ingroup DAOs
@@ -52,7 +52,7 @@
 		/// uncachers
 		//@{
 		public function uncacheById($id);
-		public function uncacheByIds($ids);
+		public function uncacheByIds(array $ids);
 		public function uncacheLists();
 		//@}
 	}

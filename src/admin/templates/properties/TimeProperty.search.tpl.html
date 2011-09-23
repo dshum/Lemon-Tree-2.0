@@ -1,7 +1,0 @@
-<span switch="true" name="<?=$propertyName?>" class="dashed hand"><?=$propertyDescription?></span>:<br>
-<div id="<?=$propertyName?>_block" style="display: <?=$open ? 'block' : 'none'?>">
-<input type="hidden" id="<?=$propertyName?>_from" name="<?=$propertyName?>_from" value="<?=$from->toString()?>"<?=$open ? '' : ' disabled="true"'?>>
-<input type="hidden" id="<?=$propertyName?>_to" name="<?=$propertyName?>_to" value="<?=$to->toString()?>"<?=$open ? '' : ' disabled="true"'?>>
-от <input class="prop-time" type="text" id="<?=$propertyName?>_from_hour" name="<?=$propertyName?>_from_hour" property="<?=$propertyName?>_from" time="true" max="23" value="<?=sprintf('%02d', $from->getHour())?>" maxlength="2">&nbsp;:&nbsp;<input class="prop-time" type="text" id="<?=$propertyName?>_from_minute" name="<?=$propertyName?>_from_minute" property="<?=$propertyName?>_from" time="true" max="59" value="<?=sprintf('%02d', $from->getMinute())?>" maxlength="2">
-до <input class="prop-time" type="text" id="<?=$propertyName?>_to_hour" name="<?=$propertyName?>_to_hour" property="<?=$propertyName?>_to" time="true" max="23" value="<?=sprintf('%02d', $to->getHour())?>" maxlength="2">&nbsp;:&nbsp;<input class="prop-time" type="text" id="<?=$propertyName?>_to_minute" name="<?=$propertyName?>_to_minute" property="<?=$propertyName?>_to" time="true" max="59" value="<?=sprintf('%02d', $to->getMinute())?>" maxlength="2">
-</div>

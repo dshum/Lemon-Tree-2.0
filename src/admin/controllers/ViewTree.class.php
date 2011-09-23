@@ -4,9 +4,9 @@
 		public function __construct()
 		{
 			$this->
-			setMethodMapping('open', 'open')->
-			setMethodMapping('view', 'view')->
-			setDefaultAction('view');
+				setMethodMapping('open', 'open')->
+				setMethodMapping('view', 'view')->
+				setDefaultAction('view');
 		}
 
 		public function handleRequest(HttpRequest $request)
@@ -16,8 +16,6 @@
 
 		public function open(HttpRequest $request)
 		{
-			$model = Model::create();
-
 			$form = Form::create();
 
 			$form->
@@ -45,13 +43,15 @@
 				} elseif(isset($openFolderList[$element->getPolymorphicId()])) {
 					unset($openFolderList[$element->getPolymorphicId()]);
 					try {
-						$activeElement = Session::get('activeElement');
-						if($activeElement instanceof Element) {
-							$parentList = $activeElement->getParentList();
-							foreach($parentList as $parent) {
-								if($parent->getId() == $element->getId()) {
-									$isParent = 1;
-									break;
+						if(Session::exist('activeElement')) {
+							$activeElement = Session::get('activeElement');
+							if($activeElement instanceof Element) {
+								$parentList = $activeElement->getParentList();
+								foreach($parentList as $parent) {
+									if($parent->getId() == $element->getId()) {
+										$isParent = 1;
+										break;
+									}
 								}
 							}
 						}
@@ -61,6 +61,7 @@
 
 			}
 
+			$model = Model::create();
 			$model->set('isParent', $isParent);
 
 			return
@@ -71,15 +72,13 @@
 
 		public function view(HttpRequest $request)
 		{
-			Item::dao()->setItemList();
-			Property::dao()->setPropertyList();
-
 			$tree = Tree::getTree();
 
-			$activeElement =
-				Session::exist('activeElement')
-				? Session::get('activeElement')
-				: Root::me();
+			if(Session::exist('activeElement')) {
+				$activeElement = Session::get('activeElement');
+			} else {
+				$activeElement = Root::me();
+			}
 
 			$model = Model::create();
 			$model->set('tree', $tree);

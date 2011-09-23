@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: DropTableQuery.class.php 4506 2007-11-04 20:45:40Z voxus $ */
 
 	/**
 	 * @ingroup OSQL

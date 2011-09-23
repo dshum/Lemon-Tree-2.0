@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: SgmlOpenTag.class.php 5498 2008-09-09 15:21:56Z voxus $ */
 
 	/**
 	 * @ingroup Html

@@ -1,6 +1,6 @@
 <?php
 /****************************************************************************
- *   Copyright (C) 2004-2009 by Konstantin V. Arkhipov, Anton E. Lebedevich *
+ *   Copyright (C) 2004-2008 by Konstantin V. Arkhipov, Anton E. Lebedevich *
  *                                                                          *
  *   This program is free software; you can redistribute it and/or modify   *
  *   it under the terms of the GNU Lesser General Public License as         *
@@ -8,11 +8,11 @@
  *   License, or (at your option) any later version.                        *
  *                                                                          *
  ****************************************************************************/
-/* $Id$ */
+/* $Id: Primitive.class.php 5454 2008-08-26 13:14:56Z voxus $ */
 
 	/**
 	 * Factory for various Primitives.
-	 *
+	 * 
 	 * @ingroup Form
 	**/
 	final class Primitive extends StaticFactory
@@ -22,7 +22,7 @@
 		**/
 		public static function spawn($primitive, $name)
 		{
-			Assert::classExists($primitive);
+			Assert::isTrue(class_exists($primitive, true));
 			
 			return new $primitive($name);
 		}
@@ -61,27 +61,10 @@
 		
 		/**
 		 * @return PrimitiveIdentifier
-		 * @obsoleted by integerIdentifier and scalarIdentifier
 		**/
 		public static function identifier($name)
 		{
 			return new PrimitiveIdentifier($name);
-		}
-		
-		/**
-		 * @return PrimitiveIntegerIdentifier
-		**/
-		public static function integerIdentifier($name)
-		{
-			return new PrimitiveIntegerIdentifier($name);
-		}
-		
-		/**
-		 * @return PrimitiveScalarIdentifier
-		**/
-		public static function scalarIdentifier($name)
-		{
-			return new PrimitiveScalarIdentifier($name);
 		}
 		
 		/**
@@ -205,14 +188,6 @@
 		}
 		
 		/**
-		 * @return PrimitiveHstore
-		**/
-		public static function hstore($name)
-		{
-			return new PrimitiveHstore($name);
-		}
-		
-		/**
 		 * @return PrimitiveMultiList
 		**/
 		public static function multiChoice($name)
@@ -293,14 +268,6 @@
 		}
 		
 		/**
-		 * @return PrimitiveNoValue
-		**/
-		public static function noValue($name)
-		{
-			return new PrimitiveNoValue($name);
-		}
-		
-		/**
 		 * @return PrimitiveHttpUrl
 		**/
 		public static function httpUrl($name)
@@ -309,35 +276,20 @@
 		}
 		
 		/**
-		 * @return BasePrimitive
+		 * @return PrimitiveRule
 		**/
-		public static function prototyped($class, $propertyName, $name = null)
+		public static function rule($name)
 		{
-			Assert::isInstance($class, 'Prototyped');
-			
-			$proto = is_string($class)
-				? call_user_func(array($class, 'proto'))
-				: $class->proto();
-			
-			if (!$name)
-				$name = $propertyName;
-			
-			return $proto->getPropertyByName($propertyName)->
-				makePrimitive($name);
+			return new PrimitiveRule($name);
 		}
 		
 		/**
-		 * @return PrimitiveIdentifier
+		 * @return PrimitiveDomDocument
 		**/
-		public static function prototypedIdentifier($class, $name = null)
+		public static function domDocument($name)
 		{
-			Assert::isInstance($class, 'DAOConnected');
-			
-			$dao = is_string($class)
-				? call_user_func(array($class, 'dao'))
-				: $class->dao();
-			
-			return self::prototyped($class, $dao->getIdName(), $name);
+			return new PrimitiveDomDocument($name);
 		}
+		
 	}
 ?>

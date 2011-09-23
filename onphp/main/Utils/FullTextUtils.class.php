@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: FullTextUtils.class.php 4587 2007-11-22 10:19:10Z voxus $ */
 
 	/**
 	 * Full-text utilities.

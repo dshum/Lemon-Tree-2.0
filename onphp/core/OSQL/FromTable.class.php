@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: FromTable.class.php 4592 2007-11-25 22:35:55Z voxus $ */
 
 	/**
 	 * SQL's "FROM"-member implementation.

@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: TimestampRange.class.php 5436 2008-08-19 19:01:54Z sherman $ */
 
 	/**
 	 * @see Timestamp
@@ -42,14 +42,6 @@
 			}
 			
 			return null;
-		}
-		
-		/**
-		 * @return TimestampRange
-		**/
-		public function toTimestampRange()
-		{
-			return $this;
 		}
 		
 		protected function getObjectName()

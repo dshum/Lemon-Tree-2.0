@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: InsertQuery.class.php 4450 2007-11-03 17:05:41Z voxus $ */
 
 	/**
 	 * @ingroup OSQL

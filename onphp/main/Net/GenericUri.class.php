@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: GenericUri.class.php 5017 2008-03-28 20:32:47Z dedmajor $ */
 
 	/**
 	 * @ingroup Net
@@ -106,11 +106,6 @@
 		**/
 		final public function transform(GenericUri $reference, $strict = true)
 		{
-			if ($this->getScheme() === null)
-				throw new WrongStateException(
-					'URI without scheme cannot be a base URI'
-				);
-			
 			if (
 				$reference->getScheme() !== ($strict ? null : $this->getScheme())
 			) {

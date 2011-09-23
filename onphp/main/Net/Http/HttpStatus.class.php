@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: HttpStatus.class.php 5138 2008-05-16 10:24:28Z ewgraf $ */
 
 	/**
 	 * Enumeration of http status codes
@@ -17,6 +17,9 @@
 	**/	
 	final class HttpStatus extends Enumeration
 	{
+		const HTTP_1_0	= 'HTTP/1.0';
+		const HTTP_1_1	= 'HTTP/1.1';
+		
 		const CODE_100	= 100;
 		const CODE_101	= 101;
 		const CODE_200	= 200;
@@ -108,9 +111,9 @@
 			return 200;
 		}
 		
-		public function toString()
+		public function toString($protocol = self::HTTP_1_1)
 		{
-			return 'HTTP/1.1 '.$this->id.' '.$this->name;
+			return $protocol.' '.$this->id.' '.$this->name;
 		}
 	}
 ?>

@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: CollectionItem.class.php 5434 2008-08-19 17:22:17Z sherman $ */
 
 	class CollectionItem extends IdentifiableObject {/*_*/}
 ?>

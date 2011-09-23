@@ -1,6 +1,6 @@
 <?php
 /***************************************************************************
- *   Copyright (C) 2006-2009 by Anton E. Lebedevich                        *
+ *   Copyright (C) 2006-2007 by Anton E. Lebedevich                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Lesser General Public License as        *
@@ -12,7 +12,7 @@
  *    by massimo dot scamarcia at gmail dot com                            *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: TextUtils.class.php 4531 2007-11-08 10:49:49Z voxus $ */
 
 	/**
 	 * @ingroup Utils
@@ -130,7 +130,7 @@
 		{
 			$length = strlen($hex);
 			
-			Assert::isEqual($length % 2, 0);
+			Assert::isTrue( $length % 2 == 0);
 			
 			$out = null;
 			for ($i = 0; $i < $length; $i += 2) {
@@ -160,21 +160,9 @@
 			return $result;
 		}
 		
-		public static function friendlyNumber($number, $delimiter = ' ')
+		public static function friendlyNumber($integer, $delimiter = ' ')
 		{
-			$localeInfo = localeconv();
-			
-			$decimalPoint = $localeInfo['decimal_point'];
-			
-			$number = (string) $number;
-			
-			$parts = explode($decimalPoint, $number);
-			
-			$integer = abs(array_shift($parts));
-			
-			$minus = $number < 0 ? '-' : '';
-			
-			$floatDiff = array_shift($parts);
+			Assert::isInteger($integer);
 			
 			if ($integer > 9999) {
 				$orders = array();
@@ -194,10 +182,7 @@
 			} else
 				$result = (string) $integer;
 			
-			if ($floatDiff)
-				$result = $result.$decimalPoint.$floatDiff;
-			
-			return $minus.$result;
+			return $result;
 		}
 	}
 ?>

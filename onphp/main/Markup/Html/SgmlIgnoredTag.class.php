@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: SgmlIgnoredTag.class.php 4499 2007-11-04 20:45:17Z voxus $ */
 
 	/**
 	 * @ingroup Html

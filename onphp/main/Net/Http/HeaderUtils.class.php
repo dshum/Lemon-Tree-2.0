@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: HeaderUtils.class.php 5142 2008-05-16 15:55:54Z ewgraf $ */
 
 	/**
 	 * Collection of static header functions.
@@ -19,10 +19,11 @@
 	{
 		private static $headerSent		= false;
 		private static $redirectSent	= false;
-		private static $cacheLifeTime   = 3600;
+		private static $cacheLifeTime	= 3600;
 		
 		public static function redirectRaw($url)
 		{
+			self::sendRedirectStatus();
 			header("Location: {$url}");
 
 			self::$headerSent = true;
@@ -32,12 +33,32 @@
 		public static function redirectBack()
 		{
 			if (isset($_SERVER['HTTP_REFERER'])) {
+				self::sendRedirectStatus();
 				header("Location: {$_SERVER['HTTP_REFERER']}");
 				self::$headerSent = true;
 				self::$redirectSent = true;
 				return $_SERVER['HTTP_REFERER'];
 			} else
 				return false;
+		}
+		
+		public static function sendRedirectStatus()
+		{
+			$protocol = HttpStatus::HTTP_1_1;
+			
+			if (isset($_SERVER['SERVER_PROTOCOL'])) {
+				$protocol = $_SERVER['SERVER_PROTOCOL'];
+			}
+			
+			$status = null;
+
+			if ($protocol == HttpStatus::HTTP_1_0) {
+				$status = new HttpStatus(HttpStatus::CODE_302);
+			} else {
+				$status = new HttpStatus(HttpStatus::CODE_303);
+			}
+			
+			self::sendHttpStatus($status, $protocol);
 		}
 		
 		public static function getParsedURI(/* ... */)
@@ -100,9 +121,12 @@
 			self::$headerSent = true;
 		}
 		
-		public static function sendHttpStatus(HttpStatus $status)
+		public static function sendHttpStatus(
+			HttpStatus $status,
+			$protocol = HttpStatus::HTTP_1_1
+		)
 		{
-			header($status->toString());
+			header($status->toString($protocol));
 			
 			self::$headerSent = true;
 		}

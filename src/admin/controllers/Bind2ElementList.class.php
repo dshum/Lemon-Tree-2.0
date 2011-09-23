@@ -4,38 +4,21 @@
 		public function __construct()
 		{
 			$this->
-			setMethodMapping('save', 'save')->
-			setMethodMapping('edit', 'edit')->
-			setDefaultAction('edit');
+				setMethodMapping('save', 'saveBindList')->
+				setMethodMapping('edit', 'editBindList')->
+				setDefaultAction('edit');
 		}
 
 		public function handleRequest(HttpRequest $request)
 		{
-			$loggedUser = LoggedUser::getUser();
-
-			if(!$loggedUser->getGroup()->getIsDeveloper()) {
-				return
-					ModelAndView::create()->
-					setModel(Model::create())->
-					setView(new RedirectToView('ViewBrowse'));
-			}
-
-			Item::dao()->setItemList();
-
 			return parent::handleRequest($request);
 		}
 
-		public function save(HttpRequest $request)
+		public function saveBindList($request)
 		{
 			$model = Model::create();
 
-			$form =
-				Form::create()->
-				add(
-					Primitive::polymorphicIdentifier('elementId')->
-					ofBase('Element')
-				)->
-				importMore($request->getGet());
+			$form = $this->makeElementForm();
 
 			$itemList = Item::dao()->getItemList();
 
@@ -76,24 +59,11 @@
 
 		}
 
-		public function edit(HttpRequest $request)
+		public function editBindList($request)
 		{
 			$model = Model::create();
 
-			$form =
-				Form::create()->
-				add(
-					Primitive::polymorphicIdentifier('elementId')->
-					ofBase('Element')
-				)->
-				importMore($request->getGet());
-
-			if($form->getErrors()) {
-				return
-					ModelAndView::create()->
-					setModel(Model::create())->
-					setView(new RedirectToView('ViewBrowse'));
-			}
+			$form = $this->makeElementForm();
 
 			$currentElement = $form->getValue('elementId');
 
@@ -139,6 +109,38 @@
 				setView('Bind2ElementList');
 
 
+		}
+
+		private function makeElementForm()
+		{
+			$form = Form::create();
+
+			$form->
+			add(
+				Primitive::polymorphicIdentifier('elementId')->
+				ofBase('Element')
+			)->
+			add(
+				Primitive::identifier('sortItemId')->
+				of('Item')
+			)->
+			add(
+				Primitive::string('sortPropertyName')
+			)->
+			add(
+				Primitive::choice('sortDirection')->
+				setList(array('asc' => 'asc', 'desc' => 'desc'))
+			)->
+			add(
+				Primitive::identifier('pagerItemId')->
+				of('Item')
+			)->
+			add(
+				Primitive::integer('pagerPage')
+			)->
+			importMore($_GET);
+
+			return $form;
 		}
 	}
 ?>

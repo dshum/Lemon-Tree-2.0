@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: DBPool.class.php 5066 2008-04-16 15:52:20Z dedmajor $ */
 
 	/**
 	 * Pool of DB's instances.
@@ -109,8 +109,16 @@
 				$link = $this->pool[$name];
 			
 			if ($link) {
-				if (!$link->isConnected())
-					$link->connect();
+				if (!$link->isConnected()) {
+					
+					try {
+						$link->connect();
+					} catch (BaseException $e) {
+						throw new DatabaseIsDownException(
+							$e->getMessage()
+						);
+					}
+				}
 				
 				return $link;
 			}

@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: OneToManyLinkedFull.class.php 4322 2007-10-02 16:05:00Z voxus $ */
 
 	/**
 	 * @ingroup Containers

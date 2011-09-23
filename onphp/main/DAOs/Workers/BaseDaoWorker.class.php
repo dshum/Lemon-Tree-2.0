@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: BaseDaoWorker.class.php 5317 2008-07-18 17:24:20Z voxus $ */
 
 	/**
 	 * @ingroup DAOs
@@ -19,22 +19,16 @@
 		const SUFFIX_INDEX	= '_lists_index_';
 		const SUFFIX_QUERY	= '_query_';
 		const SUFFIX_RESULT	= '_result_';
-		
+
 		protected $dao = null;
 		
 		protected $className = null;
-		
-		protected $watermark = null;
 		
 		public function __construct(GenericDAO $dao)
 		{
 			$this->dao = $dao;
 			
 			$this->className = $dao->getObjectName();
-			
-			if (($cache = Cache::me()) instanceof WatermarkedPeer)
-				$this->watermark =
-					$cache->mark($this->className)->getActualWatermark();
 		}
 		
 		/**
@@ -80,21 +74,21 @@
 			return $result;
 		}
 		//@}
-		
+
 		/// uncachers
 		//@{
 		public function uncacheById($id)
 		{
 			return
 				Cache::me()->mark($this->className)->
-					delete($this->makeIdKey($id));
+					delete($this->className.'_'.$id);
 		}
 		
-		public function uncacheByQuery(SelectQuery $query)
+		protected function uncacheByQuery(SelectQuery $query)
 		{
 			return
 				Cache::me()->mark($this->className)->
-					delete($this->makeQueryKey($query, self::SUFFIX_QUERY));
+					delete($this->className.self::SUFFIX_QUERY.$query->getId());
 		}
 		//@}
 		
@@ -104,14 +98,14 @@
 		{
 			return
 				Cache::me()->mark($this->className)->
-					get($this->makeIdKey($id));
+					get($this->className.'_'.$id);
 		}
 		
 		protected function getCachedByQuery(SelectQuery $query)
 		{
 			return
 				Cache::me()->mark($this->className)->
-					get($this->makeQueryKey($query, self::SUFFIX_QUERY));
+					get($this->className.self::SUFFIX_QUERY.$query->getId());
 		}
 		//@}
 		
@@ -164,19 +158,5 @@
 			return $list;
 		}
 		//@}
-		
-		protected function makeIdKey($id)
-		{
-			return $this->className.'_'.$id.$this->watermark;
-		}
-		
-		protected function makeQueryKey(SelectQuery $query, $suffix)
-		{
-			return
-				$this->className
-				.$suffix
-				.$query->getId()
-				.$this->watermark;
-		}
 	}
 ?>

@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                        *
  *                                                                          *
  ****************************************************************************/
-/* $Id$ */
+/* $Id: AggregateCache.class.php 5287 2008-07-14 22:42:48Z voxus $ */
 
 	/**
 	 * A wrapper to multiple cache for workload
@@ -230,9 +230,8 @@
 				$classLevel = $this->levels[$class];
 			else
 				$classLevel = self::LEVEL_NORMAL;
-			
-			// init by $key, randomness will be restored later
-			mt_srand(hexdec(substr(md5($key), 3, 7)));
+
+			mt_srand(hexdec(substr(md5($key), 3, 7))); // init by $key
 
 			$zeroDistances = array();
 			$weights = array();
@@ -277,15 +276,7 @@
 				++$this->peers[$selectedLabel]['stat'][$class];
 			else
 				$this->peers[$selectedLabel]['stat'][$class] = 1;
-			
-			// restore randomness
-			mt_srand(
-				(int) (
-					(int) (microtime(true) << 2)
-					* (rand(time() / 2, time()) >> 2)
-				)
-			);
-			
+
 			return $selectedLabel;
 		}
 	}

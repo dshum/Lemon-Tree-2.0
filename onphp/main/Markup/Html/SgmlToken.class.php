@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: SgmlToken.class.php 4509 2007-11-04 20:45:49Z voxus $ */
 
 	/**
 	 * @ingroup Html

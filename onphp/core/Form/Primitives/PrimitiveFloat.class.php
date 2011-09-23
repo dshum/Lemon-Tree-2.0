@@ -1,6 +1,6 @@
 <?php
 /****************************************************************************
- *   Copyright (C) 2006-2007 by Konstantin V. Arkhipov                      *
+ *   Copyright (C) 2006-2008 by Konstantin V. Arkhipov                      *
  *                                                                          *
  *   This program is free software; you can redistribute it and/or modify   *
  *   it under the terms of the GNU Lesser General Public License as         *
@@ -8,21 +8,21 @@
  *   License, or (at your option) any later version.                        *
  *                                                                          *
  ****************************************************************************/
-/* $Id$ */
+/* $Id: PrimitiveFloat.class.php 5124 2008-05-02 10:36:39Z voxus $ */
 
 	/**
 	 * @ingroup Primitives
 	**/
-	final class PrimitiveFloat extends PrimitiveNumber
+	final class PrimitiveFloat extends FiltrablePrimitive
 	{
-		protected function checkNumber($number)
+		public function getTypeName()
 		{
-			Assert::isFloat($number);
+			return 'Float';
 		}
 		
-		protected function castNumber($number)
+		public function isObjectType()
 		{
-			return (float) $number;
+			return false;
 		}
 	}
 ?>

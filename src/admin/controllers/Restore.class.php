@@ -17,26 +17,19 @@
 			{
 				case "send":
 					if($form->primitiveExists("UserName")) {
-						try {
-							$user = User::dao()->getByLogic(
-								Expression::eq('user_name', $form->getValue('UserName'))
-							);
-						} catch (ObjectNotFoundException $e) {
-							$user = null;
-						}
+						$user = User::dao()->getUserByLogin($form->getValue("UserName"));
 						if($user) {
 							if($user->getUserEmail()) {
 								$code = substr(md5(LT_SECRET_WORD.$user->getUserName()), 0, 16);
-								MailUtils::create()->
-								setModel(
-									Model::create()->
-									set('login', $user->getUserName())->
-									set('email', $user->getUserEmail())->
-									set('url', PATH_ADMIN.'?module=Restore&login='.$user->getUserName().'&code='.$code)
-								)->
-								setView('mail/restoreLink')->
-								setEncoding(DEFAULT_MAIL_ENCODING)->
-								send();
+								$vars = array(
+									'login' => $user->getUserName(),
+									'email' => $user->getUserEmail(),
+									'url' => PATH_ADMIN.'?module=Restore&login='.$user->getUserName().'&code='.$code,
+								);
+								SimpleMail::create()->
+									setTemplate(PATH_LT_MAIL_TEMPLATES.'restoreLink.php.eml')->
+									setActiveVars($vars)->
+									send();
 								$status = 'link_sent';
 								HeaderUtils::redirectRaw(PATH_ADMIN.'?module=Restore&UserName='.$user->getUserName().'&email='.$user->getUserEmail().'&status='.$status);
 								exit;

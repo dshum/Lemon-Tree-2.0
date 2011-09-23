@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: ModelAndView.class.php 4308 2007-10-01 11:50:10Z lifter $ */
 
 	/**
 	 * @ingroup Flow

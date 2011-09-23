@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                        *
  *                                                                          *
  ****************************************************************************/
-/* $Id$ */
+/* $Id: SQLChain.class.php 4564 2007-11-14 13:50:36Z voxus $ */
 
 	/**
 	 * @ingroup OSQL
@@ -32,16 +32,6 @@
 		public function getSize()
 		{
 			return count($this->chain);
-		}
-		
-		public function getChain()
-		{
-			return $this->chain;
-		}
-		
-		public function getLogic()
-		{
-			return $this->logic;
 		}
 		
 		/**

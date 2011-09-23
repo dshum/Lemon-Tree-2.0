@@ -1,30 +1,23 @@
 <?php
 	final class ImageProperty extends BaseProperty
 	{
+		private $folder = null;
 		private static $allowedMimeTypes = array(
 			'image/png',
 			'image/gif',
-			'image/jpeg',
-			'image/pjpeg',
+			'image/jpeg'
 		);
 		private static $thumbnail_prefix = 'thumbnail_';
 		private static $dir_mod = 0755;
 		private static $file_mod = 0644;
 
-		private $folder = null;
-
 		public function __construct($property, $element)
 		{
 			parent::__construct($property, $element);
 
-			$item = $property->getItem();
-			$itemClass = $item->getClass();
-			$this->folder = $itemClass->dao()->getTable();
-		}
+			$this->dataType = DataType::create(DataType::VARCHAR)->setSize(255);
 
-		public function setParameters()
-		{
-			parent::setParameters();
+			$this->folder = $this->property->getItem()->getDefaultTableName().DIRECTORY_SEPARATOR;
 
 			$this->addParameter('maxFilesizeKb', 'integer', 'Максимальный размер файла (Кб)', 2048);
 			$this->addParameter('maxWidth', 'integer', 'Максимальная ширина изображения (пиксели)', 800);
@@ -34,14 +27,6 @@
 			$this->addParameter('resizeHeight', 'integer', 'Изменить высоту изображения до', 0);
 			$this->addParameter('thumbnailWidth', 'integer', 'Ширина тумбнайла', 0);
 			$this->addParameter('thumbnailHeight', 'integer', 'Высота тумбнайла', 0);
-			$this->addParameter('jpegQuality', 'integer', 'Качество JPG, %', 60);
-
-			return $this;
-		}
-
-		public function getDataType()
-		{
-			return DataType::create(DataType::VARCHAR)->setSize(255);
 		}
 
 		public function meta()
@@ -76,17 +61,17 @@
 
 		public function path()
 		{
-			return PATH_WEB_LTDATA.$this->folder.'/'.$this->value;
+			return PATH_WEB_LTDATA.$this->folder.$this->value;
 		}
 
 		public function abspath()
 		{
-			return PATH_LTDATA.$this->folder.DIRECTORY_SEPARATOR.$this->value;
+			return PATH_LTDATA.$this->folder.$this->value;
 		}
 
 		public function relpath()
 		{
-			return '/'.FOLDER_LTDATA.$this->folder.'/'.$this->value;
+			return DIRECTORY_SEPARATOR.FOLDER_LTDATA.DIRECTORY_SEPARATOR.$this->folder.$this->value;
 		}
 
 		public function src()
@@ -122,11 +107,6 @@
 			}
 		}
 
-		public function exists()
-		{
-			return $this->value && file_exists($this->abspath());
-		}
-
 		public function filename()
 		{
 			return $this->value;
@@ -147,14 +127,19 @@
 			return round($this->filesize() / 1024 / 1024, $precision);
 		}
 
+		public function exists()
+		{
+			return $this->value && file_exists($this->abspath());
+		}
+
 		public function thumbnail_path()
 		{
-			return PATH_WEB_LTDATA.$this->folder.'/'.self::$thumbnail_prefix.$this->value;
+			return PATH_WEB_LTDATA.$this->folder.self::$thumbnail_prefix.$this->value;
 		}
 
 		public function thumbnail_abspath()
 		{
-			return PATH_LTDATA.$this->folder.DIRECTORY_SEPARATOR.self::$thumbnail_prefix.$this->value;
+			return PATH_LTDATA.$this->folder.self::$thumbnail_prefix.$this->value;
 		}
 
 		public function thumbnail_src()
@@ -182,11 +167,6 @@
 			}
 		}
 
-		public function thumbnail_exists()
-		{
-			return $this->value && file_exists($this->thumbnail_abspath());
-		}
-
 		public function thumbnail_filename()
 		{
 			return self::$thumbnail_prefix.$this->value;
@@ -194,7 +174,7 @@
 
 		public function thumbnail_filesize()
 		{
-			return $this->thumbnail_exists() ? filesize($this->thumbnail_abspath()) : 0;
+			return $this->exists() ? filesize($this->thumbnail_abspath()) : 0;
 		}
 
 		public function thumbnail_filesize_kb($precision = 0)
@@ -202,44 +182,67 @@
 			return round($this->thumbnail_filesize() / 1024, $precision);
 		}
 
-		public function getElementListView()
+		public function thumbnail_exists()
 		{
-			$model =
-				Model::create()->
-				set('value', $this->value)->
-				set('src', $this->src());
-
-			$viewName = 'properties/'.get_class($this).'.elementList';
-
-			return $this->render($model, $viewName);
+			return $this->value && file_exists($this->thumbnail_abspath());
 		}
 
-		public function getEditElementView()
+		public function editOnElement()
 		{
-			$model =
-				Model::create()->
-				set('propertyName', $this->property->getPropertyName())->
-				set('propertyDescription', $this->property->getPropertyDescription())->
-				set('value', $this->value)->
-				set('exists', $this->exists())->
-				set('path', $this->path())->
-				set('width', $this->width())->
-				set('height', $this->height())->
-				set('filesize_kb', $this->filesize_kb(1))->
-				set('filename', $this->filename())->
-				set('thumbnail_exists', $this->thumbnail_exists())->
-				set('thumbnail_path', $this->thumbnail_path())->
-				set('thumbnail_width', $this->thumbnail_width())->
-				set('thumbnail_height', $this->thumbnail_height())->
-				set('thumbnail_filesize_kb', $this->thumbnail_filesize_kb(1))->
-				set('thumbnail_filename', $this->thumbnail_filename())->
-				set('maxFilesizeKb', $this->getParameterValue('maxFilesizeKb'))->
-				set('maxWidth', $this->getParameterValue('maxWidth'))->
-				set('maxHeight', $this->getParameterValue('maxHeight'));
+			$str = $this->property->getPropertyDescription().':<br>';
+			if($this->exists()) {
+				$str .= '<table><tr valign="top">';
+				$str .= '<td>';
+				$str .= '<span class="mini">Загружено изображение: <a class="dark_grey" href="'.$this->path().'" target="_blank">'.$this->value.'</a>, <span title="Размер изображения">'.$this->width().'&#215;'.$this->height().'</span> пикселов, '.$this->filesize_kb(1).' Кб</span><br>';
+				$str .= '<img class="pict" src="'.$this->path().'?random='.md5(rand()).'" width="'.$this->width().'" height="'.$this->height().'" alt=""><br>';
+				$str .= '</td>';
+				if($this->thumbnail_exists()) {
+					$str .= '<td>';
+					$str .= '<span class="mini">Загружен тумбнайл: <a class="dark_grey" href="'.$this->thumbnail_path().'" target="_blank">'.self::$thumbnail_prefix.$this->value.'</a>, <span title="Размер изображения">'.$this->thumbnail_width().'&#215;'.$this->thumbnail_height().'</span> пикселов, '.$this->thumbnail_filesize_kb(1).' Кб</span><br>';
+					$str .= '<img class="pict" src="'.$this->thumbnail_path().'?random='.md5(rand()).'" width="'.$this->thumbnail_width().'" height="'.$this->thumbnail_height().'" alt=""><br>';
+					$str .= '</td>';
+				}
+				$str .= '</table>';
+			}
+			$str .= '<script type="text/javascript">';
+			$str .= '$(function() {';
+			$str .= '$(\'input:file[name='.$this->property->getPropertyName().']\').change(function() {';
+			$str .= '$(\'input:checkbox[name='.$this->property->getPropertyName().'_drop]\').each(function() {this.checked = false;});';
+			$str .= '});';
+			$str .= '$(\'input:checkbox[name='.$this->property->getPropertyName().'_drop]\').click(function() {';
+			$str .= 'if(this.checked) {';
+			$str .= '$(\'input:file[name='.$this->property->getPropertyName().']\').val(\'\');';
+			$str .= '}';
+			$str .= '});';
+			$str .= '});';
+			$str .= '</script>';
+			$str .= '<input type="file" name="'.$this->property->getPropertyName().'" value="'.$this->value.'" class="file-field"><br>';
+			if($this->getParameterValue('maxFilesizeKb') > 0) {
+				$str .= '<small class="red">Максимальный размер файла '.$this->getParameterValue('maxFilesizeKb').' Кб</small><br>';
+			}
+			if($this->getParameterValue('maxWidth') > 0 && $this->getParameterValue('maxHeight') > 0) {
+				$str .= '<small class="red">Максимальный размер изображения '.$this->getParameterValue('maxWidth').'&#215;'.$this->getParameterValue('maxHeight').' пикселей</small><br>';
+			} elseif($this->getParameterValue('maxWidth') > 0) {
+				$str .= '<small class="red">Максимальная ширина изображения '.$this->getParameterValue('maxWidth').' пикселей</small><br>';
+			} elseif($this->getParameterValue('maxHeight') > 0) {
+				$str .= '<small class="red">Максимальная высота изображения '.$this->getParameterValue('maxHeight').' пикселей</small><br>';
+			}
+			if($this->exists()) {
+				$str .= '<div class="file_del_check"><input type="checkbox" id="'.$this->property->getPropertyName().'_drop" name="'.$this->property->getPropertyName().'_drop" value="1" title="Удалить"><label for="'.$this->property->getPropertyName().'_drop">Удалить</label></div>';
+			}
+			$str .= '<br>';
 
-			$viewName = 'properties/'.get_class($this).'.editElement';
+			return $str;
+		}
 
-			return $this->render($model, $viewName);
+		public function printOnElementList()
+		{
+			if($this->value) {
+				$str = '<img src="'.$this->src().'" alt="'.$this->value.'">';
+				return $str;
+			} else {
+				return null;
+			}
 		}
 
 		public function set(Form $form)
@@ -281,8 +284,6 @@
 						mkdir(PATH_LTDATA.$this->folder, self::$dir_mod);
 					}
 
-					$jpegQuality = $this->getParameterValue('jpegQuality');
-
 					$thumbnailWidth = $this->getParameterValue('thumbnailWidth');
 					$thumbnailHeight = $this->getParameterValue('thumbnailHeight');
 
@@ -292,20 +293,18 @@
 					) {
 						ImageUtils::resizeAndCopyImage(
 							$file,
-							PATH_LTDATA.$this->folder.DIRECTORY_SEPARATOR.self::$thumbnail_prefix.$filename,
+							PATH_LTDATA.$this->folder.self::$thumbnail_prefix.$filename,
 							$thumbnailWidth,
-							$thumbnailHeight,
-							$jpegQuality
+							$thumbnailHeight
 						);
 						chmod(
-							PATH_LTDATA.$this->folder.DIRECTORY_SEPARATOR.self::$thumbnail_prefix.$filename,
+							PATH_LTDATA.$this->folder.self::$thumbnail_prefix.$filename,
 							self::$file_mod
 						);
 					}
 
 					$resizeWidth = $this->getParameterValue('resizeWidth');
 					$resizeHeight = $this->getParameterValue('resizeHeight');
-					$resizeQuality = $this->getParameterValue('resizeQuality');
 
 					if(
 						$resizeWidth > 0
@@ -313,22 +312,21 @@
 					) {
 						ImageUtils::resizeAndCopyImage(
 							$file,
-							PATH_LTDATA.$this->folder.DIRECTORY_SEPARATOR.$filename,
+							PATH_LTDATA.$this->folder.$filename,
 							$resizeWidth,
-							$resizeHeight,
-							$jpegQuality
+							$resizeHeight
 						);
 						chmod(
-							PATH_LTDATA.$this->folder.DIRECTORY_SEPARATOR.$filename,
+							PATH_LTDATA.$this->folder.$filename,
 							self::$file_mod
 						);
 						unlink($file);
 					} else {
 						$primitive->copyToPath(
-							PATH_LTDATA.$this->folder.DIRECTORY_SEPARATOR.$filename
+							PATH_LTDATA.$this->folder.$filename
 						);
 						chmod(
-							PATH_LTDATA.$this->folder.DIRECTORY_SEPARATOR.$filename,
+							PATH_LTDATA.$this->folder.$filename,
 							self::$file_mod
 						);
 					}
@@ -343,11 +341,11 @@
 		public function drop()
 		{
 			try {
-				if(file_exists(PATH_LTDATA.$this->folder.DIRECTORY_SEPARATOR.$this->value)) {
-					unlink(PATH_LTDATA.$this->folder.DIRECTORY_SEPARATOR.$this->value);
+				if(file_exists(PATH_LTDATA.$this->folder.$this->value)) {
+					unlink(PATH_LTDATA.$this->folder.$this->value);
 				}
-				if(file_exists(PATH_LTDATA.$this->folder.DIRECTORY_SEPARATOR.self::$thumbnail_prefix.$this->value)) {
-					unlink(PATH_LTDATA.$this->folder.DIRECTORY_SEPARATOR.self::$thumbnail_prefix.$this->value);
+				if(file_exists(PATH_LTDATA.$this->folder.self::$thumbnail_prefix.$this->value)) {
+					unlink(PATH_LTDATA.$this->folder.self::$thumbnail_prefix.$this->value);
 				}
 			} catch (BaseException $e) {}
 		}

@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: CyrillicPairs.class.php 4178 2007-09-09 17:18:54Z voxus $ */
 
 	/**
 	 * Based on CPAN's Lingua::DetectCharset.

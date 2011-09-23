@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: TidyValidator.class.php 4800 2008-01-22 03:44:23Z voxus $ */
 
 	/**
 	 * Small Tidy-based HTML validator.

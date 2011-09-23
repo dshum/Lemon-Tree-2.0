@@ -25,12 +25,31 @@
 				break;
 
 			case 'virtual':
+				$form->addMissingLabel('tableName', 'Не заполнено название таблицы.');
+				$form->addMissingLabel('controllerName', 'Не заполнено название контроллера.');
+
+				$form->addWrongLabel('classSource', 'Некорректное значение источника данных объекта.');
+				$form->addWrongLabel('tableName', 'Некорректное название таблицы.');
+				$form->addWrongLabel('controllerName', 'Некорректное название контроллера.');
 				$form->addWrongLabel('parentProperty', 'Некорректный идентификатор родительского поля.');
 				break;
 
 			case 'default': default:
+				$form->addMissingLabel('tableName', 'Не заполнено название таблицы.');
+				$form->addMissingLabel('controllerName', 'Не заполнено название контроллера.');
 				$form->addMissingLabel('mainPropertyDescription', 'Не заполнено название главного поля.');
 				$form->addMissingLabel('pathPrefix', 'Не заполнен префикс названия элементов в адресной строке.');
+				$form->addWrongLabel('classSource', 'Некорректное значение источника данных объекта.');
+				$form->addWrongLabel('tableName', 'Некорректное название таблицы.');
+				$form->addWrongLabel('controllerName', 'Некорректное название контроллера.');
+				$form->addWrongLabel('pluginName', 'Некорректное название плагина.');
+				$form->addWrongLabel('filterName', 'Некорректное название фильтра.');
+				$form->addWrongLabel('beforeInsert', 'Некорректное название класса, выполняющегося перед созданием элемента.');
+				$form->addWrongLabel('afterInsert', 'Некорректное название класса, выполняющегося после создания элемента.');
+				$form->addWrongLabel('beforeUpdate', 'Некорректное название класса, выполняющегося перед обновлением элемента.');
+				$form->addWrongLabel('afterUpdate', 'Некорректное название класса, выполняющегося после обновления элемента.');
+				$form->addWrongLabel('beforeDelete', 'Некорректное название класса, выполняющегося перед удалением элемента.');
+				$form->addWrongLabel('afterDelete', 'Некорректное название класса, выполняющегося после удаления элемента.');
 				$form->addWrongLabel('mainPropertyDescription', 'Длина названия главного поля должна быть не более 255 символов.');
 				$form->addWrongLabel('parentProperty', 'Некорректный идентификатор родительского поля.');
 				$form->addWrongLabel('pathPrefix', 'Некорректное название префикса.');

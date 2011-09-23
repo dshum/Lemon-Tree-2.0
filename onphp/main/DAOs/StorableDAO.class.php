@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: StorableDAO.class.php 4836 2008-02-19 08:13:42Z voxus $ */
 
 	/**
 	 * @ingroup DAOs

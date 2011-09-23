@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                        *
  *                                                                          *
  ****************************************************************************/
-/* $Id$ */
+/* $Id: CachePeer.class.php 5287 2008-07-14 22:42:48Z voxus $ */
 
 /*
 	CachePeer:

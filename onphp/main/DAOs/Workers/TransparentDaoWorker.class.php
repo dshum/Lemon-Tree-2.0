@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: TransparentDaoWorker.class.php 5374 2008-08-03 14:15:27Z voxus $ */
 
 	/**
 	 * Basis for transparent DAO workers.
@@ -82,7 +82,7 @@
 			$ids = array_unique($ids);
 			
 			foreach ($ids as $id)
-				$prefixed[$id] = $this->makeIdKey($id);
+				$prefixed[$id] = $this->className.'_'.$id;
 			
 			if (
 				$cachedList
@@ -182,7 +182,7 @@
 			return parent::getQueryResult($query, Cache::EXPIRES_FOREVER);
 		}
 		//@}
-		
+
 		/// cachers
 		//@{
 		protected function cacheById(
@@ -191,7 +191,7 @@
 		{
 			Cache::me()->mark($this->className)->
 				add(
-					$this->makeIdKey($object->getId()),
+					$this->className.'_'.$object->getId(),
 					$object,
 					$expires
 				);
@@ -206,7 +206,7 @@
 		{
 			return
 				$this->gentlyGetByKey(
-					$this->makeQueryKey($query, self::SUFFIX_QUERY)
+					$this->className.self::SUFFIX_QUERY.$query->getId()
 				);
 		}
 		
@@ -214,7 +214,7 @@
 		{
 			return
 				$this->gentlyGetByKey(
-					$this->makeQueryKey($query, self::SUFFIX_LIST)
+					$this->className.self::SUFFIX_LIST.$query->getId()
 				);
 		}
 		
@@ -223,7 +223,7 @@
 			return
 				Cache::me()->mark($this->className)->
 					add(
-						$this->makeIdKey($id),
+						$this->className.'_'.$id,
 						Cache::NOT_FOUND,
 						Cache::EXPIRES_FOREVER
 					);

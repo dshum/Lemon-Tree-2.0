@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: MyImprovedDialect.class.php 5257 2008-07-01 13:59:05Z voxus $ */
 
 	/**
 	 * MySQL dialect.
@@ -34,6 +34,9 @@
 			
 			if ($value instanceof Identifier && !$value->isFinalized())
 				return "''"; // instead of 'null', to be compatible with v. 4
+			
+			if (Assert::checkInteger($value))
+				return $value;
 			
 			return
 				"'"

@@ -8,30 +8,30 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: IdentifiableObject.class.php 4461 2007-11-04 20:41:33Z voxus $ */
 
 	/**
 	 * Ideal Identifiable interface implementation. ;-)
-	 * 
+	 *
 	 * @see Identifiable
-	 * 
+	 *
 	 * @ingroup Base
 	 * @ingroup Module
 	**/
 	class /* spirit of */ IdentifiableObject implements Identifiable
 	{
 		protected $id = null;
-		
+
 		/**
 		 * @return IdentifiableObject
 		**/
 		public static function wrap($id)
 		{
 			$io = new self;
-			
+
 			return $io->setId($id);
 		}
-		
+
 		public function getId()
 		{
 			if (
@@ -42,14 +42,14 @@
 			else
 				return $this->id;
 		}
-		
+
 		/**
 		 * @return IdentifiableObject
 		**/
 		public function setId($id)
 		{
 			$this->id = $id;
-			
+
 			return $this;
 		}
 	}

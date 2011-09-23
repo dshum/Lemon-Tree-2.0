@@ -17,57 +17,5 @@
 		{
 			return TABLE_PREFIX.parent::getSequence();
 		}
-
-		public function getListByGroup(Group $group)
-		{
-			return
-				Criteria::create($this)->
-				add(
-					Expression::eqId(
-						new DBField('group_id', $this->getTable()),
-						$group
-					)
-				)->
-				get();
-		}
-
-		public function getByGroupAndItem(Group $group, Item $item)
-		{
-			return
-				Criteria::create($this)->
-				add(
-					Expression::eqId(
-						new DBField('group_id', $this->getTable()),
-						$group
-					)
-				)->
-				add(
-					Expression::eqId(
-						new DBField('item_id', $this->getTable()),
-						$item
-					)
-				)->
-				setLimit(1)->
-				get();
-		}
-
-		public function dropByGroup(Group $group)
-		{
-			$db = DBPool::me()->getByDao($this);
-
-			$query =
-				OSQL::delete()->
-				from($this->getTable())->
-				where(
-					Expression::eqId(
-						new DBField('group_id', $this->getTable()),
-						$group
-					)
-				);
-
-			$db->query($query);
-
-			$this->uncacheLists();
-		}
 	}
 ?>

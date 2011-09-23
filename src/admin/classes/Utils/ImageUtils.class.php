@@ -7,7 +7,7 @@
 
 	class ImageUtils
 	{
-		public static function resizeAndCopyImage($source, $destination, $new_width, $new_height, $quality = 60)
+		public static function resizeAndCopyImage($source, $destination, $new_width, $new_height)
 		{
 			if(!is_readable($source)) return false;
 
@@ -60,7 +60,7 @@
 					imagegif($new_image, $destination);
 					break;
 				case 2:
-					imagejpeg($new_image, $destination, $quality);
+					imagejpeg($new_image, $destination, 50);
 					break;
 				case 3:
 					imagepng($new_image, $destination);

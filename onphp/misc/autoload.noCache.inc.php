@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: autoload.noCache.inc.php 5507 2008-09-19 06:51:24Z vlad $ */
 
 	/* void */ function __autoload($classname)
 	{

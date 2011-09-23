@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: Url.class.php 4619 2007-11-25 22:37:23Z voxus $ */
 
 	/**
 	 * URL is either absolute URI with authority part or relative one without

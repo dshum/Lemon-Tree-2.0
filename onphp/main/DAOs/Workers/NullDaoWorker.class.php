@@ -1,6 +1,6 @@
 <?php
 /***************************************************************************
- *   Copyright (C) 2005-2009 by Konstantin V. Arkhipov                     *
+ *   Copyright (C) 2005-2008 by Konstantin V. Arkhipov                     *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Lesser General Public License as        *
@@ -8,14 +8,14 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: NullDaoWorker.class.php 5588 2008-11-23 15:55:03Z voxus $ */
 
 	/**
 	 * Cacheless DAO worker.
-	 * 
+	 *
 	 * @see CommonDaoWorker for manual-caching one.
 	 * @see SmartDaoWorker for transparent one.
-	 * 
+	 *
 	 * @ingroup DAOs
 	**/
 	class NullDaoWorker extends CommonDaoWorker
@@ -26,23 +26,23 @@
 		{
 			return parent::getById($id, Cache::DO_NOT_CACHE);
 		}
-		
+
 		public function getByLogic(LogicalObject $logic)
 		{
 			return parent::getByLogic($logic, Cache::DO_NOT_CACHE);
 		}
-		
+
 		public function getByQuery(SelectQuery $query)
 		{
 			return parent::getByQuery($query, Cache::DO_NOT_CACHE);
 		}
-		
+
 		public function getCustom(SelectQuery $query)
 		{
 			return parent::getCustom($query, Cache::DO_NOT_CACHE);
 		}
 		//@}
-		
+
 		/// object's list getters
 		//@{
 		public function getListByIds(array $ids)
@@ -62,36 +62,36 @@
 				return array();
 			}
 		}
-		
+
 		public function getListByQuery(SelectQuery $query)
 		{
 			return parent::getListByQuery($query, Cache::DO_NOT_CACHE);
 		}
-		
+
 		public function getListByLogic(LogicalObject $logic)
 		{
 			return parent::getListByLogic($logic, Cache::DO_NOT_CACHE);
 		}
-		
+
 		public function getPlainList()
 		{
 			return parent::getPlainList(Cache::DO_NOT_CACHE);
 		}
 		//@}
-		
+
 		/// custom list getters
 		//@{
 		public function getCustomList(SelectQuery $query)
 		{
 			return parent::getCustomList($query, Cache::DO_NOT_CACHE);
 		}
-		
+
 		public function getCustomRowList(SelectQuery $query)
 		{
 			return parent::getCustomRowList($query, Cache::DO_NOT_CACHE);
 		}
 		//@}
-		
+
 		/// query result getters
 		//@{
 		public function getQueryResult(SelectQuery $query)
@@ -99,7 +99,7 @@
 			return parent::getQueryResult($query, Cache::DO_NOT_CACHE);
 		}
 		//@}
-		
+
 		/// cachers
 		//@{
 		protected function cacheById(
@@ -109,7 +109,7 @@
 		{
 			return $object;
 		}
-		
+
 		protected function cacheByQuery(
 			SelectQuery $query,
 			/* Identifiable */ $object,
@@ -119,37 +119,37 @@
 			return $object;
 		}
 		//@}
-		
+
 		/// uncachers
 		//@{
 		public function uncacheById($id)
 		{
 			return true;
 		}
-		
-		public function uncacheByIds($ids)
+
+		public function uncacheByIds(array $ids)
 		{
 			return true;
 		}
-		
+
 		public function uncacheByQuery(SelectQuery $query)
 		{
 			return true;
 		}
-		
+
 		public function uncacheLists()
 		{
 			return true;
 		}
 		//@}
-		
+
 		/// cache getters
 		//@{
 		public function getCachedById($id)
 		{
 			return null;
 		}
-		
+
 		protected function getCachedByQuery(SelectQuery $query)
 		{
 			return null;

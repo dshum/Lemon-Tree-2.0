@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: DBTransaction.class.php 3882 2007-07-27 11:20:18Z voxus $ */
 
 	/**
 	 * Database transaction implementation.

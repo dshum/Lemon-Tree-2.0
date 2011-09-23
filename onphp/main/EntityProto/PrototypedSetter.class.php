@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: PrototypedSetter.class.php 4962 2008-03-21 16:41:03Z dedmajor $ */
 
 	abstract class PrototypedSetter extends PrototypedMethodCaller
 	{

@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: DTOMessage.class.php 4967 2008-03-21 18:04:30Z dedmajor $ */
 
 	abstract class DTOMessage implements PrototypedEntity
 	{

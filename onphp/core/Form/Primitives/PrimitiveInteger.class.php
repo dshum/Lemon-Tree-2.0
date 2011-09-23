@@ -8,33 +8,21 @@
  *   License, or (at your option) any later version.                        *
  *                                                                          *
  ****************************************************************************/
-/* $Id$ */
+/* $Id: PrimitiveInteger.class.php 5124 2008-05-02 10:36:39Z voxus $ */
 
 	/**
 	 * @ingroup Primitives
 	**/
-	class PrimitiveInteger extends PrimitiveNumber
+	class PrimitiveInteger extends FiltrablePrimitive
 	{
-		const SIGNED_SMALL_MIN = -32768;
-		const SIGNED_SMALL_MAX = +32767;
-		
-		const SIGNED_MIN = -2147483648;
-		const SIGNED_MAX = +2147483647;
-		
-		const SIGNED_BIG_MIN = -9223372036854775808;
-		const SIGNED_BIG_MAX = 9223372036854775807;
-		
-		const UNSIGNED_SMALL_MAX = 65535;
-		const UNSIGNED_MAX = 4294967295;
-		
-		protected function checkNumber($number)
+		public function getTypeName()
 		{
-			Assert::isInteger($number);
+			return 'Integer';
 		}
 		
-		protected function castNumber($number)
+		public function isObjectType()
 		{
-			return (int) $number;
+			return false;
 		}
 	}
 ?>

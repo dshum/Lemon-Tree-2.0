@@ -1,6 +1,6 @@
 <?php
 /***************************************************************************
- *   Copyright (C) 2006-2008 by Konstantin V. Arkhipov                     *
+ *   Copyright (C) 2006-2007 by Konstantin V. Arkhipov                     *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Lesser General Public License as        *
@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: MappedForm.class.php 5132 2008-05-04 08:50:27Z sloory $ */
 
 	/**
 	 * @ingroup Form
@@ -97,11 +97,9 @@
 		**/
 		public function import(HttpRequest $request)
 		{
-			foreach ($this->form->getPrimitiveNames() as $name) {
-				$this->importOne($name, $request);
+			foreach ($this->form->getPrimitiveList() as $prm) {
+				$this->importOne($prm->getName(), $request);
 			}
-			
-			$this->form->checkRules();
 			
 			return $this;
 		}
@@ -115,19 +113,19 @@
 			
 			$default = ($this->type == $type);
 			
-			foreach ($this->form->getPrimitiveList() as $name => $prm) {
+			foreach ($this->form->getPrimitiveList() as $prm) {
 				if (
 					(
-						isset($this->map[$name])
-						&& in_array($type, $this->map[$name])
+						isset($this->map[$prm->getName()])
+						&& in_array($type, $this->map[$prm->getName()])
 					)
 					|| (
-						!isset($this->map[$name])
+						!isset($this->map[$prm->getName()])
 						&& $default
 					)
 				) {
 					if ($prm->getValue())
-						$result[$name] = $prm->exportValue();
+						$result[$prm->getName()] = $prm->exportValue();
 				}
 			}
 			

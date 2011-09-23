@@ -8,12 +8,12 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: PrimitiveDateRange.class.php 5345 2008-07-28 15:27:39Z voxus $ */
 
 	/**
 	 * @ingroup Primitives
 	**/
-	class PrimitiveDateRange extends FiltrablePrimitive
+	class PrimitiveDateRange extends RangedPrimitive
 	{
 		private $className = null;
 		
@@ -23,6 +23,16 @@
 		public static function create($name)
 		{
 			return new self($name);
+		}
+		
+		public function getTypeName()
+		{
+			return 'DateRange';
+		}
+		
+		public function isObjectType()
+		{
+			return true;
 		}
 		
 		/**
@@ -66,43 +76,43 @@
 						return false;
 					}
 				} else {
-					return parent::importValue(null);
+					return BasePrimitive::importValue(null);
 				}
 			} catch (WrongArgumentException $e) {
 				return false;
 			}
 		}
 		
-		public function import($scope)
+		public function import(array $scope)
 		{
-			if (parent::import($scope)) {
-				$listName = $this->getObjectName().'List';
-				try {
-					$range = $this->makeRange($scope[$this->name]);
-				} catch (WrongArgumentException $e) {
-					return false;
-				}
-				
-				if ($this->checkRanges($range)) {
-					if (
-						$this->className
-						&& ($this->className != $this->getObjectName())
-					) {
-						$newRange = new $this->className;
-						
-						if ($start = $range->getStart())
-							$newRange->setStart($start);
-						
-						if ($end = $range->getEnd())
-							$newRange->setEnd($end);
-						
-						$this->value = $newRange;
-						return true;
-					}
+			if (!BasePrimitive::import($scope))
+				return null;
+			
+			try {
+				$range = $this->makeRange($scope[$this->name]);
+			} catch (WrongArgumentException $e) {
+				return false;
+			}
+			
+			if ($this->checkRanges($range)) {
+				if (
+					$this->className
+					&& ($this->className != $this->getObjectName())
+				) {
+					$newRange = new $this->className;
 					
-					$this->value = $range;
+					if ($start = $range->getStart())
+						$newRange->setStart($start);
+					
+					if ($end = $range->getEnd())
+						$newRange->setEnd($end);
+					
+					$this->value = $newRange;
 					return true;
 				}
+				
+				$this->value = $range;
+				return true;
 			}
 			
 			return false;

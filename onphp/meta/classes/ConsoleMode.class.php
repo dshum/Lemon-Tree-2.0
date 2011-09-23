@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: ConsoleMode.class.php 3895 2007-07-27 11:21:22Z voxus $ */
 
 	/**
 	 * man console_codes

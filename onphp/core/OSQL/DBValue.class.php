@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: DBValue.class.php 4503 2007-11-04 20:45:31Z voxus $ */
 
 	/**
 	 * Container for passing values into OSQL queries.

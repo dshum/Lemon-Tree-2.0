@@ -8,10 +8,10 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: TimestampType.class.php 5087 2008-05-02 10:33:29Z voxus $ */
 
 	/**
-	 * @ingroup Types
+	 * @ingroup MetaTypes
 	**/
 	final class TimestampType extends DateType
 	{

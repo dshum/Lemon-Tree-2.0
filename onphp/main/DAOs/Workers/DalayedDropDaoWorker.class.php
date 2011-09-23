@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: DalayedDropDaoWorker.class.php 5432 2008-08-19 17:21:09Z voxus $ */
 
 	/**
 	 * DAO worker with dealyed object drop from cache

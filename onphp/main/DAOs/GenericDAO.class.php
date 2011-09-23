@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: GenericDAO.class.php 5512 2008-09-21 12:33:58Z voxus $ */
 
 	/**
 	 * Basis of all DAO's.
@@ -139,26 +139,10 @@
 			return clone $selectHead[$className];
 		}
 
-		/**
-		 * @return SelectQuery
-		**/
-		public function makeTotalCountQuery()
-		{
-			return
-				OSQL::select()->
-				get(
-					SQLFunction::create('count', DBValue::create('*'))
-				)->
-				from($this->getTable());
-		}
-
 		/// boring delegates
 		//@{
 		public function getById($id, $expires = Cache::EXPIRES_MEDIUM)
 		{
-			Assert::isScalar($id);
-			Assert::isNotEmpty($id);
-
 			if (isset($this->identityMap[$id]))
 				return $this->identityMap[$id];
 
@@ -307,7 +291,7 @@
 			return Cache::worker($this)->uncacheById($id);
 		}
 
-		public function uncacheByIds($ids)
+		public function uncacheByIds(array $ids)
 		{
 			foreach ($ids as $id)
 				unset($this->identityMap[$id]);
@@ -377,9 +361,8 @@
 
 		/* void */ protected function checkObjectType(Identifiable $object)
 		{
-			Assert::isSame(
-				get_class($object),
-				$this->getObjectName(),
+			Assert::isTrue(
+				get_class($object) === $this->getObjectName(),
 				'strange object given, i can not inject it'
 			);
 		}

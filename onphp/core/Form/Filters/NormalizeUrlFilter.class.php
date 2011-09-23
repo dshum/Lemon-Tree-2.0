@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: NormalizeUrlFilter.class.php 5130 2008-05-02 10:51:30Z voxus $ */
 
 	/**
 	 * @see RegulatedPrimitive::addImportFilter()

@@ -21,6 +21,6 @@
 <meta http-equiv="content-type" content="text/html; charset=UTF-8">
 </head>
 <body style="margin: 0; padding: 0;">
-<img src="<?=$path?>" border="0" onclick="window.close();" style="cursor: pointer; cursor: hand;" alt="<?=$title?>" title="<?=$title?>">
+<img src="<?=$path?>" border="0" onclick="window.close();" style="cursor: pointer; cursor: hand;" alt="<?=$title?>" title="<?=$title?> — [&#215;] Закрыть окно">
 </body>
 </html>

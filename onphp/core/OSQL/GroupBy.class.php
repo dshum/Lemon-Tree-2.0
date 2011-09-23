@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                        *
  *                                                                          *
  ****************************************************************************/
-/* $Id$ */
+/* $Id: GroupBy.class.php 4633 2007-11-25 22:37:59Z voxus $ */
 
 	/**
 	 * @ingroup OSQL

@@ -2,25 +2,39 @@
 <tr>
 	<td width="33%">Название:</td>
 	<td width="33%">Класс объекта:</td>
-	<td width="33%">Наследовать класс:</td>
+	<td width="33%">Наследовать класс объекта:</td>
 </tr>
 <tr>
 	<td><input type="text" name="itemDescription" value="<?=$currentItem->getItemDescription()?>"></td>
 	<td><input type="text" name="itemName" value="<?=$currentItem->getItemName()?>"<?=$mode == 'edit' ? ' disabled="true"' : ''?>></td>
-	<td><input type="text" name="parentClass" value="<?=$currentItem->getParentClass()?>"></td>
+	<td><select name="parentClass" style="width: 90%;"><option value="">Базовый класс (Element)</option><?php foreach($extendableClassList as $item) {?><option value="<?=$item->getItemName()?>"<?=$item->getItemName() == $currentItem->getParentClass() ? ' selected' : ''?>><?=$item->getItemDescription()?> (<?=$item->getItemName()?>)</option><?php }?></select></td>
 </tr>
 </table>
 <br>
 
 <table cellpadding="0" cellspacing="0" width="98%" class="forms">
 <tr>
-	<td width="33%">Родительское поле:</td>
+	<td width="33%">Источник данных:</td>
+	<td width="33%">Название таблицы:</td>
+	<td width="33%">Контроллер:</td>
+</tr>
+<tr>
+	<td><select name="classSource" style="width: 90%;"><option value="">По умолчанию</option></select></td>
+	<td><input type="text" name="tableName" value="<?=$currentItem->getTableName() ? $currentItem->getTableName() : $currentItem->getDefaultTableName()?>"></td>
+	<td><input type="text" name="controllerName" value="<?=$currentItem->getControllerName()?>"></td>
+</tr>
+</table>
+<br>
+
+<table cellpadding="0" cellspacing="0" width="98%" class="forms">
+<tr>
 	<td width="33%"><a href="<?=$baseUrl?>?module=ParameterList&itemId=<?=$currentItem->getId()?>&propertyName=elementName" onclick="LT.Common.windowOpen(this.href, 'ParameterList', 400, 500); return false;" title="Параметры поля">Главное поле</a>:</td>
+	<td width="33%">Родительское поле:</td>
 	<td width="33%">Название в адресной строке:</td>
 </tr>
 <tr>
-	<td><select name="parentProperty" style="width: 90%;"><option value="">- Выберите поле-</option><?php foreach($propertyList as $property) { ?><?php if($property->getPropertyClass() != 'OneToOneProperty') continue;?><option value="<?=$property->getId()?>"<?=$property->getIsParent() ? ' selected' : ''?>><?=$property->getPropertyDescription()?> (<?=$property->getPropertyName()?>)</option><?php }?></select></td>
 	<td><input type="text" name="mainPropertyDescription" value="<?=$currentItem->getMainPropertyDescription() ? $currentItem->getMainPropertyDescription() : 'Название'?>"></td>
+	<td><select name="parentProperty" style="width: 90%;"><option value="">- Выберите поле-</option><?php foreach($propertyList as $property) { ?><?php if($property->getPropertyClass() != 'OneToOneProperty') continue;?><option value="<?=$property->getId()?>"<?=$property->getIsParent() ? ' selected' : ''?>><?=$property->getPropertyDescription()?> (<?=$property->getPropertyName()?>)</option><?php }?></select></td>
 	<td><input type="text" name="pathPrefix" value="<?=$currentItem->getPathPrefix()?>"></td>
 </tr>
 </table>
@@ -43,6 +57,20 @@
 <option value="1"<?=$currentItem->getOrderDirection() == true ? ' selected' : ''?>>DESC</option>
 </select></td>
 	<td><input type="text" name="perPage" value="<?=$currentItem->getPerPage()?>"></td>
+	<td><input type="checkbox" id="isFolder" name="isFolder" value="1"<?=$currentItem->getIsFolder() ? ' checked' : ''?> style="width: 25px;"> <label for="isFolder">Показывать в дереве</label></td>
+</tr>
+</table>
+<br>
+
+<table cellpadding="0" cellspacing="0" width="98%" class="forms">
+<tr>
+	<td width="33%">Плагин:</td>
+	<td width="33%">Фильтр:</td>
+	<td width="33%"></td>
+</tr>
+<tr>
+	<td><input type="text" name="pluginName" value="<?=$currentItem->getPluginName()?>"></td>
+	<td><input type="text" name="filterName" value="<?=$currentItem->getFilterName()?>"></td>
 	<td></td>
 </tr>
 </table>
@@ -50,14 +78,21 @@
 
 <table cellpadding="0" cellspacing="0" width="98%" class="forms">
 <tr>
-	<td width="33%"></td>
-	<td width="33%"></td>
-	<td width="33%"></td>
+	<td width="17%">Перед созданием:</td>
+	<td width="16%">После создания:</td>
+	<td width="17%">Перед обновлением</td>
+	<td width="16%">После обновления</td>
+	<td width="17%">Перед удалением</td>
+	<td width="16%">После удаления</td>
 </tr>
 <tr>
-	<td><input type="checkbox" id="isUpdatePath" name="isUpdatePath" value="1"<?=$currentItem->getIsUpdatePath() ? ' checked' : ''?> style="width: 15px;"> <label for="isUpdatePath">Обновлять адресную строку</label></td>
-	<td><input type="checkbox" id="isFolder" name="isFolder" value="1"<?=$currentItem->getIsFolder() ? ' checked' : ''?> style="width: 15px;"> <label for="isFolder">Показывать в дереве</label></td>
-	<td><input type="checkbox" id="isSearch" name="isSearch" value="1"<?=$currentItem->getIsSearch() ? ' checked' : ''?> style="width: 15px;"> <label for="isSearch">Показывать в поиске</label></td>
+	<td><input type="text" name="beforeInsert" value="<?=$currentItem->getBeforeInsert()?>"></td>
+	<td><input type="text" name="afterInsert" value="<?=$currentItem->getAfterInsert()?>"></td>
+	<td><input type="text" name="beforeUpdate" value="<?=$currentItem->getBeforeUpdate()?>"></td>
+	<td><input type="text" name="afterUpdate" value="<?=$currentItem->getAfterUpdate()?>"></td>
+	<td><input type="text" name="beforeDelete" value="<?=$currentItem->getBeforeDelete()?>"></td>
+	<td><input type="text" name="afterDelete" value="<?=$currentItem->getAfterDelete()?>"></td>
+	<td></td>
 </tr>
 </table>
 <br>

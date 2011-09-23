@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: DebugPhpView.class.php 4162 2007-09-02 16:45:18Z voxus $ */
 
 	/**
 	 * @ingroup Flow

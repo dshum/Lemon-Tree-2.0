@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: PrimitiveTimestampRange.class.php 5341 2008-07-26 22:18:07Z voxus $ */
 
 	/**
 	 * @ingroup Primitives

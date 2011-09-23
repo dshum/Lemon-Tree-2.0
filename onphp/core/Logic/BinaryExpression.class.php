@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                        *
  *                                                                          *
  ****************************************************************************/
-/* $Id$ */
+/* $Id: BinaryExpression.class.php 5004 2008-03-27 16:39:33Z voxus $ */
 
 	/**
 	 * @ingroup Logic
@@ -49,21 +49,6 @@
 			$this->left		= $left;
 			$this->right	= $right;
 			$this->logic	= $logic;
-		}
-		
-		public function getLeft()
-		{
-			return $this->left;
-		}
-		
-		public function getRight()
-		{
-			return $this->right;
-		}
-		
-		public function getLogic()
-		{
-			return $this->logic;
 		}
 		
 		public function toDialectString(Dialect $dialect)

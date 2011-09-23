@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: SegmentHandler.class.php 4383 2007-10-16 18:09:43Z voxus $ */
 
 	/**
 	 * @ingroup DAOs

@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: ClassProjection.class.php 4243 2007-09-26 15:57:19Z voxus $ */
 
 	/**
 	 * @ingroup Projections
@@ -45,17 +45,12 @@
 			$dao = call_user_func(array($this->className, 'dao'));
 			
 			foreach ($dao->getFields() as $field)
-				$this->subProcess(
-					$query,
-					DBField::create($field, $dao->getTable())
-				);
+				$this->subProcess($query, $field);
 			
 			return $query;
 		}
 		
-		/* void */ protected function subProcess(
-			JoinCapableQuery $query, DBField $field
-		)
+		/* void */ protected function subProcess(JoinCapableQuery $query, $field)
 		{
 			$query->get($field);
 		}

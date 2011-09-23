@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: LogLevel.class.php 3937 2007-07-30 13:29:04Z dedmajor $ */
 
 	/**
 	 * @ingroup Utils

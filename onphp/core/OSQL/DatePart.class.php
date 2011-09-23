@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: DatePart.class.php 3886 2007-07-27 11:20:41Z voxus $ */
 
 	/**
 	 * @see http://www.postgresql.org/docs/current/interactive/functions-datetime.html#FUNCTIONS-DATETIME-EXTRACT

@@ -1,6 +1,6 @@
 <?php
 /***************************************************************************
- *   Copyright Denis Shumeev 2009                                          *
+ *   Copyright Denis Shumeev 2008                                          *
  *   denis@lemon-tree.ru                                                   *
  ***************************************************************************/
 /* $Id$ */
@@ -9,21 +9,18 @@
 	{
 		private $model = null;
 		private $view = null;
-		private $encoding = null;
-		private $attachments = array();
-		private $sendmailAdditionalArgs	= null;
-
-		private $body = null;
 
 		private $header = array(
-			'Content-type' => 'text/plain',
+			'From' => null,
+			'Reply-to' => null,
 			'To' => null,
 			'Cc' => null,
 			'Bcc' => null,
-			'From' => null,
-			'Reply-to' => null,
+			'Content-type' => null,
 			'Subject' => null,
 		);
+		private $body = null;
+		private $attachments = array();
 
 		public static function create()
 		{
@@ -44,28 +41,7 @@
 			return $this;
 		}
 
-		public function setEncoding($encoding)
-		{
-			$this->encoding = $encoding;
-
-			return $this;
-		}
-
-		public function setSendmailAdditionalArgs($sendmailAdditionalArgs)
-		{
-			$this->sendmailAdditionalArgs = $sendmailAdditionalArgs;
-
-			return $this;
-		}
-
-		public function addAttachment(
-			$path,
-			$name,
-			$description,
-			$id,
-			$inline = false,
-			$mimetype = 'application/octet-stream'
-		)
+		public function addAttachment($path, $name, $description, $id, $inline = false, $mimetype = 'application/octet-stream')
 		{
 			if(!$path || !is_readable($path)) return $this;
 
@@ -87,89 +63,36 @@
 
 		public function send()
 		{
+			$encoding = mb_get_info('internal_encoding');
+
 			$this->prepareContext();
 
-			if(!isset($this->header['To'])) {
-				throw new WrongArgumentException('mail to: is not specified');
-			}
-
-			$contentType = $this->header['Content-type'];
-
-			$siteEncoding = mb_get_info('internal_encoding');
-
-			if(!$this->encoding || $this->encoding == $siteEncoding) {
-
-				$encoding = $siteEncoding;
-
-				$to = $this->header['To'];
-				$cc = $this->header['Cc'];
-				$bcc = $this->header['Bcc'];
-				$from = $this->header['From'];
-				$replyTo = $this->header['Reply-to'];
-
-				$subject =
+			$to = $this->header['To'];
+			$subject =
 					"=?".$encoding."?B?"
 					.base64_encode($this->header['Subject'])
 					."?=";
-
-				$body = $this->body;
-
-			} else {
-
-				$encoding = $this->encoding;
-
-				$to = mb_convert_encoding($this->header['To'], $encoding);
-				$cc = mb_convert_encoding($this->header['Cc'], $encoding);
-				$bcc = mb_convert_encoding($this->header['Bcc'], $encoding);
-				$from = mb_convert_encoding($this->header['From'], $encoding);
-				$replyTo = mb_convert_encoding($this->header['Reply-to'], $encoding);
-
-				$body = $this->body;
-
-				if(
-					!mb_check_encoding($body, $siteEncoding)
-					&& mb_check_encoding($body, 'Windows-1251')
-				) {
-					$body = mb_convert_encoding($body, $siteEncoding, 'Windows-1251');
-				}
-
-				$subject =
-					"=?".$encoding."?B?"
-					.base64_encode(
-						iconv(
-							$siteEncoding,
-							$encoding.'//TRANSLIT',
-							$this->header['Subject']
-						)
-					)."?=";
-
-				$body = iconv(
-					$siteEncoding,
-					$encoding.'//TRANSLIT',
-					$body
-				);
-			}
-
+			$body = null;
 			$headers = null;
 
-			if($from) {
-				$headers .= 'From: '.$from.EOL;
-				$headers .= 'Return-Path: '.$from.EOL;
+			if($this->header['From']) {
+				$headers .= "From: ".$this->header['From']."\n";
+				$headers .= "Return-Path: ".$this->header['From']."\n";
 			}
 
-			if($replyTo) {
-				$headers .= 'Reply-To: '.$replyTo.EOL;
+			if($this->header['Reply-to']) {
+				$headers .= "Reply-to: ".$this->header['Reply-to']."\n";
 			}
 
-			if($cc) {
-				$headers .= 'Cc: '.$cc.EOL;
+			if($this->header['Cc']) {
+				$headers .= "Cc: ".$this->header['Cc']."\n";
 			}
 
-			if($bcc) {
-				$headers .= 'Bcc: '.$bcc.EOL;
+			if($this->header['Bcc']) {
+				$headers .= "Bcc: ".$this->header['Bcc']."\n";
 			}
 
-			$headers .= 'Date: '.date('r').EOL;
+			$headers .= "Date: ".date('r')."\n";
 
 			if(sizeof($this->attachments)) {
 
@@ -177,8 +100,8 @@
 
 				$part =
 					MimePart::create()->
-					setBody($body)->
-					setContentType($contentType)->
+					setBody($this->body)->
+					setContentType($this->header['Content-type'])->
 					setCharset($encoding)->
 					setEncoding(MailEncoding::eight());
 				$mimeMail->addPart($part);
@@ -195,14 +118,18 @@
 
 			} else {
 
-				$headers .= 'Content-type: '.$contentType.'; charset='.$encoding.EOL;
-				$headers .= 'Content-Transfer-Encoding: 8bit'.EOL;
+				if($this->header['Content-type']) {
+					$headers .= "Content-type: ".$this->header['Content-type']."; charset=".$encoding."\n";
+				} else {
+					$headers .= "Content-type: text/plain; charset=".$encoding."\n";
+				}
 
+				$headers .= "Content-Transfer-Encoding: 8bit\n";
+
+				$body = $this->body;
 			}
 
-			$sendmailAdditionalArgs = $this->sendmailAdditionalArgs;
-
-			mail($to, $subject, $body, $headers, $sendmailAdditionalArgs);
+			mail($to, $subject, $body, $headers);
 		}
 
 		private function prepareContext()
@@ -219,7 +146,7 @@
 			$text = $view->toString($this->model);
 
 			list($header, $body) = preg_split("/\r?\n\r?\n/s", $text, 2);
-			$this->body = trim($body);
+			$this->body = trim($body)."\n";
 			foreach(preg_split("/\n/s", $header) as $line) {
 				$pos = strpos($line, ':');
 				$name = ucfirst(strtolower(substr($line, 0, $pos)));

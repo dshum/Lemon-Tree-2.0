@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: FileLocker.class.php 4765 2008-01-08 04:04:04Z voxus $ */
 
 	/**
 	 * File based locker.

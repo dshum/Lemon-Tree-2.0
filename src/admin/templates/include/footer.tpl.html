@@ -1,17 +1,8 @@
 <?php if(Session::get('showSQLReport')) {?>
 <small>
 <p><a href="" style="text-decoration: none; border-bottom: 1px dashed #000;" onclick="object = document.getElementById('sql_report'); object.style.display = object.style.display == 'block' ? 'none' : 'block'; return false;">Показать SQL-запросы</a></p>
-<p id="sql_report" style="display: none;">
-Memory usage: <?=round(memory_get_usage() / 1024 / 1024, 2)?>Mb<br>
-Query total: <?=sizeof(Site::getSQLReport())?><br><br>
-<?php foreach(Site::getSQLReport() as $sql) {?>
-<b><?=$sql[1]?> sec</b>
-<?=str_replace(
-	array('COUNT', 'FROM', 'WHERE'),
-	array('<b>COUNT</b>', '<b style="color: green">FROM</b>', '<b style="color: brown">WHERE</b>'),
-	$sql[0]
-)?><br>
-<?php }?>
+<p id="sql_report" style="display: none;">Memory usage: <?=round(memory_get_usage() / 1024 / 1024, 2)?>Mb<br><br>
+<?php foreach(Site::getSQLReport() as $sql) {?><b><?=$sql[1]?> sec</b> <?=$sql[0]?><br><?php }?>
 </p></small>
 <?php }?>
 

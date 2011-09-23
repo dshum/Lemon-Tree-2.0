@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: FileReader.class.php 4443 2007-11-02 16:42:21Z sirvantos $ */
 
 	/**
 	 * @ingroup Utils

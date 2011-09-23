@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                        *
  *                                                                          *
  ****************************************************************************/
-/* $Id$ */
+/* $Id: FullText.class.php 5499 2008-09-13 12:31:52Z voxus $ */
 
 	/**
 	 * Base for all full-text stuff.

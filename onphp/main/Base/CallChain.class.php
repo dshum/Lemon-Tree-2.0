@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: CallChain.class.php 5424 2008-08-18 09:51:35Z voxus $ */
 
 	/**
 	 * @ingroup Helpers

@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: FieldTable.class.php 4234 2007-09-26 09:25:37Z voxus $ */
 
 	/**
 	 * @ingroup OSQL

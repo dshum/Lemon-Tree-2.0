@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: ForeignChangeAction.class.php 3886 2007-07-27 11:20:41Z voxus $ */
 
 	/**
 	 * @ingroup OSQL

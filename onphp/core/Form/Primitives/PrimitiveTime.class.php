@@ -1,6 +1,6 @@
 <?php
 /****************************************************************************
- *   Copyright (C) 2006-2007 by Konstantin V. Arkhipov                      *
+ *   Copyright (C) 2006-2008 by Konstantin V. Arkhipov                      *
  *                                                                          *
  *   This program is free software; you can redistribute it and/or modify   *
  *   it under the terms of the GNU Lesser General Public License as         *
@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                        *
  *                                                                          *
  ****************************************************************************/
-/* $Id$ */
+/* $Id: PrimitiveTime.class.php 5418 2008-08-14 13:36:49Z voxus $ */
 
 	/**
 	 * @ingroup Primitives
@@ -19,14 +19,24 @@
 		const MINUTES	= PrimitiveTimestamp::MINUTES;
 		const SECONDS	= PrimitiveTimestamp::SECONDS;
 		
+		public function getTypeName()
+		{
+			return 'Time';
+		}
+		
+		public function isObjectType()
+		{
+			return true;
+		}
+		
 		/**
 		 * @throws WrongArgumentException
 		 * @return PrimitiveTime
 		**/
 		public function setValue(/* Time */ $time)
 		{
-			Assert::isTrue($time instanceof Time);
-
+			Assert::isInstance($time, 'Time');
+			
 			$this->value = $time;
 			
 			return $this;
@@ -38,9 +48,9 @@
 		**/
 		public function setMin(/* Time */ $time)
 		{
-			Assert::isTrue($time instanceof Time);
-
-			$this->min = $time;
+			Assert::isInstance($time, 'Time');
+			
+			$this->atom->setMin($time);
 			
 			return $this;
 		}
@@ -51,9 +61,9 @@
 		**/
 		public function setMax(/* Time */ $time)
 		{
-			Assert::isTrue($time instanceof Time);
+			Assert::isInstance($time, 'Time');
 			
-			$this->max = $time;
+			$this->atom->setMax($time);
 			
 			return $this;
 		}
@@ -64,42 +74,19 @@
 		**/
 		public function setDefault(/* Time */ $time)
 		{
-			Assert::isTrue($time instanceof Time);
+			Assert::isInstance($time, 'Time');
 			
 			$this->default = $time;
 			
 			return $this;
 		}
 		
-		public function importSingle($scope)
+		public function importSingle(array $scope)
 		{
-			if (!BasePrimitive::import($scope))
-				return null;
-			
-			try {
-				$time = new Time($scope[$this->name]);
-			} catch (WrongArgumentException $e) {
-				return false;
-			}
-			
-			if ($this->checkLimits($time)) {
-				$this->value = $time;
-				
-				return true;
-			}
-			
-			return false;
+			return RangedPrimitive::import($scope);
 		}
 		
-		public function isEmpty($scope)
-		{
-			if ($this->getState()->isFalse())
-				return $this->isMarriedEmpty($scope);
-			
-			return empty($scope[$this->name]);
-		}
-		
-		public function importMarried($scope)
+		public function importMarried(array $scope)
 		{
 			if (
 				BasePrimitive::import($scope)
@@ -113,38 +100,19 @@
 				
 				if (isset($scope[$this->name][self::HOURS]))
 					$hours = (int) $scope[$this->name][self::HOURS];
-
+				
 				if (isset($scope[$this->name][self::MINUTES]))
 					$minutes = (int) $scope[$this->name][self::MINUTES];
-
+				
 				if (isset($scope[$this->name][self::SECONDS]))
 					$seconds = (int) $scope[$this->name][self::SECONDS];
 				
-				try {
-					$time = new Time($hours.':'.$minutes.':'.$seconds);
-				} catch (WrongArgumentException $e) {
-					return false;
-				}
+				$scope[$this->name] = $hours.':'.$minutes.':'.$seconds;
 				
-				if ($this->checkLimits($time)) {
-					$this->value = $time;
-					
-					return true;
-				}
+				return RangedPrimitive::import($scope);
 			}
 			
 			return false;
-		}
-		
-		public function import($scope)
-		{
-			if ($this->isEmpty($scope)) {
-				$this->value = null;
-				$this->raw = null;
-				return null;
-			}
-
-			return parent::import($scope);
 		}
 		
 		public function importValue($value)
@@ -155,9 +123,17 @@
 				return parent::importValue(null);
 			
 			return
-				$this->importSingle(
-					array($this->getName() => $value->toFullString())
+				RangedPrimitive::import(
+					array($this->getName() => $value->toString())
 				);
+		}
+		
+		public function isEmpty($scope)
+		{
+			if ($this->getState()->isFalse())
+				return $this->isMarriedEmpty($scope);
+			
+			return empty($scope[$this->name]);
 		}
 		
 		private function isMarriedEmpty($scope)
@@ -165,13 +141,6 @@
 			return empty($scope[$this->name][self::HOURS])
 				|| empty($scope[$this->name][self::MINUTES])
 				|| empty($scope[$this->name][self::SECONDS]);
-		}
-
-		private function checkLimits(Time $time)
-		{
-			return
-				!($this->min && $this->min->toSeconds() > $time->toSeconds())
-				&& !($this->max && $this->max->toSeconds() < $time->toSeconds());
 		}
 	}
 ?>

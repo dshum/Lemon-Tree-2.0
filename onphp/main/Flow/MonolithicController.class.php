@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                        *
  *                                                                          *
  ****************************************************************************/
-/* $Id$ */
+/* $Id: MonolithicController.class.php 5352 2008-07-29 10:36:59Z voxus $ */
 	
 	/**
 	 * @ingroup Flow
@@ -33,7 +33,7 @@
 		{
 			$this->map->import($request);
 			
-			$form = $this->getForm();
+			$form = $this->map->getForm();
 			
 			if (!$command = $form->getValue('action'))
 				$command = $form->get('action')->getDefault();

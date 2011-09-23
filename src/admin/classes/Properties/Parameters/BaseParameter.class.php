@@ -20,8 +20,13 @@
 			$this->default = $default;
 
 			try {
-				$raw = $property->getParameterValue($name);
+
+				$parameter = Parameter::dao()->getParameterByName($property, $name);
+
+				$raw = $parameter->getParameterValue();
+
 				$this->setValue($raw);
+
 			} catch (ObjectNotFoundException $e) {
 				$this->value = $default;
 			}
@@ -54,9 +59,7 @@
 
 		public function primitive()
 		{
-			return
-				Primitive::string($this->name)->
-				addImportFilter(Filter::trim());
+			return Primitive::string($this->name);
 		}
 
 		public function toRaw($value)

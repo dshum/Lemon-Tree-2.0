@@ -30,28 +30,8 @@
 		}
 	}
 
-	if(isset($deniedDropGroupError)) {
-		$error[] = 'Недостаточно прав для удаления данной группы.';
-	}
-
-	if(isset($notEmptyGroupError)) {
-		$error[] = 'Данная группа содержит группы или пользователей и не может быть удалена.';
-	}
-
-	if(isset($dropGroupError)) {
-		$error[] = 'При удалении группы произошла ошибка.';
-	}
-
-	if(isset($deniedAddGroupError)) {
-		$error[] = 'Недостаточно прав для создания данной группы.';
-	}
-
 	if(isset($addGroupError)) {
 		$error[] = 'Произошла ошибка при добавлении группы.';
-	}
-
-	if(isset($deniedSaveGroupError)) {
-		$error[] = 'Недостаточно прав для изменения данной группы.';
 	}
 
 	if(isset($saveGroupError)) {

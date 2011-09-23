@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: DB.class.php 5255 2008-07-01 13:58:59Z voxus $ */
 
 	/**
 	 * DB-connector's implementation basis.

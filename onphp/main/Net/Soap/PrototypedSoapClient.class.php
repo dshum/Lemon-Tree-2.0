@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: PrototypedSoapClient.class.php 5295 2008-07-16 17:25:59Z voxus $ */
 
 	/**
 	 * Quick reference:
@@ -26,13 +26,13 @@
 	 *	public function login(LoginRequest $request)
 	 *	{
 	 *		// preparations...
-	 *		
+	 * 
 	 *		$result = $this->call(
 	 *			'login', $request, 'LoginResponse'
 	 *		);
-	 *		
+	 * 
 	 *		// additional asserts...
-	 *		
+	 * 
 	 *		return $result;
 	 *	}
 	 * 
@@ -42,6 +42,12 @@
 	abstract class PrototypedSoapClient
 	{
 		protected $wsdlUrl		= null;
+		
+		protected $login		= null;
+		protected $password		= null;
+		
+		protected $connectTimeout	= null;
+		
 		protected $classMap		= array();
 		
 		protected $soapClient	= null;
@@ -75,22 +81,24 @@
 			
 			Assert::isNotNull($wsdlUrl);
 			
-			$this->soapClient = new SoapClient(
-				$wsdlUrl,
-				array(
-					'soap_version'	=> SOAP_1_1,
-					'classmap'		=> $this->classMap(),
-					
-					// TODO:?
-					/*
-					'compression'	=> SOAP_COMPRESSION_ACCEPT
-						| SOAP_COMPRESSION_GZIP
-					*/
-					
-					'trace'			=> true,
-					'exceptions'	=> true
-				)
+			$params = array(
+				'soap_version'	=> SOAP_1_1,
+				'classmap'		=> $this->classMap(),
+				'trace'			=> true,
+				'exceptions'	=> true
 			);
+			
+			if ($this->connectTimeout)
+				$params['connection_timeout'] = $this->connectTimeout;
+			
+			if ($this->login)
+				$params['login'] = $this->login;
+			
+			if ($this->password)
+				$params['password'] = $this->password;
+				
+			
+			$this->soapClient = new SoapClient($wsdlUrl, $params);
 		}
 		
 		public function getWsdlUrl()
@@ -104,6 +112,19 @@
 		}
 		
 		protected function call($method, DTOMessage $request, $resultClass)
+		{
+			$form = $this->unvalidatedCall($method, $request, $resultClass);
+			
+			if (!$form)
+				return null;
+			
+			return $this->makeObject($form, $resultClass);
+		}
+		
+		/**
+		 * @return Form
+		**/
+		protected function unvalidatedCall($method, DTOMessage $request, $resultClass)
 		{
 			$requestDto = $request->makeDto();
 			
@@ -121,6 +142,8 @@
 						validate($request, $form),
 					
 					Assert::dumpArgument($request)
+					."\n"
+					.Assert::dumpArgument($form->getInnerErrors())
 				);
 			}
 			
@@ -153,38 +176,45 @@
 			
 			if (!$resultClass) {
 				Assert::isNull($resultDto);
-				$result = null;
 				
-			} else {
-				Assert::isInstance($resultDto, 'DTOClass');
+				return null;
 				
-				Assert::isEqual(
-					$resultDto->entityProto()->className(),
-					$resultClass
-				);
-				
-				$form = DTOToFormImporter::create($resultDto->entityProto())->
-					make($resultDto);
-				
-				Assert::isTrue(
-					!$form->getErrors(),
-					
-					Assert::dumpArgument($resultDto)
-				);
-				
-				$result = $resultDto->makeObject($form);
-				
-				Assert::isInstance($result, 'DTOMessage');
-				
-				Assert::isEqual(get_class($result), $resultClass);
-				
-				Assert::isTrue(
-					$result->entityProto()->
-						validate($result, $form),
-						
-					Assert::dumpArgument($result)
-				);
 			}
+			
+			Assert::isInstance($resultDto, 'DTOClass');
+			
+			Assert::isEqual(
+				$resultDto->entityProto()->className(),
+				$resultClass
+			);
+			
+			return DTOToFormImporter::create($resultDto->entityProto())->
+				make($resultDto);
+		}
+		
+		
+		protected function makeObject(Form $form, $resultClass)
+		{
+			Assert::isTrue(
+				!$form->getErrors(),
+				Assert::dumpArgument($form)
+			);
+			
+			$result = FormToObjectConverter::create($form->getProto())->
+				make($form);
+			
+			Assert::isInstance($result, 'DTOMessage');
+			
+			Assert::isEqual(get_class($result), $resultClass);
+			
+			Assert::isTrue(
+				$result->entityProto()->
+					validate($result, $form),
+					
+				Assert::dumpArgument($result)
+				."\n"
+				.Assert::dumpArgument($form->getInnerErrors())
+			);
 			
 			return $result;
 		}

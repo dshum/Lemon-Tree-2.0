@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: AutoProtoClassBuilder.class.php 5053 2008-04-08 14:07:07Z voxus $ */
 
 	/**
 	 * @ingroup Builders

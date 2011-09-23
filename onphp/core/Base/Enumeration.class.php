@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: Enumeration.class.php 4746 2008-01-08 04:03:09Z voxus $ */
 
 	/**
 	 * Parent of all enumeration classes.

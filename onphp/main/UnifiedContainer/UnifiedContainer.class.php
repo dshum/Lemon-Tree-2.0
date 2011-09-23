@@ -1,6 +1,6 @@
 <?php
 /***************************************************************************
- *   Copyright (C) 2005-2009 by Konstantin V. Arkhipov                     *
+ *   Copyright (C) 2005-2008 by Konstantin V. Arkhipov                     *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Lesser General Public License as        *
@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: UnifiedContainer.class.php 5344 2008-07-28 10:51:40Z voxus $ */
 
 /*
 	UnifiedContainer:
@@ -74,8 +74,6 @@
 		// sleep state
 		protected $workerClass	= null;
 		protected $daoClass		= null;
-
-		protected $comparator	= null;
 		
 		abstract public function getParentIdField();
 		abstract public function getChildIdField();
@@ -91,8 +89,6 @@
 			$this->dao		= $dao;
 			
 			Assert::isInstance($dao->getObjectName(), 'Identifiable');
-
-			$this->comparator = SerializedObjectComparator::me();
 		}
 		
 		public function __sleep()
@@ -161,13 +157,6 @@
 			return $this->worker->getCriteria();
 		}
 		
-		public function setObjectComparator(Comparator $comparator)
-		{
-			$this->comparator = $comparator;
-			
-			return $this;
-		}
-		
 		/**
 		 * @throws WrongArgumentException
 		 * @return UnifiedContainer
@@ -211,7 +200,7 @@
 			if (!$this->isFetched() && $this->parent->getId()) {
 				$row = $this->dao->getCustom($this->worker->makeCountQuery());
 				
-				return current($row);
+				return $row['count'];
 			}
 			
 			return count($this->list);
@@ -280,10 +269,10 @@
 						$insert[] = $object;
 					} elseif (
 						isset($clones[$id])
-						// there is no another way yet to compare objects without
-						// risk of falling into fatal error:
-						// "nesting level too deep?"
-						&& ($this->comparator->compare($object, $clones[$id]) <> 0)
+						&& (
+							($object !== $clones[$id])
+							|| ($object != $clones[$id])
+						)
 					) {
 						$update[] = $object;
 					} elseif (!isset($clones[$id])) {

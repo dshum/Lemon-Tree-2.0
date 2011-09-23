@@ -1,4 +1,4 @@
-<!-- $Id$ -->
+<!-- $Id: meta.dtd 4813 2008-02-08 15:53:22Z voxus $ -->
 
 <!ELEMENT metaconfiguration (include*, classes*, sources*)>
 

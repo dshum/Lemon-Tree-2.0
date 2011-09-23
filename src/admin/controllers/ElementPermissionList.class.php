@@ -4,28 +4,13 @@
 		public function __construct()
 		{
 			$this->
-			setMethodMapping('save', 'save')->
-			setMethodMapping('edit', 'edit')->
-			setDefaultAction('edit');
+				setMethodMapping('save', 'save')->
+				setMethodMapping('edit', 'edit')->
+				setDefaultAction('edit');
 		}
 
 		public function handleRequest(HttpRequest $request)
 		{
-			$loggedUser = LoggedUser::getUser();
-
-			if(!$loggedUser->getGroup()->getIsAdmin()) {
-				return
-					ModelAndView::create()->
-					setModel(
-						Model::create()->
-						set('userId', $loggedUser->getId())
-					)->
-					setView(new RedirectToView('UserEdit'));
-			}
-
-			Item::dao()->setItemList();
-			Property::dao()->setPropertyList();
-
 			return parent::handleRequest($request);
 		}
 
@@ -55,96 +40,128 @@
 			} else {
 
 				$currentGroup = $form->getValue('groupId');
+				$currentElement = $form->getValue('elementId');
+				$permissionList = $form->getValue('permission');
 
-				if($currentGroup->isAllowed()) {
+				$itemList = $currentElement->getShowChildrenItemList();
 
-					$currentElement = $form->getValue('elementId');
-					$permissionList = $form->getValue('permission');
+				$elementList = array();
 
-					$itemPermissionList =
-						Criteria::create(ItemPermission::dao())->
+				foreach($itemList as $item) {
+					$itemClass = $item->getClass();
+					$criteria = $itemClass->dao()->getChildren($currentElement);
+					$criteria->addOrder($item->getOrderBy());
+					$pager = CriteriaPager::create($criteria);
+					if($item->getPerPage()) {
+						$page = Session::get('page');
+						$perpage =
+							$item->getPerPage()
+							? $item->getPerPage()
+							: Item::DEFAULT_PERPAGE;
+						$currentPage =
+							isset($page[$currentElement->getItemId()][$currentElement->getId()][$item->getId()])
+							? $page[$currentElement->getItemId()][$currentElement->getId()][$item->getId()]
+							: 1;
+						$pager->setPerpage($perpage)->setCurrentPage($currentPage);
+					}
+					try {
+						$elementList[$item->getId()] = $pager->getList();
+					} catch (BaseException $e) {
+						$elementList[$item->getId()] = array();
+						ErrorMessageUtils::sendMessage($e);
+					}
+				}
+
+				$itemPermissionList =
+					Criteria::create(ItemPermission::dao())->
+					add(
+						Expression::eqId(
+							new DBField('group_id', ItemPermission::dao()->getTable()),
+							$currentGroup
+						)
+					)->
+					getList();
+
+				$itemPermissionMap = array();
+				foreach($itemPermissionList as $itemPermission) {
+					$itemPermissionMap[$itemPermission->getItem()->getId()] = $itemPermission;
+				}
+
+				$elementIdList = array();
+				foreach($itemList as $item) {
+					if(isset($elementList[$item->getId()])) {
+						foreach($elementList[$item->getId()] as $element) {
+							$elementIdList[] = $element->getPolymorphicId();
+						}
+					}
+				}
+
+				$elementPermissionMap = array();
+
+				if(sizeof($elementIdList)) {
+					$elementPermissionList =
+						Criteria::create(ElementPermission::dao())->
 						add(
 							Expression::eqId(
-								new DBField('group_id', ItemPermission::dao()->getTable()),
+								new DBField('group_id', ElementPermission::dao()->getTable()),
 								$currentGroup
+							)
+						)->
+						add(
+							Expression::in(
+								new DBField('element_id', ElementPermission::dao()->getTable()),
+								$elementIdList
 							)
 						)->
 						getList();
 
-					$itemPermissionMap = array();
-					foreach($itemPermissionList as $itemPermission) {
-						$itemPermissionMap[$itemPermission->getItem()->getItemName()] = $itemPermission;
+					foreach($elementPermissionList as $elementPermission) {
+						$elementPermissionMap[$elementPermission->getElementId()] = $elementPermission;
 					}
+				}
 
-					$elementIdList = array();
-					foreach($permissionList as $elementId => $permission) {
-						$elementIdList[] = $elementId;
-					}
+				foreach($itemList as $item) {
+					if(isset($elementList[$item->getId()])) {
+						foreach($elementList[$item->getId()] as $element) {
+							if(
+								!isset($permissionList[$element->getPolymorphicId()])
+								|| !Permission::permissionExists($permissionList[$element->getPolymorphicId()])
+							) continue;
 
-					$elementPermissionMap = array();
-
-					if(sizeof($elementIdList)) {
-						$elementPermissionList =
-							Criteria::create(ElementPermission::dao())->
-							add(
-								Expression::eqId(
-									new DBField('group_id', ElementPermission::dao()->getTable()),
-									$currentGroup
+							if(
+								(
+									isset($itemPermissionMap[$item->getId()])
+									&& $element->getGroup()
+									&& $element->getGroup()->getId() == $currentGroup->getId()
+									&& $permissionList[$element->getPolymorphicId()] == $itemPermissionMap[$item->getId()]->getGroupPermission()
+								) || (
+									isset($itemPermissionMap[$item->getId()])
+									&& $permissionList[$element->getPolymorphicId()] == $itemPermissionMap[$item->getId()]->getWorldPermission()
+								) || (
+									$element->getGroup() && $element->getGroup()->getId() == $currentGroup->getId()
+									&& $permissionList[$element->getPolymorphicId()] == $currentGroup->getGroupPermission()
+								) || (
+									$permissionList[$element->getPolymorphicId()] == $currentGroup->getWorldPermission()
 								)
-							)->
-							add(
-								Expression::in(
-									new DBField('element_id', ElementPermission::dao()->getTable()),
-									$elementIdList
-								)
-							)->
-							getList();
-
-						foreach($elementPermissionList as $elementPermission) {
-							$elementPermissionMap[$elementPermission->getElementId()] = $elementPermission;
-						}
-					}
-
-					foreach($permissionList as $elementId => $permission) {
-
-						list($className, $id) = explode(PrimitivePolymorphicIdentifier::DELIMITER, $elementId);
-
-						$element = Element::getByPolymorphicId($elementId);
-
-						if(!$element || !Permission::permissionExists($permission)) continue;
-
-						if(
-							(
-								isset($itemPermissionMap[$className])
-								&& $element->getGroup() && $element->getGroup()->getId() == $currentGroup->getId()
-								&& $permission == $itemPermissionMap[$className]->getGroupPermission()
-							) || (
-								isset($itemPermissionMap[$className])
-								&& $permission == $itemPermissionMap[$className]->getWorldPermission()
-							) || (
-								$element->getGroup() && $element->getGroup()->getId() == $currentGroup->getId()
-								&& $permission == $currentGroup->getGroupPermission()
-							) || (
-								$permission == $currentGroup->getWorldPermission()
-							)
-						) {
-							if(isset($elementPermissionMap[$elementId])) {
-								ElementPermission::dao()->drop($elementPermissionMap[$elementId]);
-							}
-						} else {
-							if(isset($elementPermissionMap[$elementId])) {
-								$elementPermission = $elementPermissionMap[$elementId];
-								if($permission != $elementPermission->getPermission()) {
-									$elementPermission->setPermission($permission);
-									ElementPermission::dao()->save($elementPermission);
+							) {
+								if(isset($elementPermissionMap[$element->getPolymorphicId()])) {
+									ElementPermission::dao()->drop($elementPermissionMap[$element->getPolymorphicId()]);
 								}
 							} else {
-								$elementPermission =
-									ElementPermission::create()->
-									setGroup($currentGroup)->
-									setElementId($elementId)->
-									setPermission($permission);
-								ElementPermission::dao()->add($elementPermission);
+								if(isset($elementPermissionMap[$element->getPolymorphicId()])) {
+									$permission = $elementPermissionMap[$element->getPolymorphicId()];
+									if($permissionList[$element->getPolymorphicId()] != $permission->getPermission()) {
+										$permission->setPermission($permissionList[$element->getPolymorphicId()]);
+										ElementPermission::dao()->save($permission);
+									}
+								} else {
+									$permission =
+										ElementPermission::create()->
+										setGroup($currentGroup)->
+										setElementId($element->getPolymorphicId())->
+										setPermission($permissionList[$element->getPolymorphicId()]);
+									ElementPermission::dao()->add($permission);
+								}
 							}
 						}
 					}
@@ -161,8 +178,6 @@
 		public function edit(HttpRequest $request)
 		{
 			$model = Model::create();
-
-			$loggedUser = LoggedUser::getUser();
 
 			$form =
 				Form::create()->
@@ -186,125 +201,117 @@
 				import($_GET);
 
 			if($form->getErrors()) {
-				return
-					ModelAndView::create()->
-					setModel(Model::create())->
-					setView(new RedirectToView('GroupList'));
-			}
 
-			$currentGroup = $form->getValue('groupId');
+				$model->set('form', $form);
 
-			if(!$currentGroup->isAllowed()) {
-				return
-					ModelAndView::create()->
-					setModel(Model::create())->
-					setView(new RedirectToView('GroupList'));
-			}
+			} else {
 
-			$currentElement = $form->getActualValue('elementId');
-			$parentList = $currentElement->getParentList();
+				$currentGroup = $form->getValue('groupId');
+				$currentElement = $form->getActualValue('elementId');
+				$parentList = $currentElement->getParentList();
 
-			$itemList = $currentElement->getChildrenItemList();
+				$itemList = $currentElement->getChildrenItemList();
 
-			# Pager
+				# Pager
 
-			$pagerItem = $form->getValue('pagerItemId');
-			$pagerPage = $form->getValue('pagerPage');
-			if($pagerItem && $pagerPage) {
-				$page = $loggedUser->getParameter('page');
-				$page[$currentElement->getPolymorphicId()][$pagerItem->getId()] = $pagerPage;
-				$loggedUser->setParameter('page', $page);
-			}
-
-			# Element list
-
-			$elementList = array();
-			$pagerList = array();
-
-			foreach($itemList as $item) {
-				$itemClass = $item->getClass();
-				$criteria = $itemClass->dao()->getChildren($currentElement);
-				$criteria->addOrder($item->getOrderBy());
-				$pager = CriteriaPager::create($criteria);
-				if($item->getPerPage()) {
-					$page = $loggedUser->getParameter('page');
-					$perpage =
-						$item->getPerPage()
-						? $item->getPerPage()
-						: Item::DEFAULT_PERPAGE;
-					$currentPage =
-						isset($page[$currentElement->getPolymorphicId()][$item->getId()])
-						? $page[$currentElement->getPolymorphicId()][$item->getId()]
-						: 1;
-					$pager->setPerpage($perpage)->setCurrentPage($currentPage);
+				$pagerItem = $form->getValue('pagerItemId');
+				$pagerPage = $form->getValue('pagerPage');
+				if($pagerItem && $pagerPage) {
+					$page = Session::get('page');
+					$page[$currentElement->getItemId()][$currentElement->getId()][$pagerItem->getId()] = $pagerPage;
+					Session::assign('page', $page);
 				}
-				try {
-					$elementList[$item->getId()] = $pager->getList();
-					$pagerList[$item->getId()] = $pager;
-				} catch (BaseException $e) {
-					$elementList[$item->getId()] = array();
-					ErrorMessageUtils::sendMessage($e);
-				}
-			}
 
-			# Permission list
+				# Element list
 
-			$itemPermissionList =
-				Criteria::create(ItemPermission::dao())->
-				add(
-					Expression::eqId(
-						new DBField('group_id', ItemPermission::dao()->getTable()),
-						$currentGroup
-					)
-				)->
-				getList();
+				$elementList = array();
+				$pagerList = array();
 
-			$itemPermissionMap = array();
-			foreach($itemPermissionList as $itemPermission) {
-				$itemPermissionMap[$itemPermission->getItem()->getId()] = $itemPermission;
-			}
-
-			$elementIdList = array();
-			foreach($itemList as $item) {
-				if(isset($elementList[$item->getId()])) {
-					foreach($elementList[$item->getId()] as $element) {
-						$elementIdList[] = $element->getPolymorphicId();
+				foreach($itemList as $item) {
+					$itemClass = $item->getClass();
+					$criteria = $itemClass->dao()->getChildren($currentElement);
+					$criteria->addOrder($item->getOrderBy());
+					$pager = CriteriaPager::create($criteria);
+					if($item->getPerPage()) {
+						$page = Session::get('page');
+						$perpage =
+							$item->getPerPage()
+							? $item->getPerPage()
+							: Item::DEFAULT_PERPAGE;
+						$currentPage =
+							isset($page[$currentElement->getItemId()][$currentElement->getId()][$item->getId()])
+							? $page[$currentElement->getItemId()][$currentElement->getId()][$item->getId()]
+							: 1;
+						$pager->setPerpage($perpage)->setCurrentPage($currentPage);
+					}
+					try {
+						$elementList[$item->getId()] = $pager->getList();
+						$pagerList[$item->getId()] = $pager;
+					} catch (BaseException $e) {
+						$elementList[$item->getId()] = array();
+						ErrorMessageUtils::sendMessage($e);
 					}
 				}
-			}
 
-			$elementPermissionMap = array();
+				# Permission list
 
-			if(sizeof($elementIdList)) {
-				$elementPermissionList =
-					Criteria::create(ElementPermission::dao())->
+				$itemPermissionList =
+					Criteria::create(ItemPermission::dao())->
 					add(
 						Expression::eqId(
-							new DBField('group_id', ElementPermission::dao()->getTable()),
+							new DBField('group_id', ItemPermission::dao()->getTable()),
 							$currentGroup
-						)
-					)->
-					add(
-						Expression::in(
-							new DBField('element_id', ElementPermission::dao()->getTable()),
-							$elementIdList
 						)
 					)->
 					getList();
 
-				foreach($elementPermissionList as $elementPermission) {
-					$elementPermissionMap[$elementPermission->getElementId()] = $elementPermission->getPermission();
+				$itemPermissionMap = array();
+				foreach($itemPermissionList as $itemPermission) {
+					$itemPermissionMap[$itemPermission->getItem()->getId()] = $itemPermission;
 				}
-			}
 
-			$model->set('currentGroup', $currentGroup);
-			$model->set('currentElement', $currentElement);
-			$model->set('parentList', $parentList);
-			$model->set('itemList', $itemList);
-			$model->set('elementList', $elementList);
-			$model->set('pagerList', $pagerList);
-			$model->set('itemPermissionMap', $itemPermissionMap);
-			$model->set('elementPermissionMap', $elementPermissionMap);
+				$elementIdList = array();
+				foreach($itemList as $item) {
+					if(isset($elementList[$item->getId()])) {
+						foreach($elementList[$item->getId()] as $element) {
+							$elementIdList[] = $element->getPolymorphicId();
+						}
+					}
+				}
+
+				$elementPermissionMap = array();
+
+				if(sizeof($elementIdList)) {
+					$elementPermissionList =
+						Criteria::create(ElementPermission::dao())->
+						add(
+							Expression::eqId(
+								new DBField('group_id', ElementPermission::dao()->getTable()),
+								$currentGroup
+							)
+						)->
+						add(
+							Expression::in(
+								new DBField('element_id', ElementPermission::dao()->getTable()),
+								$elementIdList
+							)
+						)->
+						getList();
+
+					foreach($elementPermissionList as $elementPermission) {
+						$elementPermissionMap[$elementPermission->getElementId()] = $elementPermission->getPermission();
+					}
+				}
+
+				$model->set('currentGroup', $currentGroup);
+				$model->set('currentElement', $currentElement);
+				$model->set('parentList', $parentList);
+				$model->set('itemList', $itemList);
+				$model->set('elementList', $elementList);
+				$model->set('pagerList', $pagerList);
+				$model->set('itemPermissionMap', $itemPermissionMap);
+				$model->set('elementPermissionMap', $elementPermissionMap);
+			}
 
 			return ModelAndView::create()->
 				setModel($model)->

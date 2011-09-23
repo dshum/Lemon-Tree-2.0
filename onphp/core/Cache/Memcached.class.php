@@ -11,13 +11,13 @@
  *   Copyright (c) 2003, under the GNU GPL license                         *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: Memcached.class.php 5461 2008-08-31 18:49:55Z voxus $ */
 
 	/**
 	 * Memcached-based cache.
-	 *
+	 * 
 	 * @see http://www.danga.com/memcached/
-	 *
+	 * 
 	 * @ingroup Cache
 	**/
 	final class Memcached extends CachePeer
@@ -266,13 +266,7 @@
 					} else {
 						fread($this->link, 2); // skip "\r\n"
 						
-						$index++;
-						
-						if (is_numeric($key)) {
-							$result .= 'i:'.$key.';';
-						} else {
-							$result .= 's:'.strlen($key).':"'.$key.'";';
-						}
+						$result .= 'i:'.$index++.';';
 						
 						if ($flags & 1)
 							$result .= $value;

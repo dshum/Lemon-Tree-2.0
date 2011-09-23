@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: HtmlAssembler.class.php 4166 2007-09-04 15:50:30Z dedmajor $ */
 
 	/**
 	 * @ingroup Html

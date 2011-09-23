@@ -3,7 +3,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta name="Robots" content="noindex">
 <link href="css/style.css" type="text/css" rel="stylesheet">
-<script type="text/javascript" src="<?=PATH_WEB_JS?>jquery/jquery-1.3.2.min.js"></script>
+<script type="text/javascript" src="<?=PATH_WEB_JS?>jquery/jquery-1.3.min.js"></script>
 <script type="text/javascript" src="<?=PATH_WEB_JS?>jquery/jquery.form.js"></script>
 <script type="text/javascript" src="<?=PATH_WEB_JS?>common.js"></script>
 <script type="text/javascript" src="<?=PATH_WEB_JS?>tree.js"></script>
@@ -14,7 +14,7 @@ $(function() {
 	LT.Tree.setActiveFolder('<?=$activeElement->getPolymorphicId()?>');
 
 <?php foreach($tree as $element) {?>
-LT.Tree.addElement('<?=$element['parentId']?>', '<?=$element['elementId']?>', '<?=addslashes($element['elementName'])?>', <?=$element['permissionId']?>, <?=$element['openFolder']?>);
+LT.Tree.addElement('<?=$element['parentId']?>', '<?=$element['elementId']?>', '<?=$element['elementName']?>', <?=$element['permissionId']?>, <?=$element['openFolder']?>);
 <?php }?>
 
 	LT.Tree.buildTree();
@@ -41,7 +41,7 @@ LT.Tree.addElement('<?=$element['parentId']?>', '<?=$element['elementId']?>', '<
 </div></div>
 
 <div class="tree_menu">
-<img src="img/0.gif" width="39" height="39" id="refresh_icon" onmousedown="this.style.backgroundPosition = '0 -39px';" onmouseup="this.style.backgroundPosition = '0 0';" onmouseover="this.style.backgroundPosition = '0 0';" onmouseout="this.style.backgroundPosition = '0 -78px';" onclick="top.tree.document.location.reload();" alt="Обновить" title="Обновить">
+<img src="img/0.gif" width="39" height="39" id="refresh" onmousedown="this.style.backgroundPosition = '0 -39px';" onmouseup="this.style.backgroundPosition = '0 0';" onmouseover="this.style.backgroundPosition = '0 0';" onmouseout="this.style.backgroundPosition = '0 -78px';" onclick="top.tree.document.location.reload();" alt="Обновить" title="Обновить">
 </div>
 
 <a id="link_Root.1" href="browse.php" onclick="LT.Tree.showFolder('<?=Root::me()->getPolymorphicId()?>');" target="browse" title="<?=Root::me()->getElementName()?>"><img src="img/root.png" width="43" height="56" alt="<?=Root::me()->getElementName()?>"></a><br>

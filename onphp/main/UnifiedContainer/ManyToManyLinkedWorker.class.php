@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: ManyToManyLinkedWorker.class.php 3893 2007-07-27 11:21:04Z voxus $ */
 
 	/**
 	 * @ingroup Containers
@@ -63,7 +63,7 @@
 		{
 			$uc = $this->container;
 			
-			if (!$query->hasJoinedTable($uc->getHelperTable()))
+			return
 				$query->
 					join(
 						$uc->getHelperTable(),
@@ -77,16 +77,10 @@
 								$uc->getHelperTable()
 							)
 						)
-					);
-			
-			return
-				$query->
+					)->
 					andWhere(
 						Expression::eq(
-							new DBField(
-								$uc->getParentIdField(),
-								$uc->getHelperTable()
-							),
+							new DBField($uc->getParentIdField()),
 							new DBValue($uc->getParentObject()->getId())
 						)
 					);

@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: StringReplaceFilter.class.php 3884 2007-07-27 11:20:30Z voxus $ */
 
 	/**
 	 * @ingroup Filters
@@ -17,9 +17,9 @@
 	{
 		private $search		= null;
 		private $replace	= null;
-
+		
 		private $count		= null;
-
+		
 		/**
 		 * @return StringReplaceFilter
 		**/
@@ -27,53 +27,53 @@
 		{
 			return new self($search, $replace);
 		}
-
+		
 		public function __construct($search = null, $replace = null)
 		{
 			$this->search = $search;
 			$this->replace = $replace;
 		}
-
+		
 		/**
 		 * @return StringReplaceFilter
 		**/
 		public function setSearch($search)
 		{
 			$this->search = $search;
-
+			
 			return $this;
 		}
-
+		
 		public function getSearch()
 		{
 			return $this->search;
 		}
-
+		
 		/**
 		 * @return StringReplaceFilter
 		**/
 		public function setReplace($replace)
 		{
 			$this->replace = $replace;
-
+			
 			return $this;
 		}
-
+		
 		public function getReplace()
 		{
 			return $this->replace;
 		}
-
+		
 		public function getCount()
 		{
 			return $this->count;
 		}
-
+		
 		public function apply($value)
 		{
 			if ($this->search === $this->replace)
 				return $value;
-
+			
 			return
 				str_replace(
 					$this->search,

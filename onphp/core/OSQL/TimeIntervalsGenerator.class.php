@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: TimeIntervalsGenerator.class.php 5432 2008-08-19 17:21:09Z voxus $ */
 
 	/**
 	 * @ingroup OSQL
@@ -29,7 +29,7 @@
 			return new self;
 		}
 		
-		public function setRange(DateRange $range)
+		public function setRange(TimestampRange $range)
 		{
 			$this->range = $range;
 			
@@ -37,7 +37,7 @@
 		}
 		
 		/**
-		 * @return DateRange
+		 * @return TimestampRange
 		**/
 		public function getRange()
 		{
@@ -90,11 +90,6 @@
 			if (!$this->range || !$this->interval)
 				throw new WrongStateException(
 					'define time range and interval units first'
-				);
-			
-			if (!$this->range->getStart() || !$this->range->getEnd())
-				throw new WrongArgumentException(
-					'cannot operate with unlimited range'
 				);
 			
 			$firstIntervalStart =

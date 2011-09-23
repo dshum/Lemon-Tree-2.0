@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: View.class.php 5212 2008-06-18 16:08:33Z dedmajor $ */
 
 	/**
 	 * @ingroup Flow
@@ -17,9 +17,6 @@
 	{
 		const ERROR_VIEW = 'error';
 		
-		/**
-		 * @param $model null or Model
-		**/
-		public function render($model = null);
+		public function render(Model $model = null);
 	}
 ?>

@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: PrimitivePolymorphicIdentifier.class.php 5104 2008-05-02 10:34:55Z voxus $ */
 
 	/**
 	 * Hint: use raw values like 'City.42' or 'Country.42' where City and
@@ -32,7 +32,7 @@
 			
 			return get_class($value).self::DELIMITER.$value->getId();
 		}
-		
+			
 		/**
 		 * @throws WrongStateException
 		**/
@@ -49,11 +49,13 @@
 		**/
 		public function ofBase($className)
 		{
-			Assert::classExists($className);
+			Assert::isTrue(
+				class_exists($className, true),
+				"knows nothing about '{$className}' class"
+			);
 			
-			Assert::isInstance(
-				$className,
-				'DAOConnected',
+			Assert::isTrue(
+				ClassUtils::isInstanceof($className, 'DAOConnected'),
 				"class '{$className}' must implement DAOConnected interface"
 			);
 			
@@ -67,9 +69,6 @@
 			return $this->baseClassName;
 		}
 		
-		/**
-		 * @return PrimitivePolymorphicIdentifier
-		**/
 		public function setValue($value)
 		{
 			Assert::isInstance($value, $this->baseClassName);
@@ -96,14 +95,14 @@
 			);
 		}
 		
-		public function import($scope)
+		public function import(array $scope)
 		{
 			$savedRaw = null;
 			
 			if (isset($scope[$this->name]) && $scope[$this->name]) {
 				$savedRaw = $scope[$this->name];
 				
-				$this->customError = null;
+				$this->error = null;
 				
 				try {
 					
@@ -111,21 +110,21 @@
 					
 				} catch (BaseException $e) {
 					
-					$this->customError = self::WRONG_CID_FORMAT;
+					$this->setError(self::WRONG_CID_FORMAT);
 					
 				}
 				
 				if (
-					!$this->customError
+					!$this->error
 					&& !ClassUtils::isInstanceOf($class, $this->baseClassName)
 				) {
 					
-					$this->customError = self::WRONG_CLASS;
+					$this->setError(self::WRONG_CLASS);
 					
 				}
 				
 				
-				if (!$this->customError) {
+				if (!$this->error) {
 					parent::of($class);
 				
 					$scope[$this->name] = $id;
@@ -136,7 +135,7 @@
 				parent::of($this->baseClassName);
 			}
 			
-			if (!$this->customError)
+			if (!$this->error)
 				$result = parent::import($scope);
 			else {
 				$this->value = null;

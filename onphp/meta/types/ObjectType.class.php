@@ -1,6 +1,6 @@
 <?php
 /***************************************************************************
- *   Copyright (C) 2006-2008 by Konstantin V. Arkhipov                     *
+ *   Copyright (C) 2006-2007 by Konstantin V. Arkhipov                     *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Lesser General Public License as        *
@@ -8,10 +8,10 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: ObjectType.class.php 5372 2008-08-02 11:33:46Z sherman $ */
 
 	/**
-	 * @ingroup Types
+	 * @ingroup MetaTypes
 	**/
 	class ObjectType extends BasePropertyType
 	{
@@ -100,25 +100,48 @@ EOT;
 				if ($property->getFetchStrategyId() == FetchStrategy::LAZY) {
 					$className = $property->getType()->getClassName();
 					
-					$isEnumeration =
-						$property->getType()->getClass()->getPattern()
-						instanceof EnumerationClassPattern;
+					$isEnumeration = false;
 					
-					$fetchObjectString = $isEnumeration
-						? "new {$className}(\$this->{$name}Id)"
-						: "{$className}::dao()->getById(\$this->{$name}Id)";
+					$info = new ReflectionClass($className);
 					
-					$method = <<<EOT
+					while ($info = $info->getParentClass()) {
+						if ($info->getName() == 'Enumeration') {
+							$isEnumeration = true;
+							break;
+						}
+					}
+					
+					if ($property->isRequired()) {
+						$method = <<<EOT
+
+{$classHint}
+public function {$methodName}()
+{
+	if (!\$this->{$name}) {
+		\$this->{$name} = {$this->getFetchLazyObjectString($className, $name, $isEnumeration)}
+	}
+
+	return \$this->{$name};
+}
+
+EOT;
+					} else {
+						$method = <<<EOT
 
 {$classHint}
 public function {$methodName}()
 {
 	if (!\$this->{$name} && \$this->{$name}Id) {
-		\$this->{$name} = {$fetchObjectString};
+		\$this->{$name} = {$this->getFetchLazyObjectString($className, $name, $isEnumeration)}
 	}
 	
 	return \$this->{$name};
 }
+
+EOT;
+					}
+					
+					$method .= <<<EOT
 
 public function {$methodName}Id()
 {
@@ -221,9 +244,7 @@ EOT;
 				if ($property->getFetchStrategyId() == FetchStrategy::LAZY) {
 					$method = <<<EOT
 
-/**
- * @return {$property->getClass()->getName()}
-**/
+{$classHint}
 public function {$methodName}({$this->className} \${$name})
 {
 	\$this->{$name} = \${$name};
@@ -232,9 +253,7 @@ public function {$methodName}({$this->className} \${$name})
 	return \$this;
 }
 
-/**
- * @return {$property->getClass()->getName()}
-**/
+{$classHint}
 public function {$methodName}Id(\$id)
 {
 	\$this->{$name} = null;
@@ -248,7 +267,7 @@ EOT;
 					$method = <<<EOT
 
 /**
- * @return {$property->getClass()->getName()}
+ * @return {$class->getName()}
 **/
 public function {$methodName}({$this->className} \${$name})
 {
@@ -343,6 +362,14 @@ EOT;
  * @return {$this->getClassName()}
 **/
 EOT;
+		}
+		
+		private function getFetchLazyObjectString($className, $name, $isEnumeration)
+		{
+			if ($isEnumeration)
+				return "new {$className}(\$this->{$name}Id);";
+			else
+				return "{$className}::dao()->getById(\$this->{$name}Id);";
 		}
 	}
 ?>

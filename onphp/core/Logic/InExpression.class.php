@@ -1,6 +1,6 @@
 <?php
 /****************************************************************************
- *   Copyright (C) 2004-2009 by Konstantin V. Arkhipov, Anton E. Lebedevich *
+ *   Copyright (C) 2004-2007 by Konstantin V. Arkhipov, Anton E. Lebedevich *
  *                                                                          *
  *   This program is free software; you can redistribute it and/or modify   *
  *   it under the terms of the GNU Lesser General Public License as         *
@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                        *
  *                                                                          *
  ****************************************************************************/
-/* $Id$ */
+/* $Id: InExpression.class.php 4564 2007-11-14 13:50:36Z voxus $ */
 
 	/**
 	 * Name says it all. :-)
@@ -29,7 +29,6 @@
 			Assert::isTrue(
 				($right instanceof Query)
 				|| ($right instanceof Criteria)
-				|| ($right instanceof MappableObject)
 				|| is_array($right)
 			);
 			
@@ -54,7 +53,7 @@
 					$right[] = $dao->guessAtom($atom, $query);
 				}
 			} elseif ($this->right instanceof MappableObject)
-				$right = $this->right->toMapped($dao, $query);
+				$right = $right->toMapped($dao, $query);
 			else
 				$right = $this->right; // untransformable
 			

@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                        *
  *                                                                          *
  ****************************************************************************/
-/* $Id$ */
+/* $Id: CommonDaoWorker.class.php 5396 2008-08-07 11:59:20Z voxus $ */
 
 	/**
 	 * Tunable (aka manual) caching DAO worker.
@@ -70,7 +70,7 @@
 				}
 			}
 		}
-		
+
 		public function getByLogic(
 			LogicalObject $logic, $expires = Cache::DO_NOT_CACHE
 		)
@@ -80,7 +80,7 @@
 					$this->dao->makeSelectHead()->andWhere($logic), $expires
 				);
 		}
-		
+
 		public function getByQuery(
 			SelectQuery $query, $expires = Cache::DO_NOT_CACHE
 		)
@@ -160,7 +160,7 @@
 			}
 		}
 		//@}
-		
+
 		/// object's list getters
 		//@{
 		public function getListByIds(
@@ -178,7 +178,7 @@
 				$prefixed = array();
 				
 				foreach ($ids as $id)
-					$prefixed[$id] = $this->makeIdKey($id);
+					$prefixed[$id] = $this->className.'_'.$id;
 				
 				if (
 					$cachedList
@@ -295,7 +295,11 @@
 		public function getTotalCount($expires = Cache::DO_NOT_CACHE)
 		{
 			$count = $this->getCustom(
-				$this->dao->makeTotalCountQuery(), $expires
+				OSQL::select()->
+				get(
+					SQLFunction::create('count', DBValue::create('*'))
+				)->
+				from($this->dao->getTable())
 			);
 			
 			return current($count);
@@ -420,7 +424,7 @@
 			}
 		}
 		//@}
-		
+
 		/// cachers
 		//@{
 		protected function cacheById(
@@ -431,7 +435,7 @@
 				
 				Cache::me()->mark($this->className)->
 					add(
-						$this->makeIdKey($object->getId()),
+						$this->className.'_'.$object->getId(),
 						$object,
 						$expires
 					);
@@ -450,7 +454,7 @@
 			
 				Cache::me()->mark($this->className)->
 					add(
-						$this->makeQueryKey($query, self::SUFFIX_QUERY),
+						$this->className.self::SUFFIX_QUERY.$query->getId(),
 						$object,
 						$expires
 					);
@@ -489,7 +493,7 @@
 			return parent::uncacheById($id);
 		}
 		
-		public function uncacheByIds($ids)
+		public function uncacheByIds(array $ids)
 		{
 			foreach ($ids as $id)
 				parent::uncacheById($id);

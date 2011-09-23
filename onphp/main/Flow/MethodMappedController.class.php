@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                        *
  *                                                                          *
  ****************************************************************************/
-/* $Id$ */
+/* $Id: MethodMappedController.class.php 3890 2007-07-27 11:20:59Z voxus $ */
 	
 	/**
 	 * @ingroup Flow
@@ -51,8 +51,7 @@
 			Form::create()->
 				add($action)->
 				import($request->getGet())->
-				importMore($request->getPost())->
-				importMore($request->getAttached());
+				importMore($request->getPost());
 			
 			if (!$command = $action->getValue())
 				return $action->getDefault();

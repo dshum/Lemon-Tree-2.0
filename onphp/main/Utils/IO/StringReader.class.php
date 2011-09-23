@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: StringReader.class.php 4471 2007-11-04 20:42:57Z voxus $ */
 
 	/**
 	 * @ingroup Utils

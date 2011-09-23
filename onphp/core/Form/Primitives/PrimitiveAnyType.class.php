@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: PrimitiveAnyType.class.php 4414 2007-10-30 14:42:57Z dedmajor $ */
 
 	/**
 	 * @ingroup Primitives

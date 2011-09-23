@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: LogicUtils.class.php 3897 2007-07-27 11:21:25Z voxus $ */
 
 	/**
 	 * @ingroup Utils

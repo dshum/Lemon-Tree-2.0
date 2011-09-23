@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: AutoDaoBuilder.class.php 5049 2008-04-07 15:58:43Z voxus $ */
 
 	/**
 	 * @ingroup Builders

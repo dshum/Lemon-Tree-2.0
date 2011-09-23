@@ -4,38 +4,21 @@
 		public function __construct()
 		{
 			$this->
-			setMethodMapping('save', 'save')->
-			setMethodMapping('edit', 'edit')->
-			setDefaultAction('edit');
+				setMethodMapping('save', 'saveBindList')->
+				setMethodMapping('edit', 'editBindList')->
+				setDefaultAction('edit');
 		}
 
 		public function handleRequest(HttpRequest $request)
 		{
-			$loggedUser = LoggedUser::getUser();
-
-			if(!$loggedUser->getGroup()->getIsDeveloper()) {
-				return
-					ModelAndView::create()->
-					setModel(Model::create())->
-					setView(new RedirectToView('ViewBrowse'));
-			}
-
-			Item::dao()->setItemList();
-
 			return parent::handleRequest($request);
 		}
 
-		public function save(HttpRequest $request)
+		public function saveBindList($request)
 		{
 			$model = Model::create();
 
-			$form =
-				Form::create()->add(
-					Primitive::identifier('itemId')->
-					of('Item')->
-					required()
-				)->
-				import($request->getGet());
+			$form = $this->makeItemEditForm();
 
 			$itemList = Item::dao()->getItemList();
 
@@ -44,7 +27,7 @@
 					Primitive::boolean('check_'.$item->getId())
 				);
 			}
-			$form->importMore($request->getPost());
+			$form->importMore($_POST);
 
 			if($form->getErrors()) {
 
@@ -84,25 +67,11 @@
 
 		}
 
-		public function edit(HttpRequest $request)
+		public function editBindList($request)
 		{
 			$model = Model::create();
 
-			$form =
-				Form::create()->
-				add(
-					Primitive::identifier('itemId')->
-					of('Item')->
-					required()
-				)->
-				import($request->getGet());
-
-			if($form->getErrors()) {
-				return
-					ModelAndView::create()->
-					setModel(Model::create())->
-					setView(new RedirectToView('ViewBrowse'));
-			}
+			$form = $this->makeItemEditForm();
 
 			$currentItem = $form->getValue('itemId');
 
@@ -111,10 +80,7 @@
 			$bind2ItemList =
 				Criteria::create(Bind2Item::dao())->
 				add(
-					Expression::eqId(
-						new DBField('item_id'),
-						$currentItem
-					)
+					Expression::eqId(new DBField("item_id"), $currentItem)
 				)->
 				getList();
 
@@ -130,6 +96,20 @@
 			return ModelAndView::create()->
 				setModel($model)->
 				setView('Bind2ItemList');
+		}
+
+		private function makeItemEditForm()
+		{
+			$form = Form::create();
+
+			$form->add(
+				Primitive::identifier('itemId')->
+				of('Item')->
+				required()
+			)->
+			import($_GET);
+
+			return $form;
 		}
 	}
 ?>

@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: Color.class.php 3894 2007-07-27 11:21:13Z voxus $ */
 
 	/**
 	 * @ingroup Turing
@@ -24,16 +24,7 @@
 		**/
 		public static function create($rgb)
 		{
-			static $flyweightColors = array();
-			
-			if (isset($flyweightColors[$rgb]))
-				return $flyweightColors[$rgb];
-			
-			$result = new self($rgb);
-			
-			$flyweightColors[$rgb] = $result;
-			
-			return $result;
+			return new self($rgb);
 		}
 		
 		// valid values: #AABBCC, DDEEFF, A15B, etc.

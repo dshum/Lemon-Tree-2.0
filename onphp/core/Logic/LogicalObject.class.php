@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: LogicalObject.class.php 3885 2007-07-27 11:20:34Z voxus $ */
 
 	/**
 	 * Support interface for Form's logic rules.

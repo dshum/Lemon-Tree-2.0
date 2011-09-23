@@ -43,7 +43,6 @@ small, .mini {font-size: 11px; color: #666;}
 .elements-list th {color: #666; white-space: nowrap; padding: 3px 3px 2px 3px; border-bottom: 4px solid #9ACB9B; font-weight: normal; text-align: left;}
 .elements-list th img.sort {vertical-align: middle; margin-left: 3px;}
 * html .elements-list th img.sort {margin-top: 3px;}
-.elements-list th span {cursor: pointer; cursor: hand; text-decoration: underline; color: #4d7c49;}
 
 .setrights td, .setrights th {text-align: center;}
 .setrights .left {text-align: left;}
@@ -130,14 +129,13 @@ div.checkbox_off {position: relative; top: -3px; width: 13px; height: 14px; back
 .hand {cursor: pointer; cursor: hand;}
 .pager {float: left; margin: 5px 0 0 0; font-size: 11px;}
 .pager span {float: left; padding: 2px 0;}
-.pager a, .pager b, .pager i {float: left; font-style: normal; cursor: pointer; cursor: hand; padding: 2px 0; width: 25px; text-align: center; margin: 0 1px 2px 1px; background: #EEFFEE; text-decoration: none;}
-.pager a:hover, .pager i.pager_over {cursor: pointer; cursor: hand; text-decoration: none; color: #000; background: #FFFADB;}
+.pager a, .pager b {float: left; padding: 2px 0; width: 25px; text-align: center; margin: 0 1px 2px 1px; background: #EEFFEE; text-decoration: none;}
+.pager a:hover {text-decoration: none; color: #000; background: #FFFADB;}
 .pager a#prev_page, .pager a#next_page {background: none; font-size: 14px; padding: 0;}
 .pager a:hover#prev_page, .pager a:hover#next_page {color: #000;}
 .pager b {background: #FFFADB; font-weight: normal; color: #855900;}
 .pager {float: left;}
-.pager i.pager_arr {font-size: 14px; background: none;}
-h2 span {color: #333;}
+h2 span {color: #DDD;}
 
 .dashed {border-bottom: 1px dashed;}
 .dh {cursor: pointer; cursor: hand; border-bottom: 1px dashed #999;}
@@ -181,10 +179,7 @@ input.ename {font-size: 18px; color: #666;}
 .fm .record_block {margin-bottom: 7px;}
 .fm .btn {margin: 5px 0;}
 
-.element-list-header td {padding: 0 0 3px 0; border-collapse: collapse;}
-
-.order_link {padding-top: 8px; float: right; white-space: nowrap;}
-.element-list-header .order_link {padding: 8px 0 0 25px; font-size: 88%;}
+.order_link {float: right; margin-top: 8px;}
 .order_link img, .em img {vertical-align: middle;}
 .order_link a, .em {text-decoration: none;}
 .order_link a:hover, .em:hover  {text-decoration: none;}
@@ -222,11 +217,11 @@ td.file img {width: 18px; height: 18px; background: url(../img/file.png) no-repe
 * html .elements-list .editonbrowse td {padding: 0 0 2px 0; border: none;}
 .elements-list .editonbrowse td img {margin-right: 3px; width: 18px; height: 18px; background: url(../img/edit.png) no-repeat; background: expression('none'); filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=/LT/img/edit.png,sizingMethod=crop);}
 
-#trash_icon {background: url(../img/btn_trash.png) no-repeat 0 -78px;}
-#search_icon {background: url(../img/btn_search.png) no-repeat 0 -78px;}
-#refresh_icon {background: url(../img/btn_refresh.png) no-repeat 0 -78px;}
-#control_icon {background: url(../img/btn_control.png) no-repeat 0 -78px;}
-#user_icon img {vertical-align: middle; margin: 0 5px 0 0;}
+#trash {background: url(../img/btn_trash.png) no-repeat 0 -78px;}
+#search {background: url(../img/btn_search.png) no-repeat 0 -78px;}
+#refresh {background: url(../img/btn_refresh.png) no-repeat 0 -78px;}
+#control {background: url(../img/btn_control.png) no-repeat 0 -78px;}
+#user img {vertical-align: middle; margin: 0 5px 0 0;}
 
 #browse_edit {background: url(../img/btn_edit.png) no-repeat 0 -108px;}
 #browse_edit.off {background: url(../img/btn_edit.png) no-repeat 0 -162px;}

@@ -8,13 +8,13 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: CompressWhitespaceFilter.class.php 3884 2007-07-27 11:20:30Z voxus $ */
 
 	/**
 	 * Replaces multiple adjacent whitespace by one
-	 * 
+	 *
 	 * @see RegulatedPrimitive::addImportFilter()
-	 * 
+	 *
 	 * @ingroup Filters
 	**/
 	final class CompressWhitespaceFilter extends BaseFilter
@@ -26,7 +26,7 @@
 		{
 			return Singleton::getInstance(__CLASS__);
 		}
-		
+
 		public function apply($value)
 		{
 			return preg_replace('/[ \t]+/', ' ', $value);

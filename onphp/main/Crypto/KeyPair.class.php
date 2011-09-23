@@ -1,6 +1,6 @@
 <?php
 /***************************************************************************
- *   Copyright (C) 2007 by Anton E. Lebedevich                             *
+ *   Copyright (C) 2007-2008 by Anton E. Lebedevich                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Lesser General Public License as        *
@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: KeyPair.class.php 5107 2008-05-02 10:35:12Z voxus $ */
 
 	/**
 	 * @ingroup Crypto
@@ -16,12 +16,12 @@
 	interface KeyPair
 	{
 		/**
-		 * @return BigInteger
+		 * @return ExternalBigInteger
 		**/
 		public function getPublic();
 		
 		/**
-		 * @return BigInteger
+		 * @return ExternalBigInteger
 		**/
 		public function getPrivate();
 	}

@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: eAcceleratorLocker.class.php 3881 2007-07-27 11:20:13Z voxus $ */
 
 	/**
 	 * @see http://eaccelerator.net/

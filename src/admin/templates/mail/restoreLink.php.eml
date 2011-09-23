@@ -1,7 +1,7 @@
 From: <?=FEEDBACK_EMAIL?>;
 To: <?=$email?>;
 Subject: Lemon Tree - восстановление пароля;
-Content-type: text/html;
+Content-type: text/html; charset=windows-1251;
 
 Кто-то отправил запрос на получение нового пароля для учетной записи <?=$login?>.<br>
 Если это были Вы, то пройдите по ссылке, указанной ниже.<br>

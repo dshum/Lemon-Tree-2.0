@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: HttpRequest.class.php 5148 2008-05-26 12:01:00Z voxus $ */
 
 	/**
 	 * @ingroup Flow
@@ -143,15 +143,6 @@
 			return $this;
 		}
 		
-		/**
-		 * @return HttpRequest
-		**/
-		public function setServerVar($name, $value)
-		{
-			$this->server[$name] = $value;
-			return $this;
-		}
-		
 		public function &getCookie()
 		{
 			return $this->cookie;
@@ -198,6 +189,16 @@
 		public function setFiles(array $files)
 		{
 			$this->files = $files;
+			
+			return $this;
+		}
+		
+		/**
+		 * @return HttpRequest
+		**/
+		public function setFilesVar($name, $value)
+		{
+			$this->files[$name] = $value;
 			
 			return $this;
 		}
@@ -265,6 +266,16 @@
 		public function getByType(RequestType $type)
 		{
 			return $this->{$type->getName()};
+		}
+		
+		/**
+		 * @return HttpRequest
+		**/
+		public function setByType(RequestType $type, array $array)
+		{
+			$this->{$type->getName()} = $array;
+			
+			return $this;
 		}
 		
 		public function getHeaderList()
@@ -341,6 +352,53 @@
 		public function getUrl()
 		{
 			return $this->url;
+		}
+		
+		/**
+		 * @return HttpUrl
+		 * 
+		 * See also:
+		 * HttpUrl::toHttpRequest()
+		 * 
+		**/
+		public function toHttpUrl()
+		{
+			$result = HttpUrl::create();
+			
+			if (
+				$this->hasServerVar('HTTP_HOST')
+				|| $this->hasServerVar('SERVER_NAME')
+			) {
+				$result->
+					setScheme(
+						$this->hasServerVar('HTTPS')
+						? 'https'
+						: 'http'
+					)->
+					setHost(
+						$this->hasServerVar('SERVER_NAME')
+						? $this->getServerVar('SERVER_NAME')
+						: $this->hasServerVar('HTTP_HOST')
+					);
+			}
+			
+			if ($this->hasServerVar('REQUEST_URI')) {
+				$path = $this->getServerVar('REQUEST_URI');
+				
+				$pos = strpos($path, '?');
+				
+				if ($pos !== false)
+					$path = substr($path, 0, $pos);
+				
+				$result->setPath($path);
+			}
+			
+			$getVars = $this->getGet();
+			
+			if ($getVars)
+				$result->setQuery(http_build_query($getVars));
+			
+			return $result;
 		}
 	}
 ?>

@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                        *
  *                                                                          *
  ****************************************************************************/
-/* $Id$ */
+/* $Id: IdentifiableTree.class.php 3970 2007-08-04 12:23:03Z voxus $ */
 
 	/**
 	 * @see NamedTree

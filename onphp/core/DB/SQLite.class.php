@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: SQLite.class.php 5256 2008-07-01 13:59:02Z voxus $ */
 
 	/**
 	 * SQLite DB connector.

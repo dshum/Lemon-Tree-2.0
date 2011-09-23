@@ -1,6 +1,6 @@
 <?php
 /***************************************************************************
- *   Copyright (C) 2006-2009 by Konstantin V. Arkhipov                     *
+ *   Copyright (C) 2006-2008 by Konstantin V. Arkhipov                     *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Lesser General Public License as        *
@@ -8,13 +8,15 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: PrimitiveIdentifier.class.php 5104 2008-05-02 10:34:55Z voxus $ */
 
 	/**
 	 * @ingroup Primitives
 	**/
 	class PrimitiveIdentifier extends IdentifiablePrimitive
 	{
+		private $info = null;
+		
 		private $methodName	= 'getById';
 		
 		/**
@@ -25,11 +27,15 @@
 		{
 			$className = $this->guessClassName($class);
 			
-			Assert::classExists($className);
+			Assert::isTrue(
+				class_exists($className, true),
+				"knows nothing about '{$className}' class"
+			);
 			
-			Assert::isInstance(
-				$className,
-				'DAOConnected',
+			$this->info = new ReflectionClass($className);
+			
+			Assert::isTrue(
+				$this->info->implementsInterface('DAOConnected'),
 				"class '{$className}' must implement DAOConnected interface"
 			);
 			
@@ -74,24 +80,29 @@
 		
 		public function importValue($value)
 		{
-			if ($value instanceof Identifiable) {
-				try {
-					Assert::isInstance($value, $this->className);
+			try {
+				if ($value instanceof Identifiable) {
+					Assert::isTrue(
+						ClassUtils::isInstanceOf($value, $this->className)
+					);
 					
 					return
 						$this->import(
 							array($this->getName() => $value->getId())
 						);
-				
-				} catch (WrongArgumentException $e) {
-					return false;
+				} elseif ($value) {
+					Assert::isPositiveInteger($value);
+					
+					return $this->import(array($this->getName() => $value));
 				}
+			} catch (WrongArgumentException $e) {
+				return false;
 			}
 			
-			return parent::importValue($value);
+			return parent::importValue(null);
 		}
 		
-		public function import($scope)
+		public function import(array $scope)
 		{
 			if (!$this->className)
 				throw new WrongStateException(
@@ -116,36 +127,29 @@
 			
 			if ($result === true) {
 				try {
-					$result = $this->actualImportValue($this->value);
+					$result =
+						(strpos($this->methodName, '::') === false)
+							? $this->dao()->{$this->methodName}($this->value)
+							: ClassUtils::callStaticMethod(
+								$this->methodName, $this->value
+							);
 					
-					Assert::isInstance($result, $className);
+					if (!$result || !($result instanceof $className)) {
+						$this->value = null;
+						return false;
+					}
 					
 					$this->value = $result;
 					
-					return true;
-				
-				} catch (WrongArgumentException $e) {
-					// not imported
 				} catch (ObjectNotFoundException $e) {
-					// not imported
+					$this->value = null;
+					return false;
 				}
 				
-				$this->value = null;
-				
-				return false;
+				return true;
 			}
 			
 			return $result;
-		}
-		
-		protected function actualImportValue($value)
-		{
-			return
-				(strpos($this->methodName, '::') === false)
-					? $this->dao()->{$this->methodName}($value)
-					: ClassUtils::callStaticMethod(
-						$this->methodName, $value
-					);
 		}
 	}
 ?>

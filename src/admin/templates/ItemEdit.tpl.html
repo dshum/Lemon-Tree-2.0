@@ -22,15 +22,15 @@ $classTypeList = array(
 
 <?php
 ob_start();
-$partViewer->view('ItemEdit.default');
+$partViewer->view("ItemEdit.default");
 $contentDefault = ob_get_contents();
 ob_end_clean();
 ob_start();
-$partViewer->view('ItemEdit.abstract');
+$partViewer->view("ItemEdit.abstract");
 $contentAbstract = ob_get_contents();
 ob_end_clean();
 ob_start();
-$partViewer->view('ItemEdit.virtual');
+$partViewer->view("ItemEdit.virtual");
 $contentVirtual = ob_get_contents();
 ob_end_clean();
 ?>

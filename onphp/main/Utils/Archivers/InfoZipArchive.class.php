@@ -8,41 +8,39 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: InfoZipArchive.class.php 3894 2007-07-27 11:21:13Z voxus $ */
 
 	/**
 	 * PECL ZipArchive proxy with Info-Zip wrapper.
 	 * 
 	 * @see http://pecl.php.net/package/zip
-	 *
-	 * @ingroup Utils
 	**/
 	final class InfoZipArchive extends FileArchive
 	{
-		private $zipArchive = null;
-		
+		private $zipArchive	= null;
+
 		public function __construct($cmdBinPath = '/usr/bin/unzip')
 		{
 			$usingCmd = $cmdBinPath;
-			
+
 			if (class_exists('ZipArchive', false)) {
-				
+
 				$this->zipArchive = new ZipArchive();
 				$usingCmd = null;
-				
+
 			} elseif ($usingCmd === null)
 				throw
 					new UnsupportedMethodException(
 						'no built-in support for zip'
 					);
-			
+
 			parent::__construct($usingCmd);
 		}
-		
+
 		public function open($sourceFile)
 		{
 			parent::open($sourceFile);
-			
+
 			if ($this->zipArchive) {
 				$resultCode = $this->zipArchive->open($sourceFile);
 				
@@ -51,10 +49,10 @@
 						'ZipArchive::open() returns error code == '.$resultCode
 					);
 			}
-			
+
 			return $this;
 		}
-		
+
 		public function readFile($fileName)
 		{
 			if (!$this->sourceFile)
@@ -65,7 +63,7 @@
 			
 			if ($this->zipArchive) {
 				$result = $this->zipArchive->getFromName($fileName);
-				
+
 				if ($result === false)
 					throw new ArchiverException(
 						'ZipArchive::getFromName() failed'
@@ -73,11 +71,11 @@
 				
 				return $result;
 			}
-			
+
 			$options = '-c -q'
 				.' '.escapeshellarg($this->sourceFile)
 				.' '.escapeshellarg($fileName);
-			
+
 			return $this->execStdoutOptions($options);
 		}
 	}

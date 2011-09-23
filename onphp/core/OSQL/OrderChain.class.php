@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: OrderChain.class.php 4564 2007-11-14 13:50:36Z voxus $ */
 
 	/**
 	 * @ingroup OSQL

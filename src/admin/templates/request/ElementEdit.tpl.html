@@ -39,6 +39,7 @@
 		}
 
 		$form->
+		addWrongLabel('controllerName', 'Некорректное название контроллера.')->
 		addWrongLabel('shortName', 'Некорректное название элемента в адресной строке.');
 
 		foreach($form->getTextualErrors() as $label) {
@@ -57,14 +58,6 @@
 
 	if(isset($restrict) && $restrict == 'error') {
 		$error[] = 'Невозможно удалить этот элемент, пока существуют связанные с ним элементы.';
-	}
-
-	if(isset($denied) && $denied == 'drop') {
-		$error[] = 'Нет прав для удаления этого элемента.';
-	}
-
-	if(isset($denied) && $denied == 'save') {
-		$error[] = 'Нет прав для редактирования этого элемента.';
 	}
 
 	$json['error'] = $error;

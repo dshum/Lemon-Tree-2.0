@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: HttpUrl.class.php 5036 2008-04-02 18:49:09Z dedmajor $ */
 
 	/**
 	 * @ingroup Net
@@ -138,6 +138,34 @@
 		public function makeComparable()
 		{
 			return $this->ensureAbsolute()->normalize()->setFragment(null);
+		}
+		
+		// FIXME: move to HttpRequest
+		public function toHttpRequest()
+		{
+			$getVars = array();
+			$serverVars = array();
+			
+			if ($this->getHost()) {
+				if ($this->getScheme() == 'https')
+					$serverVars['HTTPS'] = true;
+			
+				$serverVars['HTTP_HOST'] = $this->getHost();
+				$serverVars['SERVER_NAME'] = $this->getHost();
+			}
+			
+			if ($this->getPath()) {
+				$serverVars['REQUEST_URI'] = $this->getPath();
+			}
+			
+			if ($this->getQuery()) {
+				$serverVars['QUERY_STRING'] = $this->getQuery();
+				parse_str($this->getQuery(), $getVars);
+			}
+			
+			return HttpRequest::create()->
+				setGet($getVars)->
+				setServer($serverVars);
 		}
 	}
 ?>

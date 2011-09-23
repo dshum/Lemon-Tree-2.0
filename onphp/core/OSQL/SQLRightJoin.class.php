@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: SQLRightJoin.class.php 5391 2008-08-04 11:51:28Z voxus $ */
 
 	/**
 	 * @ingroup OSQL

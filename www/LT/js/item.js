@@ -44,7 +44,7 @@ LT.Item = function() {
 			}
 		}
 
-		if(data.tree && data.tree.length && top.tree) {
+		if(data.tree && data.tree.length) {
 			top.tree.LT.Tree.dropTree();
 			for(var i in data.tree) {
 				top.tree.LT.Tree.addElement(data.tree[i].parentId, data.tree[i].elementId, data.tree[i].elementName, 1, 0);
@@ -188,10 +188,6 @@ LT.Item = function() {
 			this.id = 'property_row_'+added.id;
 		});
 
-		$('input:hidden[name=propertyClass_add_onetomany]:first').each(function(){
-			this.name = 'propertyClass_'+added.id;
-		});
-
 		$('input[name=propertyDescription_add_onetomany]:first').each(function(){
 			this.name = 'propertyDescription_'+added.id;
 			this.value = added.propertyDescription;
@@ -200,6 +196,12 @@ LT.Item = function() {
 		$('input[name=propertyName_add_onetomany]:first').each(function(){
 			this.name = 'propertyName_'+added.id;
 			this.value = added.propertyName;
+		});
+
+		$('select[name=propertyClass_add_onetomany]:first').each(function(){
+			this.name = 'propertyClass_'+added.id;
+			this.value = added.propertyClass;
+			this.options[0] = null;
 		});
 
 		$('select[name=fetchClass_add_onetomany]:first').each(function(){
@@ -215,6 +217,7 @@ LT.Item = function() {
 
 		$('input[name=propertyDescription_add_onetomany]').each(function(){this.value = '';});
 		$('input[name=propertyName_add_onetomany]').each(function(){this.value = '';});
+		$('select[name=propertyClass_add_onetomany]').each(function(){this.selectedIndex = 0;});
 		$('select[name=fetchClass_add_onetomany]').each(function(){this.selectedIndex = 0;});
 	};
 
@@ -225,10 +228,6 @@ LT.Item = function() {
 			this.id = 'property_row_'+added.id;
 		});
 
-		$('input:hidden[name=propertyClass_add_manytomany]:first').each(function(){
-			this.name = 'propertyClass_'+added.id;
-		});
-
 		$('input[name=propertyDescription_add_manytomany]:first').each(function(){
 			this.name = 'propertyDescription_'+added.id;
 			this.value = added.propertyDescription;
@@ -237,6 +236,12 @@ LT.Item = function() {
 		$('input[name=propertyName_add_manytomany]:first').each(function(){
 			this.name = 'propertyName_'+added.id;
 			this.value = added.propertyName;
+		});
+
+		$('select[name=propertyClass_add_manytomany]:first').each(function(){
+			this.name = 'propertyClass_'+added.id;
+			this.value = added.propertyClass;
+			this.options[0] = null;
 		});
 
 		$('select[name=fetchClass_add_manytomany]:first').each(function(){
@@ -250,19 +255,9 @@ LT.Item = function() {
 			$(this).css({display: 'block'});
 		});
 
-		$('#parameterListButton_add_manytomany:first').each(function(){
-			this.id = 'parameterListButton_'+added.id;
-			$(this).css({display: 'block'}).click(function() {
-				LT.Common.windowOpen(
-					LT.Common.baseUrl+'?module=ParameterList&propertyId='+added.id,
-					'ParameterList', 600, 500
-				);
-				return false;
-			});
-		});
-
 		$('input[name=propertyDescription_add_manytomany]').each(function(){this.value = '';});
 		$('input[name=propertyName_add_manytomany]').each(function(){this.value = '';});
+		$('select[name=propertyClass_add_manytomany]').each(function(){this.selectedIndex = 0;});
 		$('select[name=fetchClass_add_manytomany]').each(function(){this.selectedIndex = 0;});
 	};
 

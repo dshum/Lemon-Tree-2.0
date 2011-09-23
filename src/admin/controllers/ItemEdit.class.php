@@ -17,8 +17,6 @@
 
 		public function handleRequest(HttpRequest $request)
 		{
-			Item::dao()->setItemList();
-
 			return parent::handleRequest($request);
 		}
 
@@ -42,28 +40,35 @@
 				setParentClass($form->getValue('parentClass'));
 
 				switch($form->getValue('classType')) {
-					case 'abstract': case 'virtual':
+					case 'abstract':
+						break;
+
+					case 'virtual':
 						$newItem->
-						setMainPropertyDescription(null)->
-						setPathPrefix(null)->
-						setIsUpdatePath(false)->
-						setIsFolder(false)->
-						setOrderField(null)->
-						setOrderDirection(false)->
-						setPerPage(null)->
-						setIsSearch(false);
+						setControllerName($form->getValue('controllerName'))->
+						setClassSource($form->getValue('classSource'))->
+						setTableName($form->getValue('tableName'));
 						break;
 
 					case 'default': default:
 						$newItem->
+						setControllerName($form->getValue('controllerName'))->
+						setPluginName($form->getValue('pluginName'))->
+						setFilterName($form->getValue('filterName'))->
+						setBeforeInsert($form->getValue('beforeInsert'))->
+						setAfterInsert($form->getValue('afterInsert'))->
+						setBeforeUpdate($form->getValue('beforeUpdate'))->
+						setAfterUpdate($form->getValue('afterUpdate'))->
+						setBeforeDelete($form->getValue('beforeDelete'))->
+						setAfterDelete($form->getValue('afterDelete'))->
+						setClassSource($form->getValue('classSource'))->
+						setTableName($form->getValue('tableName'))->
 						setMainPropertyDescription($form->getValue('mainPropertyDescription'))->
 						setPathPrefix($form->getValue('pathPrefix'))->
-						setIsUpdatePath($form->getValue('isUpdatePath'))->
 						setIsFolder($form->getValue('isFolder'))->
 						setOrderField($form->getValue('orderField'))->
-						setOrderDirection($form->getValue('orderDirection'))->
-						setPerPage($form->getValue('perPage'))->
-						setIsSearch($form->getValue('isSearch'));
+						setOrderDirection($form->getValue('orderDirection') == 1)->
+						setPerPage($form->getValue('perPage'));
 						break;
 				}
 
@@ -110,7 +115,8 @@
 
 				$currentItem = $form0->getValue('itemId');
 
-				$propertyList = Property::dao()->getPropertyList($currentItem);
+				$propertyList =
+					Property::dao()->getPropertyList($currentItem);
 
 				$form = $this->makeSaveForm($currentItem);
 
@@ -188,7 +194,10 @@
 		public function create($request)
 		{
 			# Current item
-			$currentItem = Item::create();
+			$currentItem =
+				Item::create()->
+				setId(null)->
+				setControllerName('error');
 
 			# Item list
 			$itemList = Item::dao()->getItemList();
@@ -196,9 +205,13 @@
 			# Property class list
 			$propertyClassList = Property::getPropertyClassList();
 
+			$extendableClassList = array();
 			$fetchClassList = array();
 
 			foreach($itemList as $item) {
+				if(!sizeof(Property::dao()->getPropertyList($item))) {
+					$extendableClassList[] = $item;
+				}
 				if(!$item->isAbstract()) {
 					$fetchClassList[] = $item;
 				}
@@ -211,6 +224,7 @@
 				set('itemList', $itemList)->
 				set('propertyList', array())->
 				set('propertyClassList', $propertyClassList)->
+				set('extendableClassList', $extendableClassList)->
 				set('fetchClassList', $fetchClassList);
 
 			return
@@ -221,9 +235,6 @@
 
 		public function edit($request)
 		{
-			$requestUri = $request->getServerVar('REQUEST_URI');
-			Session::assign('browseLastUrl', $requestUri);
-
 			$form = $this->makeItemEditForm();
 
 			if(!$form->getErrors()) {
@@ -235,14 +246,19 @@
 				$itemList = Item::dao()->getItemList();
 
 				# Property list
-				$propertyList = Property::dao()->getPropertyList($currentItem);
+				$propertyList =
+					Property::dao()->getPropertyList($currentItem);
 
 				# Property class list
 				$propertyClassList = Property::getPropertyClassList();
 
+				$extendableClassList = array();
 				$fetchClassList = array();
 
 				foreach($itemList as $item) {
+					if($currentItem->isExtendable($item)) {
+						$extendableClassList[] = $item;
+					}
 					if(!$item->isAbstract()) {
 						$fetchClassList[] = $item;
 					}
@@ -255,6 +271,7 @@
 					set('itemList', $itemList)->
 					set('propertyList', $propertyList)->
 					set('propertyClassList', $propertyClassList)->
+					set('extendableClassList', $extendableClassList)->
 					set('fetchClassList', $fetchClassList);
 
 				return
@@ -290,6 +307,21 @@
 			$itemList = Item::dao()->getItemList();
 
 			$itemNameList = array();
+			$extendableClassList = array();
+
+			foreach($itemList as $item) {
+				$itemNameList[$item->getItemName()] = $item->getItemName();
+				if(
+					$item->getClassType() != 'final'
+					&& !sizeof(Property::dao()->getPropertyList($item))
+				) {
+					$extendableClassList[$item->getItemName()] = $item->getItemName();
+				}
+			}
+
+			$classSourceList = array(
+				'default' => 'default',
+			);
 
 			$classTypeList = array(
 				'default' => 'default',
@@ -318,6 +350,16 @@
 				addImportFilter(Filter::trim())
 			)->
 			add(
+				Primitive::rule('itemNameUnique')->
+				setForm($form)->
+				setExpression(
+					Expression::notIn(
+						new FormField('itemName'),
+						$itemNameList
+					)
+				)
+			)->
+			add(
 				Primitive::string('itemDescription')->
 				required()->
 				setMax(255)->
@@ -329,20 +371,10 @@
 				required()
 			)->
 			add(
-				Primitive::string('parentClass')->
-				setMax(50)->
-				setAllowedPattern('/^([a-z0-9_]*)$/i')->
-				addImportFilter(Filter::trim())
+				Primitive::choice('parentClass')->
+				setList($extendableClassList)
 			)->
-			import($_POST)->
-			addRule(
-				'itemNameUnique',
-				Expression::notIn(
-					new FormField('itemName'),
-					$itemNameList
-				)
-			)->
-			checkRules();
+			import($_POST);
 
 			switch($form->getValue('classType')) {
 
@@ -352,6 +384,23 @@
 				case 'virtual':
 					$form->
 					add(
+						Primitive::choice('classSource')->
+						setList($classSourceList)
+					)->
+					add(
+						Primitive::string('tableName')->
+						setMax(255)->
+						setAllowedPattern('/^([a-z0-9_]*)$/i')->
+						addImportFilter(Filter::trim())
+					)->
+					add(
+						Primitive::string('controllerName')->
+						required()->
+						setMax(50)->
+						setAllowedPattern('/^([a-z0-9_]*)$/i')->
+						addImportFilter(Filter::trim())
+					)->
+					add(
 						Primitive::identifier('parentProperty')->
 						of('Property')
 					);
@@ -359,6 +408,23 @@
 
 				case 'default': default:
 					$form->
+					add(
+						Primitive::choice('classSource')->
+						setList($classSourceList)
+					)->
+					add(
+						Primitive::string('tableName')->
+						setMax(255)->
+						setAllowedPattern('/^([a-z0-9_]*)$/i')->
+						addImportFilter(Filter::trim())
+					)->
+					add(
+						Primitive::string('controllerName')->
+						required()->
+						setMax(50)->
+						setAllowedPattern('/^([a-z0-9_]*)$/i')->
+						addImportFilter(Filter::trim())
+					)->
 					add(
 						Primitive::string('mainPropertyDescription')->
 						required()->
@@ -371,9 +437,6 @@
 						setMax(50)->
 						setAllowedPattern('/^([a-z0-9_\-]*)$/')->
 						addImportFilter(Filter::trim())
-					)->
-					add(
-						Primitive::boolean('isUpdatePath')
 					)->
 					add(
 						Primitive::boolean('isFolder')
@@ -392,11 +455,56 @@
 						setMax(500)
 					)->
 					add(
-						Primitive::boolean('isSearch')
-					)->
-					add(
 						Primitive::identifier('parentProperty')->
 						of('Property')
+					)->
+					add(
+						Primitive::string('pluginName')->
+						setMax(50)->
+						setAllowedPattern('/^([a-z0-9_]*)$/i')->
+						addImportFilter(Filter::trim())
+					)->
+					add(
+						Primitive::string('filterName')->
+						setMax(50)->
+						setAllowedPattern('/^([a-z0-9_]*)$/i')->
+						addImportFilter(Filter::trim())
+					)->
+					add(
+						Primitive::string('beforeInsert')->
+						setMax(50)->
+						setAllowedPattern('/^([a-z0-9_]*)$/i')->
+						addImportFilter(Filter::trim())
+					)->
+					add(
+						Primitive::string('afterInsert')->
+						setMax(50)->
+						setAllowedPattern('/^([a-z0-9_]*)$/i')->
+						addImportFilter(Filter::trim())
+					)->
+					add(
+						Primitive::string('beforeUpdate')->
+						setMax(50)->
+						setAllowedPattern('/^([a-z0-9_]*)$/i')->
+						addImportFilter(Filter::trim())
+					)->
+					add(
+						Primitive::string('afterUpdate')->
+						setMax(50)->
+						setAllowedPattern('/^([a-z0-9_]*)$/i')->
+						addImportFilter(Filter::trim())
+					)->
+					add(
+						Primitive::string('beforeDelete')->
+						setMax(50)->
+						setAllowedPattern('/^([a-z0-9_]*)$/i')->
+						addImportFilter(Filter::trim())
+					)->
+					add(
+						Primitive::string('afterDelete')->
+						setMax(50)->
+						setAllowedPattern('/^([a-z0-9_]*)$/i')->
+						addImportFilter(Filter::trim())
 					);
 					break;
 			}
@@ -416,14 +524,25 @@
 
 			$fetchClassList = array();
 			$fetchClassExtendedList = array();
+			$extendableClassList = array();
 
 			$fetchClassExtendedList['Root'] = 'Root';
 			foreach($itemList as $item) {
+				if(
+					$item->getClassType() != 'final'
+					&& $currentItem->isExtendable($item)
+				) {
+					$extendableClassList[$item->getItemName()] = $item->getItemName();
+				}
 				if($item->getClassType() != 'abstract') {
 					$fetchClassList[$item->getItemName()] = $item->getItemName();
 					$fetchClassExtendedList[$item->getItemName()] = $item->getItemName();
 				}
 			}
+
+			$classSourceList = array(
+				'default' => 'default',
+			);
 
 			$classTypeList = array(
 				'default' => 'default',
@@ -471,10 +590,8 @@
 				addImportFilter(Filter::trim())
 			)->
 			add(
-				Primitive::string('parentClass')->
-				setMax(50)->
-				setAllowedPattern('/^([a-z0-9_]*)$/i')->
-				addImportFilter(Filter::trim())
+				Primitive::choice('parentClass')->
+				setList($extendableClassList)
 			)->
 			import($_POST);
 
@@ -486,6 +603,23 @@
 				case 'virtual':
 					$form->
 					add(
+						Primitive::choice('classSource')->
+						setList($classSourceList)
+					)->
+					add(
+						Primitive::string('tableName')->
+						setMax(255)->
+						setAllowedPattern('/^([a-z0-9_]*)$/i')->
+						addImportFilter(Filter::trim())
+					)->
+					add(
+						Primitive::string('controllerName')->
+						required()->
+						setMax(50)->
+						setAllowedPattern('/^([a-z0-9_]*)$/i')->
+						addImportFilter(Filter::trim())
+					)->
+					add(
 						Primitive::identifier('parentProperty')->
 						of('Property')
 					);
@@ -493,6 +627,23 @@
 
 				case 'default': default:
 					$form->
+					add(
+						Primitive::choice('classSource')->
+						setList($classSourceList)
+					)->
+					add(
+						Primitive::string('tableName')->
+						setMax(255)->
+						setAllowedPattern('/^([a-z0-9_]*)$/i')->
+						addImportFilter(Filter::trim())
+					)->
+					add(
+						Primitive::string('controllerName')->
+						required()->
+						setMax(50)->
+						setAllowedPattern('/^([a-z0-9_]*)$/i')->
+						addImportFilter(Filter::trim())
+					)->
 					add(
 						Primitive::string('mainPropertyDescription')->
 						required()->
@@ -505,9 +656,6 @@
 						setMax(50)->
 						setAllowedPattern('/^([a-z0-9_\-]*)$/')->
 						addImportFilter(Filter::trim())
-					)->
-					add(
-						Primitive::boolean('isUpdatePath')
 					)->
 					add(
 						Primitive::boolean('isFolder')
@@ -526,11 +674,56 @@
 						setMax(500)
 					)->
 					add(
-						Primitive::boolean('isSearch')
-					)->
-					add(
 						Primitive::identifier('parentProperty')->
 						of('Property')
+					)->
+					add(
+						Primitive::string('pluginName')->
+						setMax(50)->
+						setAllowedPattern('/^([a-z0-9_]*)$/i')->
+						addImportFilter(Filter::trim())
+					)->
+					add(
+						Primitive::string('filterName')->
+						setMax(50)->
+						setAllowedPattern('/^([a-z0-9_]*)$/i')->
+						addImportFilter(Filter::trim())
+					)->
+					add(
+						Primitive::string('beforeInsert')->
+						setMax(50)->
+						setAllowedPattern('/^([a-z0-9_]*)$/i')->
+						addImportFilter(Filter::trim())
+					)->
+					add(
+						Primitive::string('afterInsert')->
+						setMax(50)->
+						setAllowedPattern('/^([a-z0-9_]*)$/i')->
+						addImportFilter(Filter::trim())
+					)->
+					add(
+						Primitive::string('beforeUpdate')->
+						setMax(50)->
+						setAllowedPattern('/^([a-z0-9_]*)$/i')->
+						addImportFilter(Filter::trim())
+					)->
+					add(
+						Primitive::string('afterUpdate')->
+						setMax(50)->
+						setAllowedPattern('/^([a-z0-9_]*)$/i')->
+						addImportFilter(Filter::trim())
+					)->
+					add(
+						Primitive::string('beforeDelete')->
+						setMax(50)->
+						setAllowedPattern('/^([a-z0-9_]*)$/i')->
+						addImportFilter(Filter::trim())
+					)->
+					add(
+						Primitive::string('afterDelete')->
+						setMax(50)->
+						setAllowedPattern('/^([a-z0-9_]*)$/i')->
+						addImportFilter(Filter::trim())
 					);
 					break;
 			}
@@ -546,14 +739,12 @@
 				add(
 					Primitive::string('propertyDescription_'.$property->getId().'')->
 					required()->
-					setMax(255)->
-					addImportFilter(Filter::trim())
+					setMax(255)
 				)->
 				add(
 					Primitive::string('propertyName_'.$property->getId().'')->
 					required()->
 					setMax(50)->
-					addImportFilter(Filter::trim())->
 					setAllowedPattern('/^([a-z0-9]*)$/i')
 				)->
 				add(
@@ -592,7 +783,6 @@
 			add(
 				Primitive::string('propertyName_add_field')->
 				setMax(50)->
-				addImportFilter(Filter::trim())->
 				setAllowedPattern('/^([a-z0-9]*)$/i')
 			)->
 			add(
@@ -607,13 +797,11 @@
 			)->
 			add(
 				Primitive::string('propertyDescription_add_onetoone')->
-				setMax(255)->
-				addImportFilter(Filter::trim())
+				setMax(255)
 			)->
 			add(
 				Primitive::string('propertyName_add_onetoone')->
 				setMax(50)->
-				addImportFilter(Filter::trim())->
 				setAllowedPattern('/^([a-z0-9_]*)$/i')
 			)->
 			add(
@@ -630,13 +818,11 @@
 			)->
 			add(
 				Primitive::string('propertyDescription_add_onetomany')->
-				setMax(255)->
-				addImportFilter(Filter::trim())
+				setMax(255)
 			)->
 			add(
 				Primitive::string('propertyName_add_onetomany')->
 				setMax(50)->
-				addImportFilter(Filter::trim())->
 				setAllowedPattern('/^([a-z0-9_]*)$/i')
 			)->
 			add(
@@ -650,7 +836,6 @@
 			add(
 				Primitive::string('propertyName_add_manytomany')->
 				setMax(50)->
-				addImportFilter(Filter::trim())->
 				setAllowedPattern('/^([a-z0-9_]*)$/i')
 			)->
 			add(
@@ -669,7 +854,14 @@
 			setParentClass($form->getValue('parentClass'));
 
 			switch($currentItem->getClassType()) {
-				case 'abstract': case 'virtual':
+				case 'abstract':
+					break;
+
+				case 'virtual':
+					$currentItem->
+					setControllerName($form->getValue('controllerName'))->
+					setClassSource($form->getValue('classSource'))->
+					setTableName($form->getValue('tableName'));
 					break;
 
 				case 'default': default:
@@ -681,14 +873,23 @@
 						$this->refreshTree = true;
 					}
 					$currentItem->
+					setControllerName($form->getValue('controllerName'))->
+					setPluginName($form->getValue('pluginName'))->
+					setFilterName($form->getValue('filterName'))->
+					setBeforeInsert($form->getValue('beforeInsert'))->
+					setAfterInsert($form->getValue('afterInsert'))->
+					setBeforeUpdate($form->getValue('beforeUpdate'))->
+					setAfterUpdate($form->getValue('afterUpdate'))->
+					setBeforeDelete($form->getValue('beforeDelete'))->
+					setAfterDelete($form->getValue('afterDelete'))->
+					setClassSource($form->getValue('classSource'))->
+					setTableName($form->getValue('tableName'))->
 					setMainPropertyDescription($form->getValue('mainPropertyDescription'))->
 					setPathPrefix($form->getValue('pathPrefix'))->
-					setIsUpdatePath($form->getValue('isUpdatePath'))->
 					setIsFolder($form->getValue('isFolder'))->
 					setOrderField($form->getValue('orderField'))->
 					setOrderDirection($form->getValue('orderDirection') == 1)->
-					setPerPage($form->getValue('perPage'))->
-					setIsSearch($form->getValue('isSearch'));
+					setPerPage($form->getValue('perPage'));
 					break;
 			}
 
@@ -697,7 +898,8 @@
 
 		private function saveProperties(Item $currentItem, Form $form)
 		{
-			$propertyList = Property::dao()->getPropertyList($currentItem);
+			$propertyList =
+				Property::dao()->getPropertyList($currentItem);
 
 			$dropped = array();
 
@@ -705,8 +907,9 @@
 				if($form->getValue('drop_'.$property->getId().'')) {
 
 					# Drop property
-					Property::dao()->dropProperty($property);
 					$this->dropped[$property->getId()] = $property->getId();
+
+					Property::dao()->dropProperty($property);
 
 				} else {
 
@@ -716,7 +919,6 @@
 					setId($property->getId())->
 					setItem($property->getItem())->
 					setPropertyOrder($property->getPropertyOrder())->
-					setPropertyParameters($property->getPropertyParameters())->
 					setIsShow($form->getValue('isShow_'.$property->getId().''))->
 					setIsRequired($form->getValue('isRequired_'.$property->getId().''))->
 					setPropertyDescription($form->getValue('propertyDescription_'.$property->getId().''))->

@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: RequestType.class.php 4688 2007-12-11 09:27:25Z lifter $ */
 
 	/**
 	 * @ingroup Helpers

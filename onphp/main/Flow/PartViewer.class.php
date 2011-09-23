@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: PartViewer.class.php 5487 2008-09-04 13:11:16Z vlad $ */
 
 	/**
 	 * @ingroup Flow
@@ -50,10 +50,7 @@
 			
 			$model->set('rootModel', $rootModel);
 			
-			if ($partName instanceof View)
-				$partName->render($model);
-			else
-				$this->viewResolver->resolveViewName($partName)->render($model);
+			$this->viewResolver->resolveViewName($partName)->render($model);
 			
 			return $this;
 		}

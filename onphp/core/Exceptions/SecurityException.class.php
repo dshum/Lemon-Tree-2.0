@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: SecurityException.class.php 3953 2007-07-31 19:21:10Z dedmajor $ */
 
 	/**
 	 * @ingroup Exceptions

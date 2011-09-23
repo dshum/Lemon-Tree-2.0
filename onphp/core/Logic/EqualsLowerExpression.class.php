@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                        *
  *                                                                          *
  ****************************************************************************/
-/* $Id$ */
+/* $Id: EqualsLowerExpression.class.php 5224 2008-06-20 14:42:50Z sherman $ */
 
 	/**
 	 * @ingroup Logic

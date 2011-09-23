@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: PCREFilter.class.php 4180 2007-09-09 18:27:40Z voxus $ */
 
 	/**
 	 * @ingroup Filters

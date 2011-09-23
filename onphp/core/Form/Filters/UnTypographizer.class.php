@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: UnTypographizer.class.php 3884 2007-07-27 11:20:30Z voxus $ */
 
 	/**
 	 * @ingroup Filters

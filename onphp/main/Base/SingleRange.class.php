@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: SingleRange.class.php 5117 2008-05-02 10:36:01Z voxus $ */
 
 	/**
 	 * @ingroup Helpers

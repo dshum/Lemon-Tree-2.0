@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: HtmlTokenizer.class.php 4765 2008-01-08 04:04:04Z voxus $ */
 
 	/**
 	 * @ingroup Html

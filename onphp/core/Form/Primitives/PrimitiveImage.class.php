@@ -1,6 +1,6 @@
 <?php
 /***************************************************************************
- *   Copyright (C) 2006-2007 by Konstantin V. Arkhipov                     *
+ *   Copyright (C) 2006-2008 by Konstantin V. Arkhipov                     *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Lesser General Public License as        *
@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: PrimitiveImage.class.php 5104 2008-05-02 10:34:55Z voxus $ */
 
 	/**
 	 * Image uploads helper.
@@ -65,11 +65,6 @@
 			return $this;
 		}
 		
-		public function getMaxWidth()
-		{
-			return $this->maxWidth;
-		}
-		
 		/**
 		 * @return PrimitiveImage
 		**/
@@ -78,11 +73,6 @@
 			$this->minWidth = $min;
 			
 			return $this;
-		}
-		
-		public function getMinWidth()
-		{
-			return $this->minWidth;
 		}
 		
 		/**
@@ -95,11 +85,6 @@
 			return $this;
 		}
 		
-		public function getMaxHeight()
-		{
-			return $this->maxHeight;
-		}
-		
 		/**
 		 * @return PrimitiveImage
 		**/
@@ -110,12 +95,7 @@
 			return $this;
 		}
 		
-		public function getMinHeight()
-		{
-			return $this->minHeight;
-		}
-		
-		public function import($scope)
+		public function import(array $scope)
 		{
 			if (!$result = parent::import($scope))
 				return $result;

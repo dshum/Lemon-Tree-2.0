@@ -1,6 +1,6 @@
 <?php
 /***************************************************************************
- *   Copyright (C) 2007-2008 by Konstantin V. Arkhipov                     *
+ *   Copyright (C) 2007 by Konstantin V. Arkhipov                          *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Lesser General Public License as        *
@@ -8,20 +8,20 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: PropertyPath.class.php 4564 2007-11-14 13:50:36Z voxus $ */
 
 	/**
 	 * @ingroup Criteria
 	**/
 	final class PropertyPath
 	{
-		private $root		= null;
-		private $path		= null;
-		
-		private $properties	= array();
+		private $root = null;
+		private $path = null;
 		
 		private static $daos	= array();
-		private static $protos	= array(); // zergs suck anyway ;-)
+		private static $protos 	= array(); // zergs suck anyway ;-)
+		
+		private $properties	= array();
 		
 		public function __construct($root, $path)
 		{
@@ -30,8 +30,10 @@
 			if (is_object($root))
 				$className = get_class($root);
 			else {
-				Assert::classExists($root);
-				
+				Assert::isTrue(
+					class_exists($root, true),
+					'inexistant class given'
+				);
 				$className = $root;
 			}
 			

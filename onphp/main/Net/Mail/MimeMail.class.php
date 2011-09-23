@@ -10,7 +10,7 @@
  *   Based on PEAR's Mail::MIME by Richard Heyes                           *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: MimeMail.class.php 4618 2007-11-25 22:37:21Z voxus $ */
 
 	/**
 	 * @ingroup Mail

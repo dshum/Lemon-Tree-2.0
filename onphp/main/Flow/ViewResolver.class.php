@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: ViewResolver.class.php 5447 2008-08-26 10:21:10Z vlad $ */
 
 	/**
 	 * @ingroup Flow
@@ -21,5 +21,7 @@
 		 * @return	View
 		**/
 		public function resolveViewName($viewName);
+		
+		public function viewExists($viewName);
 	}
 ?>

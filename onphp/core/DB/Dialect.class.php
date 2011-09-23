@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: Dialect.class.php 4605 2007-11-25 22:36:40Z voxus $ */
 
 	/**
 	 * Base (aka ANSI) SQL dialect.

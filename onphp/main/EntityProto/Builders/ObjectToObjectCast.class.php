@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: ObjectToObjectCast.class.php 5028 2008-03-31 17:17:33Z dedmajor $ */
 
 	final class ObjectToObjectCast extends ObjectBuilder
 	{

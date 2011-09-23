@@ -1,6 +1,6 @@
 <?php
 /***************************************************************************
- *   Copyright (C) 2007-2009 by Anton E. Lebedevich                        *
+ *   Copyright (C) 2007 by Anton E. Lebedevich                             *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Lesser General Public License as        *
@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: MultiPrefixPhpViewResolver.class.php 5447 2008-08-26 10:21:10Z vlad $ */
 
 	/**
 	 * View resolver for php templates with multiple prefix support
@@ -18,7 +18,7 @@
 	 * 
 	 * @ingroup Flow
 	**/
-	class MultiPrefixPhpViewResolver implements ViewResolver
+	final class MultiPrefixPhpViewResolver implements ViewResolver
 	{
 		private $prefixes	= array();
 		private $lastAlias	= null;
@@ -77,18 +77,8 @@
 		public function dropPrefixes()
 		{
 			$this->prefixes = array();
-			return $this;
-		}
-		
-		public function isPrefixDisabled($alias)
-		{
-			Assert::isIndexExists(
-				$this->prefixes,
-				$alias,
-				'no such alias: '.$alias
-			);
 			
-			return !empty($this->disabled[$alias]);
+			return $this;
 		}
 		
 		/**
@@ -100,11 +90,11 @@
 				$alias = $this->lastAlias;
 			
 			Assert::isNotNull($alias, 'nothing to disable');
-			Assert::isIndexExists(
-				$this->prefixes,
-				$alias,
-				'no such alias: '.$alias
-			);
+			
+			if (!isset($this->prefixes[$alias]))
+				throw new WrongArgumentException(
+					'no such alias: '.$alias
+				);
 			
 			$this->disabled[$alias] = $disabled;
 			
@@ -127,6 +117,7 @@
 		public function setPostfix($postfix)
 		{
 			$this->postfix = $postfix;
+			
 			return $this;
 		}
 		
@@ -141,7 +132,11 @@
 			);
 			
 			if ($prefix = $this->findPrefix($viewName))
-				return $this->makeView($prefix, $viewName);
+				return
+					new $this->viewClassName(
+						$prefix.$viewName.$this->postfix,
+						$this
+					);
 			
 			if (!$this->findPrefix($viewName, false))
 				throw new WrongArgumentException(
@@ -186,17 +181,6 @@
 			}
 			
 			return null;
-		}
-		
-		/**
-		 * @return View
-		**/
-		protected function makeView($prefix, $viewName)
-		{
-			return new $this->viewClassName(
-				$prefix.$viewName.$this->postfix,
-				$this
-			);
 		}
 		
 		private function getAutoAlias($prefix)

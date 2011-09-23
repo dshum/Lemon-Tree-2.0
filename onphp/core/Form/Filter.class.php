@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: Filter.class.php 5223 2008-06-19 14:31:04Z dedmajor $ */
 
 	/**
 	 * Factory for Filtrator implementations.
@@ -154,6 +154,14 @@
 		public static function safeUtf8()
 		{
 			return Singleton::getInstance('SafeUtf8Filter');
+		}
+		
+		/**
+		 * @return Stringizer
+		**/
+		public static function stringizer()
+		{
+			return Singleton::getInstance('Stringizer');
 		}
 	}
 ?>

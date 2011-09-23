@@ -1,6 +1,6 @@
 <?php
 /***************************************************************************
- *   Copyright (C) 2006-2007 by Konstantin V. Arkhipov                     *
+ *   Copyright (C) 2006-2008 by Konstantin V. Arkhipov                     *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Lesser General Public License as        *
@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: Format.class.php 5114 2008-05-02 10:35:45Z voxus $ */
 
 	/**
 	 * @ingroup MetaBase
@@ -69,7 +69,13 @@
 					++$chain;
 				} elseif (substr($string, -2, 2) == "(\n")
 					++$indent;
-				elseif ($string == "\n" && $indent == 0) {
+				elseif (
+					(substr($string, -2, 2) == ")\n")
+					&& (substr($string, 0, 2) == 'if')
+				) {
+					++$indent;
+					++$chain;
+				} elseif ($string == "\n" && $indent == 0) {
 					++$indent;
 				} elseif ($string == "return\n") {
 					++$indent;

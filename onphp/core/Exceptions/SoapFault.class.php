@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                        *
  *                                                                          *
  ****************************************************************************/
-/* $Id$ */
+/* $Id: SoapFault.class.php 5013 2008-03-28 13:45:43Z voxus $ */
 
 	/**
 	 * In case we're soapless.

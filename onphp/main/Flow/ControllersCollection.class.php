@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                        *
  *                                                                          *
  ****************************************************************************/
-/* $Id$ */
+/* $Id: ControllersCollection.class.php 5335 2008-07-25 13:57:18Z voxus $ */
 
 	abstract class ControllersCollection implements Controller
 	{

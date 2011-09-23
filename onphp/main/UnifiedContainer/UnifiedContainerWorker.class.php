@@ -1,6 +1,6 @@
 <?php
 /***************************************************************************
- *   Copyright (C) 2005-2009 by Konstantin V. Arkhipov                     *
+ *   Copyright (C) 2005-2008 by Konstantin V. Arkhipov                     *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Lesser General Public License as        *
@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: UnifiedContainerWorker.class.php 4895 2008-03-07 14:56:42Z voxus $ */
 
 	/**
 	 * @see UnifiedContainer
@@ -51,32 +51,14 @@
 		**/
 		public function makeCountQuery()
 		{
-			$query = $this->makeFetchQuery();
-			
-			if ($query->isDistinct()) {
-				$countFunction =
-					SQLFunction::create(
-						'count',
-						DBField::create(
-							$this->container->getDao()->getIdName(),
-							$this->container->getDao()->getTable()
-						)
-					)->
-					setAggregateDistinct();
-				
-				$query->unDistinct();
-			
-			} else {
-				$countFunction = SQLFunction::create('count', DBValue::create('*'));
-			}
-			
-			return $query->
-				dropFields()->
-				dropOrder()->
-				dropLimit()->
-				get(
-					$countFunction->setAlias('count')
-				);
+			return
+				$this->
+					makeFetchQuery()->
+					dropFields()->
+					dropOrder()->
+					get(
+						SQLFunction::create('count', '*')->setAlias('count')
+					);
 		}
 		
 		public function dropList()

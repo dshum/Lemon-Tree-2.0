@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: MySQL.class.php 5018 2008-03-29 01:42:27Z serg $ */
 
 	/**
 	 * MySQL DB connector.
@@ -174,25 +174,21 @@
 		{
 			static $types = array(
 				'tinyint'	=> DataType::SMALLINT,
-				'smallint'	=> DataType::SMALLINT,
 				'int'		=> DataType::INTEGER,
 				'bigint'	=> DataType::BIGINT,
-
-				'double'	=> DataType::DOUBLE,
 
 				'varchar'	=> DataType::VARCHAR,
 				'text'		=> DataType::TEXT,
 
-				'time'		=> DataType::TIME,
 				'timestamp' => DataType::TIMESTAMP,
 				'date'		=> DataType::DATE
 			);
 
-			try {
-				$result = $this->queryRaw('SHOW COLUMNS FROM '.$table);
-			} catch (BaseException $e) {
+			$result = $this->queryRaw('SHOW COLUMNS FROM '.$table);
+
+			if (!(mysql_num_rows($result) > 0)) {
 				throw new ObjectNotFoundException(
-					"unknown table '{$table}'"
+					"no info for table '{$table}'"
 				);
 			}
 

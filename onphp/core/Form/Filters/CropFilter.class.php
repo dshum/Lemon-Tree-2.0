@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: CropFilter.class.php 4651 2007-11-27 10:47:11Z voxus $ */
 
 	/**
 	 * @see RegulatedPrimitive::addImportFilter()

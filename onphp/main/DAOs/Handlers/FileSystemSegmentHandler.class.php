@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: FileSystemSegmentHandler.class.php 5046 2008-04-07 08:39:27Z voxus $ */
 
 	/**
 	 * @ingroup DAOs

@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: DictionaryDaoBuilder.class.php 4627 2007-11-25 22:37:41Z voxus $ */
 
 	/**
 	 * @ingroup Builders

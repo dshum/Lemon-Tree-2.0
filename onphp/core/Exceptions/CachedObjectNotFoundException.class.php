@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                        *
  *                                                                          *
  ****************************************************************************/
-/* $Id$ */
+/* $Id: CachedObjectNotFoundException.class.php 5375 2008-08-03 14:19:20Z voxus $ */
 
 	/**
 	 * @ingroup Exceptions

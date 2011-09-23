@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: DirectoryLocker.class.php 5263 2008-07-06 18:38:02Z voxus $ */
 
 	/**
 	 * Directories based locker.

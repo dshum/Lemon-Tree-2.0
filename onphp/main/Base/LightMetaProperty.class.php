@@ -1,6 +1,6 @@
 <?php
 /***************************************************************************
- *   Copyright (C) 2006-2009 by Konstantin V. Arkhipov                     *
+ *   Copyright (C) 2006-2008 by Konstantin V. Arkhipov                     *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Lesser General Public License as        *
@@ -8,12 +8,12 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: LightMetaProperty.class.php 5506 2008-09-18 12:23:42Z sherman $ */
 
 	/**
 	 * Simplified MetaClassProperty for passing information
 	 * between userspace and MetaConfiguration.
-	 *
+	 * 
 	 * @ingroup Helpers
 	**/
 	class LightMetaProperty implements Stringable
@@ -22,24 +22,24 @@
 		
 		private static $limits = array(
 			0x0002 => array(
-				PrimitiveInteger::SIGNED_SMALL_MIN,
-				PrimitiveInteger::SIGNED_SMALL_MAX
+				Integer::SIGNED_SMALL_MIN,
+				Integer::SIGNED_SMALL_MAX
 			),
 			0x1002 => array(
 				0,
-				PrimitiveInteger::UNSIGNED_SMALL_MAX
+				Integer::UNSIGNED_SMALL_MAX
 			),
 			0x0004 => array(
-				PrimitiveInteger::SIGNED_MIN,
-				PrimitiveInteger::SIGNED_MAX
+				Integer::SIGNED_MIN,
+				Integer::SIGNED_MAX
 			),
 			0x1004 => array(
 				0,
-				PrimitiveInteger::UNSIGNED_MAX
+				Integer::UNSIGNED_MAX
 			),
 			0x0008 => array(
-				PrimitiveInteger::SIGNED_BIG_MIN,
-				PrimitiveInteger::SIGNED_BIG_MAX
+				Integer::SIGNED_BIG_MIN,
+				Integer::SIGNED_BIG_MAX
 			),
 			0x1008 => array(
 				0,
@@ -84,7 +84,7 @@
 		
 		/**
 		 * must by in sync with InnerMetaProperty::make()
-		 *
+		 * 
 		 * @return LightMetaProperty
 		**/
 		public static function fill(
@@ -111,14 +111,11 @@
 			if ($size) {
 				if (
 					($type == 'integer')
-					|| ($type == 'identifier') // obsoleted
-					|| ($type == 'integerIdentifier')
+					|| ($type == 'identifier')
 					|| ($type == 'enumeration')
 				) {
 					$property->min = self::$limits[$size][0];
 					$property->max = self::$limits[$size][1];
-				} elseif ($type == 'scalarIdentifier') {
-					// supported only in master
 				} elseif ($type != 'float') { // string
 					$property->max = $size;
 				}
@@ -135,9 +132,7 @@
 			
 			$property->identifier =
 				$generic && $required && (
-					($type == 'identifier') // obsoleted
-					|| ($type == 'integerIdentifier')
-					|| ($type == 'scalarIdentifier')
+					$type == 'identifier'
 				);
 			
 			return $property;
@@ -287,32 +282,6 @@
 			return true;
 		}
 		
-		/**
-		 * @return BasePrimitive
-		**/
-		public function makePrimitive($name)
-		{
-			$prm =
-				call_user_func(
-					array('Primitive', $this->type),
-					$name
-				);
-			
-			if (null !== ($min = $this->getMin()))
-				$prm->setMin($min);
-			
-			if (null !== ($max = $this->getMax()))
-				$prm->setMax($max);
-			
-			if ($prm instanceof IdentifiablePrimitive)
-				$prm->of($this->className);
-			
-			if ($this->required)
-				$prm->required();
-			
-			return $prm;
-		}
-		
 		public function fillMapping(array $mapping)
 		{
 			if (
@@ -336,9 +305,25 @@
 		**/
 		public function fillForm(Form $form, $prefix = null)
 		{
-			return $form->add(
-				$this->makePrimitive($prefix.$this->name)
-			);
+			$prm =
+				call_user_func(
+					array('Primitive', $this->type),
+					$prefix.$this->name
+				);
+			
+			if (null !== ($min = $this->getMin()))
+				$prm->setMin($min);
+			
+			if (null !== ($max = $this->getMax()))
+				$prm->setMax($max);
+			
+			if ($prm instanceof IdentifiablePrimitive)
+				$prm->of($this->className);
+			
+			if ($this->required)
+				$prm->required();
+			
+			return $form->add($prm);
 		}
 		
 		/**
@@ -364,19 +349,6 @@
 				
 				if ($this->type == 'binary') {
 					$query->set($this->columnName, new DBBinary($value));
-				} elseif ($this->type == 'hstore') {
-					$string = null;
-					if (!empty($value))
-						foreach ($value as $k => $v) {
-							$k = addslashes($k);
-							if ($v !== null) {
-								$v = addslashes($v);
-								$string .= "\"{$k}\"=>\"{$v}\",";
-							} else {
-								$string .= "\"{$k}\"=>NULL,";
-							}
-						}
-					$query->set($this->columnName, $string);
 				} else {
 					$query->lazySet($this->columnName, $value);
 				}
@@ -395,10 +367,6 @@
 			
 			if ($this->className == 'HttpUrl') {
 				return HttpUrl::create()->parse($raw);
-			}
-					
-			if ($this->type == 'hstore') {
-				return $this->hstoreStringToArray($raw);
 			}
 			
 			if (
@@ -517,16 +485,6 @@
 		{
 			// NOTE: enum here formless types
 			return ($this->type == 'enumeration');
-		}
-		
-		protected function hstoreStringToArray($string)
-		{
-			if (!$string)
-				return array();
-			
-			eval("\$return = array({$string});");
-			
-			return $return;
 		}
 	}
 ?>

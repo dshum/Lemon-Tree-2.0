@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: MailEncoding.class.php 3891 2007-07-27 11:21:01Z voxus $ */
 
 	/**
 	 * @ingroup Mail

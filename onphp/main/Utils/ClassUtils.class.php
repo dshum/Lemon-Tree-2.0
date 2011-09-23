@@ -1,6 +1,6 @@
 <?php
 /***************************************************************************
- *   Copyright (C) 2007-2009 by Dmitry E. Demidov                          *
+ *   Copyright (C) 2007-2008 by Dmitry E. Demidov                          *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Lesser General Public License as        *
@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: ClassUtils.class.php 5469 2008-08-31 18:59:22Z voxus $ */
 
 	/**
 	 * @ingroup Utils
@@ -19,7 +19,7 @@
 		
 		/* void */ public static function copyProperties($source, $destination)
 		{
-			Assert::isEqual(get_class($source), get_class($destination));
+			Assert::isTrue(get_class($source) == get_class($destination));
 			
 			$class = new ReflectionClass($source);
 			
@@ -103,10 +103,7 @@
 		
 		public static function isClassName($className)
 		{
-			if (!is_string($className))
-				return false;
-
-			return preg_match('/^'.self::CLASS_NAME_PATTERN.'$/', $className) > 0;
+			return preg_match('/^'.self::CLASS_NAME_PATTERN.'$/', $className);
 		}
 		
 		/// to avoid dependency on SPL's class_implements

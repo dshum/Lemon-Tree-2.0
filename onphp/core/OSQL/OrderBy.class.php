@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: OrderBy.class.php 5395 2008-08-05 18:45:57Z dedmajor $ */
 
 	/**
 	 * @ingroup OSQL
@@ -17,6 +17,7 @@
 	final class OrderBy extends FieldTable implements MappableObject
 	{
 		private $direction	= null;
+		
 		private $nulls		= null;
 		
 		/**
@@ -38,7 +39,6 @@
 		public function __clone()
 		{
 			$this->direction = clone $this->direction;
-			$this->nulls = clone $this->nulls;
 		}
 		
 		/**
@@ -87,13 +87,13 @@
 		**/
 		public function nullsLast()
 		{
-			$this->nulls->setFalse();
+			$this->direction->setFalse();
 			return $this;
 		}
 		
 		public function isNullsFirst()
 		{
-			return $this->nulls->decide(true, false, true);
+			return $this->direction->decide(true, false, true);
 		}
 		
 		/**
@@ -103,8 +103,8 @@
 		{
 			$this->nulls->setValue($nullsFirst);
 			return $this;
-		}
 		
+		}
 		/**
 		 * @return OrderBy
 		**/
@@ -123,13 +123,10 @@
 		{
 			$order = self::create($dao->guessAtom($this->field, $query));
 			
-			if (!$this->nulls->isNull())
-				$order->setNullsFirst($this->nulls->getValue());
+			if ($this->direction->isNull())
+				return $order;
 			
-			if (!$this->direction->isNull())
-				$order->setDirection($this->direction->getValue());
-			
-			return $order;
+			return $order->{$this->direction->decide('asc', 'desc')}();
 		}
 		
 		public function toDialectString(Dialect $dialect)
@@ -138,23 +135,17 @@
 				$this->field instanceof SelectQuery
 				|| $this->field instanceof LogicalObject
 			)
-				$result = '('.$dialect->fieldToString($this->field).')';
+				$result =
+					'('.$dialect->fieldToString($this->field).')'
+					.$this->direction->decide(' ASC', ' DESC');
 			else
-				$result = parent::toDialectString($dialect);
+				$result =
+					parent::toDialectString($dialect)
+					.$this->direction->decide(' ASC', ' DESC');
 			
-			$result .=
-				$this->direction->decide(' ASC', ' DESC')
-				.$this->nulls->decide(' NULLS FIRST', ' NULLS LAST');
+			$result .= $this->nulls->decide(' NULLS FIRST', ' NULLS LAST');
 			
 			return $result;
-		}
-		
-		public function getFieldName()
-		{
-			if ($this->field instanceof DBField)
-				return $this->field->getField();
-			else
-				return $this->field;
 		}
 	}
 ?>

@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: FullTextSearch.class.php 3969 2007-08-04 12:22:59Z voxus $ */
 
 	/**
 	 * @ingroup OSQL

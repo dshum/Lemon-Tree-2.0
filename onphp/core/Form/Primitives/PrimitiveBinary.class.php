@@ -1,6 +1,6 @@
 <?php
 /***************************************************************************
- *   Copyright (C) 2007 by Konstantin V. Arkhipov                          *
+ *   Copyright (C) 2007-2008 by Konstantin V. Arkhipov                     *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Lesser General Public License as        *
@@ -8,32 +8,20 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: PrimitiveBinary.class.php 5124 2008-05-02 10:36:39Z voxus $ */
 
 	/**
 	 * @ingroup Primitives
 	**/
 	final class PrimitiveBinary extends FiltrablePrimitive
 	{
-		public function import($scope)
+		public function getTypeName()
 		{
-			if (!BasePrimitive::import($scope))
-				return null;
-			
-			$this->value = (string) $scope[$this->name];
-			
-			$this->selfFilter();
-			
-			if (!empty($this->value) && is_string($this->value)
-				&& ($length = strlen($this->value))
-				&& !($this->max && $length > $this->max)
-				&& !($this->min && $length < $this->min)
-			) {
-				return true;
-			} else {
-				$this->value = null;
-			}
-			
+			return 'Binary';
+		}
+		
+		public function isObjectType()
+		{
 			return false;
 		}
 	}

@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: DBBinary.class.php 4504 2007-11-04 20:45:33Z voxus $ */
 
 	/**
 	 * Container for passing binary values into OSQL queries.

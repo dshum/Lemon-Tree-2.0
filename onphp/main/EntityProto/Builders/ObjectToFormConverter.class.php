@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: ObjectToFormConverter.class.php 4966 2008-03-21 18:03:32Z dedmajor $ */
 
 	final class ObjectToFormConverter extends FormBuilder
 	{

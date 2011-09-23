@@ -37,12 +37,12 @@
 				foreach($data as $v) {
 					$result[] = self::php2js($v);
 				}
-				return '['.join(',', $result).']';
+				return '[ '.join(', ', $result).' ]';
 			} else {
 				foreach($data as $k => $v) {
-					$result[] = self::php2js($k).':'.self::php2js($v);
+					$result[] = self::php2js($k).': '.self::php2js($v);
 				}
-				return '{'.join(',', $result).'}';
+				return '{ '.join(', ', $result).' }';
 			}
 		}
 	}

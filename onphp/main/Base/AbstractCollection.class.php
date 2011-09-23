@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: AbstractCollection.class.php 5434 2008-08-19 17:22:17Z sherman $ */
 
 	abstract class AbstractCollection implements Collection
 	{
@@ -81,19 +81,6 @@
 		public function getList()
 		{
 			return $this->items;
-		}
-		
-		/**
-		 * @return CollectionItem
-		**/
-		public function getByName($name)
-		{
-			return $this->items[$name];
-		}
-		
-		public function has($name)
-		{
-			return isset($this->items[$name]);
 		}
 	}
 ?>

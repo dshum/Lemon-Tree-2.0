@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: PrimitiveForm.class.php 5104 2008-05-02 10:34:55Z voxus $ */
 
 	/**
 	 * @ingroup Primitives
@@ -27,11 +27,17 @@
 		**/
 		public function of($className)
 		{
-			Assert::classExists($className);
+			Assert::isTrue(
+				class_exists($className, true),
+				"knows nothing about '{$className}' class"
+			);
 			
 			$protoClass = EntityProto::PROTO_CLASS_PREFIX.$className;
 			
-			Assert::classExists($protoClass);
+			Assert::isTrue(
+				class_exists($protoClass, true),
+				"knows nothing about '{$protoClass}' class"
+			);
 			
 			return $this->ofProto(Singleton::getInstance($protoClass));
 		}
@@ -121,12 +127,12 @@
 			return array();
 		}
 		
-		public function import($scope)
+		public function import(array $scope)
 		{
 			return $this->actualImport($scope, true);
 		}
 		
-		public function unfilteredImport($scope)
+		public function unfilteredImport(array $scope)
 		{
 			return $this->actualImport($scope, false);
 		}
@@ -156,7 +162,7 @@
 			}
 			
 			$this->imported = true;
-			
+				
 			if ($this->value->getErrors())
 				return false;
 			

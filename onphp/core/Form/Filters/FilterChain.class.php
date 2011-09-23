@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: FilterChain.class.php 4454 2007-11-03 19:46:22Z voxus $ */
 
 	/**
 	 * Chained Filtrator.

@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: CacheSegmentHandler.class.php 4725 2007-12-23 01:16:03Z voxus $ */
 
 	/**
 	 * @ingroup DAOs

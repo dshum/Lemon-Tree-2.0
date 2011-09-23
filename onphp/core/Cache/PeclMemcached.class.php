@@ -8,14 +8,14 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: PeclMemcached.class.php 5287 2008-07-14 22:42:48Z voxus $ */
 
 	/**
 	 * Connector for PECL's Memcache extension by Antony Dovgal.
-	 *
+	 * 
 	 * @see http://tony2001.phpclub.net/
 	 * @see http://pecl.php.net/package/memcache
-	 *
+	 * 
 	 * @ingroup Cache
 	**/
 	final class PeclMemcached extends CachePeer
@@ -101,10 +101,7 @@
 		
 		public function getList($indexes)
 		{
-			return
-				($return = $this->get($indexes))
-					? $return
-					: array();
+			return $this->get($indexes);
 		}
 		
 		public function get($index)

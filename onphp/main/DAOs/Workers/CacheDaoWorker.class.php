@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: CacheDaoWorker.class.php 5380 2008-08-04 11:03:53Z voxus $ */
 
 	/**
 	 * Transparent and scalable DAO worker, Jedi's best choice.
@@ -21,7 +21,7 @@
 	**/
 	final class CacheDaoWorker extends TransparentDaoWorker
 	{
-		const MAX_RANDOM_ID = 134217728;
+		const MAX_RANDOM_ID = 1048576;
 		
 		/// cachers
 		//@{
@@ -31,12 +31,14 @@
 			$expires = Cache::EXPIRES_FOREVER
 		)
 		{
+			$key =
+				$this->className
+				.self::SUFFIX_QUERY
+				.$query->getId()
+				.$this->getLayerId();
+			
 			Cache::me()->mark($this->className)->
-				add(
-					$this->makeQueryKey($query, self::SUFFIX_QUERY),
-					$object,
-					$expires
-				);
+				add($key, $object, $expires);
 			
 			return $object;
 		}
@@ -51,12 +53,16 @@
 				Assert::isTrue(current($array) instanceof Identifiable);
 			}
 			
-			Cache::me()->mark($this->className)->
-				add(
-					$this->makeQueryKey($query, self::SUFFIX_LIST),
-					$array,
-					Cache::EXPIRES_FOREVER
-				);
+			$cache = Cache::me();
+			
+			$key =
+				$this->className
+				.self::SUFFIX_LIST
+				.$query->getId()
+				.$this->getLayerId();
+			
+			$cache->mark($this->className)->
+				add($key, $array, Cache::EXPIRES_FOREVER);
 			
 			return $array;
 		}
@@ -77,11 +83,13 @@
 		}
 		//@}
 		
-		/// internal helpers
+		/// internal helper
 		//@{
 		protected function gentlyGetByKey($key)
 		{
-			return Cache::me()->mark($this->className)->get($key);
+			return Cache::me()->mark($this->className)->get(
+				$key.$this->getLayerId()
+			);
 		}
 		
 		private function getLayerId()
@@ -102,11 +110,6 @@
 			}
 			
 			return '@'.$result;
-		}
-		
-		protected function makeQueryKey(SelectQuery $query, $suffix)
-		{
-			return parent::makeQueryKey($query, $suffix).$this->getLayerId();
 		}
 		//@}
 	}

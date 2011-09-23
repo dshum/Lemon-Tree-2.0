@@ -1,6 +1,6 @@
 <?php
 /***************************************************************************
- *   Copyright (C) 2005-2008 by Anton E. Lebedevich                        *
+ *   Copyright (C) 2005-2007 by Anton E. Lebedevich                        *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Lesser General Public License as        *
@@ -8,7 +8,7 @@
  *   License, or (at your option) any later version.                       *
  *                                                                         *
  ***************************************************************************/
-/* $Id$ */
+/* $Id: DBField.class.php 4461 2007-11-04 20:41:33Z voxus $ */
 
 	/**
 	 * Reference for actual DB-table column.
@@ -20,7 +20,7 @@
 	{
 		private $field	= null;
 		private $table	= null;
-		
+
 		public function __construct($field, $table = null)
 		{
 			$this->field = $field;
@@ -52,7 +52,7 @@
 					? $dialect->toCasted($field, $this->cast)
 					: $field;
 		}
-		
+
 		public function getField()
 		{
 			return $this->field;
@@ -76,7 +76,7 @@
 				throw new WrongStateException(
 					'you should not override setted table'
 				);
-			
+
 			if (!$table instanceof DialectString)
 				$this->table = new FromTable($table);
 			else

@@ -1,3 +1,0 @@
-<?=$propertyDescription?>:
-<input type="hidden" name="<?=$propertyName?>" value="<?=$value?>">
-<?php if($element) {?><a href="<?=PATH_ADMIN_BROWSE.'?module=ElementEdit&elementId='.$element->getPolymorphicId()?>" title="<?=$element->getItem()->getItemDescription()?>"><?=$element->getAlterName()?></a><?php } elseif($value) {?><span class="grey"><?=$value?></span><?php } else {?>Не определено<?php }?><br><br>
