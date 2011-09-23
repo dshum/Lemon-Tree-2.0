@@ -28,14 +28,8 @@
  *   firstDayOfWeek: 1, // Monday
  *   weekend: "0,6", // Sunday and Saturday
  *   dateFormat: '%Y-%m-%d',
- *   showHandler: null, // Will use default show handler
  *   selectHandler: null, // Will use default select handler
  *   closeHandler: null // Will use default close handler
- *
- * Edited by Denis Shumeev:
- *   added russian names;
- *   added format with month in genitive case
- *   added showHandler.
  */
 ;(function($) {
 	var Calendar = function() {
@@ -211,14 +205,6 @@
 		return event.preventDefault();
 	};
 
-	Calendar.defaultShowHandler = function(calendar) {
-		if (!calendar.dateField) {
-			return false;
-		}
-
-		return true;
-	}
-
 	Calendar.defaultSelectHandler = function(calendar) {
 		if (!calendar.dateField) {
 			return false;
@@ -285,7 +271,7 @@
 			date.setDate(1);
 			var day1 = (date.getDay() - this.firstDayOfWeek) % 7;
 			if (day1 < 0) day1 += 7;
-			date.setDate(day1 ? -day1 : 0);
+			date.setDate(-day1);
 			date.setDate(date.getDate() + 1);
 
 			// Fill in the days of the month
@@ -423,15 +409,6 @@
 		//------------------------------------------------------------------------------
 
 		/**
-		 * Calls the Show Handler (if defined)
-		 */
-		callShowHandler: function() {
-			if (this.showHandler) {
-				this.showHandler(this, this.date.print(this.dateFormat));
-			}
-		},
-
-		/**
 		 * Calls the Select Handler (if defined)
 		 */
 		callSelectHandler: function() {
@@ -457,7 +434,6 @@
 		 * Shows the Calendar
 		 */
 		show: function() {
-			this.callShowHandler();
 			this.container.show();
 			if (this.isPopup) {
 				window._popupCalendar = this;
@@ -566,6 +542,14 @@
 				case "%B":
 					for (j = 0; j < 12; ++j) {
 						if (Calendar.MONTH_NAMES[j].substr(0, a[i].length).toLowerCase() == a[i].toLowerCase()) {
+							m = j;
+							break;
+						}
+					}
+					break;
+				case "%G":
+					for (j = 0; j < 12; ++j) {
+						if (Calendar.MONTH_NAMES_IN_GENITIVE_CASE[j].substr(0, a[i].length).toLowerCase() == a[i].toLowerCase()) {
 							m = j;
 							break;
 						}
@@ -762,7 +746,6 @@
 			weekend: "0,6", // Sunday and Saturday
 			dateFormat: '%Y-%m-%d',
 			dateField: null,
-			showHandler: null,
 			selectHandler: null,
 			closeHandler: null
 		};
@@ -780,7 +763,6 @@
 			calendar.dateFormat = settings.dateFormat;
 			calendar.dateField = (settings.dateField || self);
 
-			calendar.showHandler = (settings.showHandler || Calendar.defaultShowHandler);
 			calendar.selectHandler = (settings.selectHandler || Calendar.defaultSelectHandler);
 
 			// Inline Calendar

@@ -70,13 +70,11 @@
 					# User log
 					UserLog::me()->log(
 						UserActionType::ACTION_TYPE_ORDER_ELEMENT_LIST_ID,
-						$parent->getPolymorphicId()
+						null
 					);
-
-					Site::updateLastModified();
 				}
 
-				$model->set('form', $form);
+				$model->set("form", $form);
 			}
 
 			return

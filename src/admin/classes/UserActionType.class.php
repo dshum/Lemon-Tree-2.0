@@ -14,10 +14,6 @@
 		const ACTION_TYPE_ORDER_ELEMENT_LIST_ID = 11;
 		const ACTION_TYPE_PLUGIN_ID = 12;
 		const ACTION_TYPE_LOGIN_ID = 13;
-		const ACTION_TYPE_EDIT_ELEMENT_ID = 14;
-		const ACTION_TYPE_VIEW_BROWSE_ID = 15;
-		const ACTION_TYPE_SEARCH_ID = 16;
-		const ACTION_TYPE_PLUGIN_ACTION_ID = 17;
 
 		private static $actionTypeNameList = array(
 			self::ACTION_TYPE_ADD_ELEMENT_ID => 'Добавление элемента',
@@ -33,15 +29,6 @@
 			self::ACTION_TYPE_ORDER_ELEMENT_LIST_ID => 'Сортировка списка элементов',
 			self::ACTION_TYPE_PLUGIN_ID => 'Плагин',
 			self::ACTION_TYPE_LOGIN_ID => 'Авторизация',
-			self::ACTION_TYPE_EDIT_ELEMENT_ID => 'Просмотр элемента',
-			self::ACTION_TYPE_VIEW_BROWSE_ID => 'Просмотр списка элементов',
-			self::ACTION_TYPE_SEARCH_ID => 'Поиск элементов',
-			self::ACTION_TYPE_PLUGIN_ACTION_ID => 'Плагин-экшн',
-		);
-
-		private static $excludeActionTypeList = array(
-			self::ACTION_TYPE_EDIT_ELEMENT_ID => 'Просмотр элемента',
-			self::ACTION_TYPE_VIEW_BROWSE_ID => 'Просмотр списка элементов',
 		);
 
 		public static function create()
@@ -65,11 +52,6 @@
 		public static function actionTypeExists($id)
 		{
 			return isset(self::$actionTypeNameList[$id]);
-		}
-
-		public static function isExcludeActionType($id)
-		{
-			return isset(self::$excludeActionTypeList[$id]);
 		}
 	}
 ?>

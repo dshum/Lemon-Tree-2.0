@@ -109,22 +109,21 @@
 					$page[$element->getPolymorphicId()][$item->getId()] = $currentPage;
 					Session::assign('page', $page);
 				}
+			}
 
-				if(
-					$expandList == 'expand'
-					|| $sortFieldName
-					|| $currentPage
-					|| $isFilter
-				) {
-					$elementListModelAndView = $this->getElementListModelAndView(
-						$request,
-						$element,
-						$item
-					);
-					$model->set('itemId', $item->getId());
-					$model->set('elementListModelAndView', $elementListModelAndView);
-				}
-
+			if(
+				$expandList == 'expand'
+				|| $sortFieldName
+				|| $currentPage
+				|| $isFilter
+			) {
+				$elementListModelAndView = $this->getElementListModelAndView(
+					$request,
+					$element,
+					$item
+				);
+				$model->set('itemId', $item->getId());
+				$model->set('elementListModelAndView', $elementListModelAndView);
 			}
 
 			return
@@ -143,53 +142,27 @@
 			add(
 				Primitive::set('edited')
 			)->
-			import($request->getPost());
+			import($_POST);
 
 			$edited = $form->getValue('edited');
 
-			$elementMap = array();
-			$originalMap = array();
 			$changed = array();
 			$saved = array();
 
 			foreach($edited as $elementId => $propertyList) {
 				$element = Element::getByPolymorphicId($elementId);
 				if($element instanceof Element) {
-					$original = clone $element;
-					$item = $element->getItem();
 
-					# Before update action
-					try {
-						$actionName = PluginManager::me()->getBeforeUpdateAction(
-							$item->getItemName()
-						);
-						if($actionName && ClassUtils::isClassName($actionName)) {
-							$action = new $actionName($original);
-						}
-					} catch (BaseException $e) {
-						ErrorMessageUtils::sendMessage($e);
-					}
-
-					$elementMap[$elementId] = $element;
-					$originalMap[$elementId] = $original;
-				}
-			}
-
-			foreach($edited as $elementId => $propertyList) {
-				if(isset($elementMap[$elementId])) {
-
-					$element = $elementMap[$elementId];
-					$original = $originalMap[$elementId];
 					$item = $element->getItem();
 					$form = Form::create();
 
 					foreach($propertyList as $propertyName => $flag) {
 						if(!$flag) continue;
 						$property = Property::dao()->getPropertyByName($item, $propertyName);
-						$propertyClass = $property->getClass($element)->setParameters();
+						$propertyClass = $property->getClass($element);
 						$form = $propertyClass->add2multiform($form);
 					}
-					$form->import($request->getPost());
+					$form->import($_POST);
 
 					foreach($propertyList as $propertyName => $flag) {
 						if(!$flag) continue;
@@ -199,39 +172,14 @@
 							$value = $form->getValue($primitiveName);
 							$primitive = $form->get($primitiveName);
 							$element->set($propertyName, $value);
-							$propertyClass = $property->getClass($element)->setParameters();
+							$propertyClass = $property->getClass($element);
 							$changed[$elementId][$propertyName] = $propertyClass->getEditElementListView();
 						}
 					}
 
 					if(isset($changed[$elementId])) {
-						try {
-							$element = $element->dao()->save($element);
-							$saved[] = $element->getPolymorphicId();
-						} catch (BaseException $e) {
-							ErrorMessageUtils::sendMessage($e);
-						}
-					}
-				}
-			}
-
-			foreach($edited as $elementId => $propertyList) {
-				if(isset($elementMap[$elementId])) {
-
-					$element = $elementMap[$elementId];
-					$original = $originalMap[$elementId];
-					$item = $element->getItem();
-
-					# After update action
-					try {
-						$actionName = PluginManager::me()->getAfterUpdateAction(
-							$item->getItemName()
-						);
-						if($actionName && ClassUtils::isClassName($actionName)) {
-							$action = new $actionName($element, $original);
-						}
-					} catch (BaseException $e) {
-						ErrorMessageUtils::sendMessage($e);
+						$element = $element->dao()->save($element);
+						$saved[] = $element->getPolymorphicId();
 					}
 				}
 			}
@@ -241,8 +189,6 @@
 				UserActionType::ACTION_TYPE_SAVE_ELEMENT_LIST_ID,
 				implode(', ', $saved)
 			);
-
-			Site::updateLastModified();
 
 			$model->set('changed', $changed);
 
@@ -262,7 +208,7 @@
 			add(
 				Primitive::set('check')
 			)->
-			import($request->getPost());
+			import($_POST);
 
 			$check = $form->getValue('check');
 
@@ -276,19 +222,6 @@
 
 			foreach($dropElementList as $element) {
 				$item = $element->getItem();
-
-				# Before delete action
-				try {
-					$actionName = PluginManager::me()->getBeforeDeleteAction(
-						$item->getItemName()
-					);
-					if($actionName && ClassUtils::isClassName($actionName)) {
-						$action = new $actionName($element);
-					}
-				} catch (BaseException $e) {
-					ErrorMessageUtils::sendMessage($e);
-				}
-
 				if($element->getStatus() == 'trash') {
 					$result =  $element->dao()->dropElement($element);
 					$actionTypeId = UserActionType::ACTION_TYPE_DROP_ELEMENT_LIST_ID;
@@ -296,30 +229,13 @@
 					$result =  $element->dao()->moveElementToTrash($element);
 					$actionTypeId = UserActionType::ACTION_TYPE_DROP_ELEMENT_LIST_TO_TRASH_ID;
 				}
-
-				if($result) {
-
-					# After delete action
-					try {
-						$actionName = PluginManager::me()->getAfterDeleteAction(
-							$item->getItemName()
-						);
-						if($actionName && ClassUtils::isClassName($actionName)) {
-							$action = new $actionName($element);
-						}
-					} catch (BaseException $e) {
-						ErrorMessageUtils::sendMessage($e);
-					}
-
+				if(!$result) {
+					$model->set('restrict', 'error');
+				} else {
 					if($item->getIsFolder()) {
 						$refreshTree = true;
 					}
 					$dropped[] = $element->getPolymorphicId();
-
-				} else {
-
-					$model->set('restrict', 'error');
-
 				}
 			}
 
@@ -328,8 +244,6 @@
 				$actionTypeId,
 				implode(', ', $dropped)
 			);
-
-			Site::updateLastModified();
 
 			$model->set('dropped', $dropped);
 
@@ -355,7 +269,7 @@
 			add(
 				Primitive::set('check')
 			)->
-			import($request->getPost());
+			import($_POST);
 
 			$check = $form->getValue('check');
 
@@ -369,33 +283,7 @@
 			foreach($restoreElementList as $element) {
 				$item = $element->getItem();
 				if($element->getStatus() == 'trash') {
-
-					# Before restore action
-					try {
-						$actionName = PluginManager::me()->getBeforeInsertAction(
-							$item->getItemName()
-						);
-						if($actionName && ClassUtils::isClassName($actionName)) {
-							$action = new $actionName($element);
-						}
-					} catch (BaseException $e) {
-						ErrorMessageUtils::sendMessage($e);
-					}
-
 					$result = $element->dao()->restoreElementFromTrash($element);
-
-					# After restore action
-					try {
-						$actionName = PluginManager::me()->getAfterInsertAction(
-							$item->getItemName()
-						);
-						if($actionName && ClassUtils::isClassName($actionName)) {
-							$action = new $actionName($element);
-						}
-					} catch (BaseException $e) {
-						ErrorMessageUtils::sendMessage($e);
-					}
-
 					if($item->getIsFolder()) {
 						$refreshTree = true;
 					}
@@ -408,8 +296,6 @@
 				UserActionType::ACTION_TYPE_RESTORE_ELEMENT_LIST_ID,
 				implode(', ', $restored)
 			);
-
-			Site::updateLastModified();
 
 			$model->set('restored', $restored);
 
@@ -431,6 +317,9 @@
 
 			$loggedUser = LoggedUser::getUser();
 
+			$requestUri = $request->getServerVar('REQUEST_URI');
+			Session::assign('browseLastUrl', $requestUri);
+
 			$form = $this->makeElementListForm();
 
 			if($form->getErrors()) {
@@ -448,58 +337,7 @@
 			$currentItemId = $currentElement->getItemId();
 			$parentList = $currentElement->getParentList();
 
-			# Plugin
-
-			$pluginModelAndView = null;
-
-			$pluginName = PluginManager::me()->getBrowsePlugin(
-				$currentElement->getPolymorphicId()
-			);
-
-			if($pluginName) {
-
-				$pluginClass = new $pluginName($currentElement);
-				$pluginModelAndView = $pluginClass->handleRequest($request);
-
-				$pluginModel = $pluginModelAndView->getModel();
-				$pluginView = $pluginModelAndView->getView();
-
-				if(is_string($pluginView) && $pluginView == 'redirectBack') {
-					$href =
-						isset($_SERVER['HTTP_REFERER'])
-						? $_SERVER['HTTP_REFERER']
-						: PATH_ADMIN_BROWSE;
-					$pluginView = new RedirectView($href);
-				}
-
-				if(!$pluginView instanceof View) {
-					$pluginViewName = $pluginView;
-					$viewResolver =
-						MultiPrefixPhpViewResolver::create()->
-						setViewClassName('SimplePhpView')->
-						addPrefix(PATH_USER_PLUGIN_TEMPLATES)->
-						addPrefix(PATH_USER_TEMPLATES);
-					$pluginView = $viewResolver->resolveViewName($pluginViewName);
-					$pluginModelAndView->setView($pluginView);
-				}
-
-				$pluginModel->
-				set('element', $currentElement)->
-				set('selfUrl', PATH_ADMIN_BROWSE.'?module='.get_class($this))->
-				set('baseUrl', PATH_ADMIN_BROWSE);
-
-				if(
-					$pluginView instanceof RedirectView
-					|| $request->hasGetVar('print')
-				) {
-					return $pluginModelAndView;
-				}
-			}
-
 			# Set id for active element and opened folder in tree
-
-			$requestUri = $request->getServerVar('REQUEST_URI');
-			Session::assign('browseLastUrl', $requestUri);
 
 			if(
 				($currentItem && $currentItem->getIsFolder())
@@ -577,6 +415,49 @@
 				}
 			}
 
+			# Plugin
+
+			$pluginModelAndView = null;
+
+			$pluginName = PluginManager::me()->getElementPlugin(
+				$currentElement->getPolymorphicId()
+			);
+
+			if($pluginName) {
+
+				$pluginClass = new $pluginName($currentElement);
+				$pluginModelAndView = $pluginClass->handleRequest($request);
+
+				$pluginModel = $pluginModelAndView->getModel();
+				$pluginView = $pluginModelAndView->getView();
+
+				if(is_string($pluginView) && $pluginView == 'redirectBack') {
+					$href =
+						isset($_SERVER['HTTP_REFERER'])
+						? $_SERVER['HTTP_REFERER']
+						: PATH_ADMIN_BROWSE;
+					$pluginView = new RedirectView($href);
+				}
+
+				if(!$pluginView instanceof View) {
+					$pluginViewName = $pluginView;
+					$viewResolver =
+						MultiPrefixPhpViewResolver::create()->
+						setViewClassName('SimplePhpView')->
+						addPrefix(PATH_USER_PLUGIN_TEMPLATES);
+					$pluginView = $viewResolver->resolveViewName($pluginViewName);
+					$pluginModelAndView->setView($pluginView);
+				}
+
+				if($pluginView instanceof RedirectView) {
+					return $pluginModelAndView;
+				} else {
+					$pluginModel->
+					set('selfUrl', PATH_ADMIN_BROWSE.'?module='.get_class($this))->
+					set('baseUrl', PATH_ADMIN_BROWSE);
+				}
+			}
+
 			# Element list
 
 			$expand = $loggedUser->getParameter('expand');
@@ -601,11 +482,6 @@
 				}
 			}
 
-			UserLog::me()->log(
-				UserActionType::ACTION_TYPE_VIEW_BROWSE_ID,
-				$currentElement->getPolymorphicId()
-			);
-
 			$model->set('currentItem', $currentItem);
 			$model->set('currentElement', $currentElement);
 			$model->set('parentList', $parentList);
@@ -628,10 +504,35 @@
 			Item $item
 		)
 		{
+			$sort = Session::get('sort');
+			$page = Session::get('page');
+
+			$sortFieldName =
+				isset($sort[$element->getPolymorphicId()][$item->getId()]['fieldName'])
+				? $sort[$element->getPolymorphicId()][$item->getId()]['fieldName']
+				: $item->getOrderBy()->getFieldName();
+
+			$sortIsAsc =
+				isset($sort[$element->getPolymorphicId()][$item->getId()]['isAsc'])
+				? $sort[$element->getPolymorphicId()][$item->getId()]['isAsc']
+				: $item->getOrderBy()->isAsc();
+
+			$orderBy = OrderBy::create($sortFieldName);
+			if(!$sortIsAsc) {
+				$orderBy->desc();
+			}
+
+			$currentPage =
+				isset($page[$element->getPolymorphicId()][$item->getId()])
+				? $page[$element->getPolymorphicId()][$item->getId()]
+				: 1;
+
 			$elementListModelAndView = $this->ElementListHandleRequest(
 				$request,
 				$element,
-				$item
+				$item,
+				$orderBy,
+				$currentPage
 			);
 
 			$elementListModel = $elementListModelAndView->getModel();
@@ -651,7 +552,9 @@
 		private function ElementListHandleRequest(
 			HttpRequest $request,
 			Element $currentElement,
-			Item $currentItem
+			Item $currentItem,
+			OrderBy $orderBy,
+			$currentPage = 1
 		)
 		{
 			$model = Model::create();
@@ -809,9 +712,11 @@
 				}
 			}
 
+			$criteria->addOrder($orderBy);
+
 			# Filter
 
-			$filterName = PluginManager::me()->getFilter(
+			$filterName = PluginManager::me()->getItemFilter(
 				$currentItem->getItemName()
 			);
 
@@ -848,35 +753,7 @@
 				}
 			}
 
-			# Sort
-
-			$sort = Session::get('sort');
-
-			$sortFieldName =
-				isset($sort[$currentElement->getPolymorphicId()][$currentItem->getId()]['fieldName'])
-				? $sort[$currentElement->getPolymorphicId()][$currentItem->getId()]['fieldName']
-				: $currentItem->getOrderBy()->getFieldName();
-
-			$sortIsAsc =
-				isset($sort[$currentElement->getPolymorphicId()][$currentItem->getId()]['isAsc'])
-				? $sort[$currentElement->getPolymorphicId()][$currentItem->getId()]['isAsc']
-				: $currentItem->getOrderBy()->isAsc();
-
-			$orderBy = OrderBy::create($sortFieldName);
-			if(!$sortIsAsc) {
-				$orderBy->desc();
-			}
-
-			$criteria->addOrder($orderBy);
-
 			# Pager
-
-			$page = Session::get('page');
-
-			$currentPage =
-				isset($page[$currentElement->getPolymorphicId()][$currentItem->getId()])
-				? $page[$currentElement->getPolymorphicId()][$currentItem->getId()]
-				: 1;
 
 			$pager = CriteriaPager::create($criteria);
 

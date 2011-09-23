@@ -59,17 +59,17 @@
 		$error[] = 'Невозможно удалить этот элемент, пока существуют связанные с ним элементы.';
 	}
 
-	if(isset($denied) && $denied == 'drop') {
-		$error[] = 'Нет прав для удаления этого элемента.';
-	}
-
-	if(isset($denied) && $denied == 'save') {
-		$error[] = 'Нет прав для редактирования этого элемента.';
-	}
-
 	$json['error'] = $error;
 
-	$json['propertyContent'] = isset($propertyContent) ? $propertyContent : array();
+	$json['propertyContent'] =
+		isset($propertyContent)
+		? str_replace(
+			array('<', '>'),
+			array('[[[', ']]]'),
+			$propertyContent
+		)
+		: array();
+
 	$json['tree'] = isset($tree) ? $tree : array();
 	$json['parentId'] = isset($parentId) ? $parentId : null;
 	$json['returnElementId'] = isset($returnElementId) ? $returnElementId : null;

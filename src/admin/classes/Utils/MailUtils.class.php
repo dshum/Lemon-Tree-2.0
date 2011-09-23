@@ -124,15 +124,6 @@
 				$from = mb_convert_encoding($this->header['From'], $encoding);
 				$replyTo = mb_convert_encoding($this->header['Reply-to'], $encoding);
 
-				$body = $this->body;
-
-				if(
-					!mb_check_encoding($body, $siteEncoding)
-					&& mb_check_encoding($body, 'Windows-1251')
-				) {
-					$body = mb_convert_encoding($body, $siteEncoding, 'Windows-1251');
-				}
-
 				$subject =
 					"=?".$encoding."?B?"
 					.base64_encode(
@@ -146,7 +137,7 @@
 				$body = iconv(
 					$siteEncoding,
 					$encoding.'//TRANSLIT',
-					$body
+					$this->body
 				);
 			}
 

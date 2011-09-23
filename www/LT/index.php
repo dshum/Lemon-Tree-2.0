@@ -1,8 +1,6 @@
 <?php
 	require $_SERVER['DOCUMENT_ROOT'].'/../src/config.inc.php';
 
-	ob_start('fatalErrorHandler');
-
 	define('PATH_WEB_CSS', PATH_ADMIN.'css/');
 	define('PATH_WEB_IMG', PATH_ADMIN.'img/');
 	define('PATH_WEB_JS', PATH_ADMIN.'js/');
@@ -78,7 +76,8 @@
 		if(!$view instanceof RedirectView) {
 			$model->
 			set('selfUrl', PATH_ADMIN.'index.php?module='.$controllerName)->
-			set('baseUrl', PATH_ADMIN.'index.php');
+			set('baseUrl', PATH_ADMIN.'index.php')->
+			set('controllerName', $controllerName);
 		}
 
 		$view->render($model);
@@ -95,7 +94,7 @@
 			ErrorMessageUtils::sendMessage($e);
 			DBPool::me()->shutdown();
 			header('HTTP/1.1 500 Internal Server Error');
-			$model = Model::create()->set('e', $e);
+			$model = Model::create();
 			$viewResolver =
 				MultiPrefixPhpViewResolver::create()->
 				setViewClassName('SimplePhpView')->

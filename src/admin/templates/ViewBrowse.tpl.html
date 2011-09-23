@@ -345,8 +345,6 @@ $(function() {
 		var fieldName = $(this).attr('field');
 		var direction = $(this).attr('direction');
 
-		LT.Common.showIndicator();
-
 		$.post(
 			'<?=$selfUrl?>&action=show',
 			{
@@ -362,7 +360,6 @@ $(function() {
 					elementListContent = elementListContent.replace(/\[\[\[/g, '<').replace(/\]\]\]/g, '>');
 					$('#item_'+itemId).html(elementListContent);
 				}
-				LT.Common.unlock();
 			},
 			'json'
 		);
@@ -371,8 +368,6 @@ $(function() {
 	$('i[pager=true]').livequery('click', function() {
 		var itemId = $(this).attr('itemid');
 		var page = $(this).attr('page');
-
-		LT.Common.showIndicator();
 
 		$.post(
 			'<?=$selfUrl?>&action=show',
@@ -388,7 +383,6 @@ $(function() {
 					elementListContent = elementListContent.replace(/\[\[\[/g, '<').replace(/\]\]\]/g, '>');
 					$('#item_'+itemId).html(elementListContent);
 				}
-				LT.Common.unlock();
 			},
 			'json'
 		);

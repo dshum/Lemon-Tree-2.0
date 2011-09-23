@@ -55,8 +55,7 @@
 						new DBField('id', $criteria->getDao()->getTable())
 					),
 					'count'
-				)->
-				limit(1);
+				);
 
 			$custom = $criteria->getDao()->getCustom($query);
 

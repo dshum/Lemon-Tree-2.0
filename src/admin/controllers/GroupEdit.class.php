@@ -104,7 +104,6 @@
 						setOwnerPermission($form->getValue('ownerPermission'))->
 						setGroupPermission($form->getValue('groupPermission'))->
 						setWorldPermission($form->getValue('worldPermission'))->
-						setIsSearch($form->getValue('isSearch'))->
 						setIsDeveloper($form->getValue('isDeveloper'))->
 						setIsAdmin($form->getValue('isAdmin'));
 
@@ -149,7 +148,6 @@
 					setOwnerPermission($form->getValue('ownerPermission'))->
 					setGroupPermission($form->getValue('groupPermission'))->
 					setWorldPermission($form->getValue('worldPermission'))->
-					setIsSearch($form->getValue('isSearch'))->
 					setIsDeveloper($form->getValue('isDeveloper'))->
 					setIsAdmin($form->getValue('isAdmin'));
 
@@ -294,9 +292,6 @@
 				required()
 			)->
 			add(
-				Primitive::boolean('isSearch')
-			)->
-			add(
 				Primitive::boolean('isDeveloper')
 			)->
 			add(
@@ -338,9 +333,6 @@
 				Primitive::choice('worldPermission')->
 				setList(Permission::getPermissionNameList())->
 				required()
-			)->
-			add(
-				Primitive::boolean('isSearch')
 			)->
 			add(
 				Primitive::boolean('isDeveloper')

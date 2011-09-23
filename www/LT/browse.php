@@ -1,10 +1,6 @@
 <?php
 	require $_SERVER['DOCUMENT_ROOT'].'/../src/config.inc.php';
 
-	ob_start('fatalErrorHandler');
-
-	define('PATH_IMG', DOCUMENT_ROOT.FOLDER_LT.'img/');
-
 	define('PATH_WEB_CSS', PATH_ADMIN.'css/');
 	define('PATH_WEB_IMG', PATH_ADMIN.'img/');
 	define('PATH_WEB_JS', PATH_ADMIN.'js/');
@@ -91,6 +87,7 @@
 			$model->
 			set('selfUrl', PATH_ADMIN_BROWSE.'?module='.$controllerName)->
 			set('baseUrl', PATH_ADMIN_BROWSE)->
+			set('controllerName', $controllerName)->
 			set('loggedUser', $loggedUser);
 		}
 

@@ -1,6 +1,0 @@
-<span switch="true" name="<?=$propertyName?>" class="dashed hand"><?=$propertyDescription?></span>:<br>
-<div id="<?=$propertyName?>_block" style="display: <?=$value !== null ? 'block' : 'none'?>">
-<input type="radio" id="<?=$propertyName?>_true" name="<?=$propertyName?>" value="true"<?=$value === true ? ' checked' : ''?><?=$value === null ? ' disabled="true"' : ''?>><label for="<?=$propertyName?>_true">Да</label>
-<input type="radio" id="<?=$propertyName?>_false" name="<?=$propertyName?>" value="false"<?=$value === false ? ' checked' : ''?><?=$value === null ? ' disabled="true"' : ''?>><label for="<?=$propertyName?>_false">Нет</label>
-<input type="radio" id="<?=$propertyName?>_null" name="<?=$propertyName?>" value="null"<?=$value === null ? ' checked' : ''?><?=$value === null ? ' disabled="true"' : ''?>><label for="<?=$propertyName?>_null">Не важно</label>
-</div>

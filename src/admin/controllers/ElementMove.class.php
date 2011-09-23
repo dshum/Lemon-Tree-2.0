@@ -53,42 +53,13 @@
 				$moveElementList = Element::getListByPolymorphicIds($check);
 
 				foreach($moveElementList as $element) {
-
 					$item = $element->getItem();
-
-					# Before move action
-					try {
-						$actionName = PluginManager::me()->getBeforeUpdateAction(
-							$item->getItemName()
-						);
-						if($actionName && ClassUtils::isClassName($actionName)) {
-							$action = new $actionName($original);
-						}
-					} catch (BaseException $e) {
-						ErrorMessageUtils::sendMessage($e);
+					if($item->getIsFolder()) {
+						$refreshTree = true;
 					}
-
 					try {
-
-						$element = $element->dao()->moveElement($element, $target);
-
-						# After move action
-						try {
-							$actionName = PluginManager::me()->getAfterUpdateAction(
-								$item->getItemName()
-							);
-							if($actionName && ClassUtils::isClassName($actionName)) {
-								$action = new $actionName($element, $original);
-							}
-						} catch (BaseException $e) {
-							ErrorMessageUtils::sendMessage($e);
-						}
-
-						if($item->getIsFolder()) {
-							$refreshTree = true;
-						}
+						$element->dao()->moveElement($element, $target);
 						$moved[] = $element->getPolymorphicId();
-
 					} catch (BaseException $e) {
 						ErrorMessageUtils::sendMessage($e);
 					}

@@ -19,6 +19,7 @@
 			parent::setParameters();
 
 			$this->addParameter('node', 'element', 'Вершина дерева', Root::me());
+			$this->addParameter('mount', 'integer', 'Глубина дерева', 1);
 			$this->addParameter('showItems', 'itemList', 'Показывать классы элементов', array());
 			$this->addParameter('showList', 'boolean', 'Выводить список элементов', true);
 
@@ -55,6 +56,7 @@
 		{
 			$readonly = $this->getParameterValue('readonly');
 			$node = $this->getParameterValue('node');
+			$mount = $this->getParameterValue('mount');
 			$showItemList = $this->getParameterValue('showItems');
 
 			if(!$readonly && $node instanceof Element) {
@@ -95,11 +97,6 @@
 		}
 
 		public function getEditElementListView()
-		{
-			return null;
-		}
-
-		public function getElementSearchView(Form $form)
 		{
 			return null;
 		}

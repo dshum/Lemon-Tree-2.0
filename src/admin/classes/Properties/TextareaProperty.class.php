@@ -29,7 +29,7 @@
 				addImportFilter(Filter::trim());
 
 			if($this->getParameterValue('typograph')) {
-				$primitive->addImportFilter(RussianTypograph::me());
+				$primitive->addImportFilter(MyRussianTypograph::me());
 			}
 
 			return $form->add($primitive);
@@ -48,7 +48,7 @@
 				addImportFilter(Filter::trim());
 
 			if($this->getParameterValue('typograph')) {
-				$primitive->addImportFilter(RussianTypograph::me());
+				$primitive->addImportFilter(MyRussianTypograph::me());
 			}
 
 			return $form->add($primitive);

@@ -88,7 +88,6 @@
 		{
 			if(
 				$this->getParameterValue('hidden') == false
-				&& $this->getParameterValue('readonly') == false
 				&& $form->primitiveExists($this->property->getPropertyName())
 			) {
 				$setter = $this->property->setter();
@@ -158,6 +157,17 @@
 			return $criteria;
 		}
 
+		public function printOnElementSearch(Form $form)
+		{
+			$value =
+				$form->primitiveExists($this->property->getPropertyName())
+				? $form->getValue($this->property->getPropertyName())
+				: null;
+			$str = $this->property->getPropertyDescription().': ';
+			$str .= '<input type="text" class="prop" name="'.$this->property->getPropertyName().'" value="'.$value.'" style="width: 50%;">';
+			return $str;
+		}
+
 		public function getElementListView()
 		{
 			$model =
@@ -184,41 +194,13 @@
 
 		public function getEditElementView()
 		{
-			$readonly = $this->getParameterValue('readonly');
-
 			$model =
 				Model::create()->
 				set('propertyName', $this->property->getPropertyName())->
 				set('propertyDescription', $this->property->getPropertyDescription())->
-				set('readonly', $readonly)->
 				set('value', $this->value);
 
 			$viewName = 'properties/'.get_class($this).'.editElement';
-
-			return $this->render($model, $viewName);
-		}
-
-		public function getElementSearchView(Form $form)
-		{
-			$propertyDescription = $this->property->getPropertyDescription();
-			if(mb_strlen($propertyDescription) > 50) {
-				$propertyDescription = mb_substr($propertyDescription, 0, 50).'...';
-			}
-
-			$propertyName = $this->property->getPropertyName();
-
-			$value =
-				$form->primitiveExists($propertyName)
-				? $form->getValue($propertyName)
-				: null;
-
-			$model =
-				Model::create()->
-				set('propertyName', $propertyName)->
-				set('propertyDescription', $propertyDescription)->
-				set('value', $value);
-
-			$viewName = 'properties/'.get_class($this).'.search';
 
 			return $this->render($model, $viewName);
 		}

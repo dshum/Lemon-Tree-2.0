@@ -69,34 +69,21 @@
 			return $criteria;
 		}
 
-		public function getElementSearchView(Form $form)
+		public function printOnElementSearch(Form $form)
 		{
-			$propertyDescription = $this->property->getPropertyDescription();
-			if(mb_strlen($propertyDescription) > 50) {
-				$propertyDescription = mb_substr($propertyDescription, 0, 50).'...';
-			}
-
-			$propertyName = $this->property->getPropertyName();
-
 			$from =
-				$form->primitiveExists($propertyName.'_from')
-				? $form->getValue($propertyName.'_from')
+				$form->primitiveExists($this->property->getPropertyName().'_from')
+				? $form->getValue($this->property->getPropertyName().'_from')
 				: null;
 			$to =
-				$form->primitiveExists($propertyName.'_to')
-				? $form->getValue($propertyName.'_to')
+				$form->primitiveExists($this->property->getPropertyName().'_to')
+				? $form->getValue($this->property->getPropertyName().'_to')
 				: null;
 
-			$model =
-				Model::create()->
-				set('propertyName', $propertyName)->
-				set('propertyDescription', $propertyDescription)->
-				set('from', $from)->
-				set('to', $to);
-
-			$viewName = 'properties/'.get_class($this).'.search';
-
-			return $this->render($model, $viewName);
+			$str = $this->property->getPropertyDescription().' ';
+			$str .= 'от <input type="text" class="prop-mini" name="'.$this->property->getPropertyName().'_from" value="'.$from.'" style="width: 75px;">';
+			$str .= ' до <input type="text" class="prop-mini" name="'.$this->property->getPropertyName().'_to" value="'.$to.'" style="width: 75px;">';
+			return $str;
 		}
 	}
 ?>

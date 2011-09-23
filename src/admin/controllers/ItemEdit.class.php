@@ -43,27 +43,16 @@
 
 				switch($form->getValue('classType')) {
 					case 'abstract': case 'virtual':
-						$newItem->
-						setMainPropertyDescription(null)->
-						setPathPrefix(null)->
-						setIsUpdatePath(false)->
-						setIsFolder(false)->
-						setOrderField(null)->
-						setOrderDirection(false)->
-						setPerPage(null)->
-						setIsSearch(false);
 						break;
 
 					case 'default': default:
 						$newItem->
 						setMainPropertyDescription($form->getValue('mainPropertyDescription'))->
 						setPathPrefix($form->getValue('pathPrefix'))->
-						setIsUpdatePath($form->getValue('isUpdatePath'))->
 						setIsFolder($form->getValue('isFolder'))->
 						setOrderField($form->getValue('orderField'))->
-						setOrderDirection($form->getValue('orderDirection'))->
-						setPerPage($form->getValue('perPage'))->
-						setIsSearch($form->getValue('isSearch'));
+						setOrderDirection($form->getValue('orderDirection') == 1)->
+						setPerPage($form->getValue('perPage'));
 						break;
 				}
 
@@ -373,9 +362,6 @@
 						addImportFilter(Filter::trim())
 					)->
 					add(
-						Primitive::boolean('isUpdatePath')
-					)->
-					add(
 						Primitive::boolean('isFolder')
 					)->
 					add(
@@ -390,9 +376,6 @@
 						Primitive::integer('perPage')->
 						optional()->
 						setMax(500)
-					)->
-					add(
-						Primitive::boolean('isSearch')
 					)->
 					add(
 						Primitive::identifier('parentProperty')->
@@ -507,9 +490,6 @@
 						addImportFilter(Filter::trim())
 					)->
 					add(
-						Primitive::boolean('isUpdatePath')
-					)->
-					add(
 						Primitive::boolean('isFolder')
 					)->
 					add(
@@ -524,9 +504,6 @@
 						Primitive::integer('perPage')->
 						optional()->
 						setMax(500)
-					)->
-					add(
-						Primitive::boolean('isSearch')
 					)->
 					add(
 						Primitive::identifier('parentProperty')->
@@ -683,12 +660,10 @@
 					$currentItem->
 					setMainPropertyDescription($form->getValue('mainPropertyDescription'))->
 					setPathPrefix($form->getValue('pathPrefix'))->
-					setIsUpdatePath($form->getValue('isUpdatePath'))->
 					setIsFolder($form->getValue('isFolder'))->
 					setOrderField($form->getValue('orderField'))->
 					setOrderDirection($form->getValue('orderDirection') == 1)->
-					setPerPage($form->getValue('perPage'))->
-					setIsSearch($form->getValue('isSearch'));
+					setPerPage($form->getValue('perPage'));
 					break;
 			}
 

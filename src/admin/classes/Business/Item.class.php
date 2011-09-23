@@ -154,7 +154,7 @@
 				$propertyList = Property::dao()->getPropertyList($item);
 				foreach($propertyList as $property) {
 					if(
-						$property->getPropertyClass() == Property::ONE_TO_ONE_PROPERTY
+						$property->getPropertyClass() == 'OneToOneProperty'
 						&& $property->getFetchClass() == $this->getItemName()
 					) {
 						$childrenItemList[] = $item;

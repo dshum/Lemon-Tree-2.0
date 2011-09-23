@@ -82,7 +82,6 @@ $(function() {
 
 <form name="UserActionListForm" action="<?=$baseUrl?>">
 <input type="hidden" name="module" value="UserActionList">
-<?php if($currentUser) {?><input type="hidden" name="userId" value="<?=$currentUser->getId()?>"><?php }?>
 <input type="hidden" id="dateFrom" name="dateFrom" value="<?=$dateFrom->toDate()?>">
 <input type="hidden" id="dateTo" name="dateTo" value="<?=$dateTo->toDate()?>">
 

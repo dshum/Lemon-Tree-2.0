@@ -58,25 +58,27 @@
 <?php foreach($propertyList as $property) { ?>
 <?php if($property->getPropertyClass() != 'OneToOneProperty') continue;?>
 <tr id="property_row_<?=$property->getId()?>">
-	<td><input type="hidden" name="propertyClass_<?=$property->getId()?>" value="OneToOneProperty"><input type="checkbox" name="isShow_<?=$property->getId()?>" value="1"<?=$property->getIsShow() ? ' checked' : ''?> title="Выбрать"></td>
+<input type="hidden" name="propertyClass_<?=$property->getId()?>" value="OneToOneProperty">
+	<td><input type="checkbox" name="isShow_<?=$property->getId()?>" value="1"<?=$property->getIsShow() ? ' checked' : ''?> title="Выбрать"></td>
 	<td><input type="checkbox" name="isRequired_<?=$property->getId()?>" value="1"<?=$property->getIsRequired() ? ' checked' : ''?> title="Выбрать"></td>
 	<td><input type="text" class="item-name" name="propertyDescription_<?=$property->getId()?>" value="<?=$property->getPropertyDescription()?>"></td>
 	<td><input type="text" class="item-name" name="propertyName_<?=$property->getId()?>" value="<?=$property->getPropertyName()?>"></td>
 	<td><?php if($currentItem->getClassType() == 'default') {?><a id="parameterListButton_<?=$property->getId()?>" href="<?=$baseUrl?>?module=ParameterList&propertyId=<?=$property->getId()?>" target="_blank" title="Параметры поля"><img src="img/ico_popup.gif" alt="Параметры поля"></a><?php }?></td>
 	<td><select name="fetchClass_<?=$property->getId()?>" class="prop-select" style="width: 210px;"><option value="Root">Корневой раздел</option><?php foreach($fetchClassList as $item) {?><option value="<?=$item->getItemName()?>"<?=$item->getItemName() == $property->getFetchClass() ? ' selected' : ''?>><?=$item->getItemDescription()?></option><?php }?></select></td>
-	<td><select name="fetchStrategyId_<?=$property->getId()?>" class="prop-select" style="width: 75px;"><option value="<?=FetchStrategy::LAZY?>"<?=$property->getFetchStrategyId() == FetchStrategy::LAZY ? ' selected' : ''?>>LAZY</option><option value="<?=FetchStrategy::JOIN?>"<?=$property->getFetchStrategyId() == FetchStrategy::JOIN ? ' selected' : ''?>>JOIN</option><option value="<?=FetchStrategy::CASCADE?>"<?=$property->getFetchStrategyId() == FetchStrategy::CASCADE ? ' selected' : ''?>>CASCADE</option></select></td>
+	<td><select name="fetchStrategyId_<?=$property->getId()?>" class="prop-select" style="width: 75px;"><option value="<?=FetchStrategy::JOIN?>">JOIN</option><option value="<?=FetchStrategy::CASCADE?>"<?=$property->getFetchStrategyId() == FetchStrategy::CASCADE ? ' selected' : ''?>>CASCADE</option><option value="<?=FetchStrategy::LAZY?>"<?=$property->getFetchStrategyId() == FetchStrategy::LAZY ? ' selected' : ''?>>LAZY</option></select></td>
 	<td><select name="onDelete_<?=$property->getId()?>" class="prop-select" style="width: 75px;"><?php foreach(Property::getOnDeleteActionList() as $actionName => $actionDescription) {?><option value="<?=$actionName?>"<?=$property->getOnDelete() == $actionName ? ' selected' : ''?>><?=$actionDescription?></option><?php }?></select></td>
 	<td class="center"><input type="checkbox" name="drop_<?=$property->getId()?>" value="1" title="Удалить"></td>
 </tr>
 <?php } ?>
 <tr id="property_row_add_onetoone">
-	<td><input type="hidden" name="propertyClass_add_onetoone" value="OneToOneProperty"><input type="checkbox" name="isShow_add_onetoone" value="1" title="Выбрать"></td>
+<input type="hidden" name="propertyClass_add_onetoone" value="OneToOneProperty">
+	<td><input type="checkbox" name="isShow_add_onetoone" value="1" title="Выбрать"></td>
 	<td><input type="checkbox" name="isRequired_add_onetoone" value="1" title="Выбрать"></td>
 	<td><input type="text" class="item-name" name="propertyDescription_add_onetoone" value=""></td>
 	<td><input type="text" class="item-name" name="propertyName_add_onetoone" value=""></td>
 	<td><?php if($currentItem->getClassType() == 'default') {?><a id="parameterListButton_add_onetoone" href="" target="_blank" title="Параметры поля" style="display: none;"><img src="img/ico_popup.gif" alt="Параметры поля"></a><?php }?></td>
 	<td><select name="fetchClass_add_onetoone" class="prop-select" style="width: 210px;"><option value="">- Выберите объект -</option><option value="Root">Корневой раздел</option><?php foreach($fetchClassList as $item) {?><option value="<?=$item->getItemName()?>"><?=$item->getItemDescription()?></option><?php }?></select></td>
-	<td><select name="fetchStrategyId_add_onetoone" class="prop-select" style="width: 75px;"><option value="<?=FetchStrategy::LAZY?>">LAZY</option><option value="<?=FetchStrategy::JOIN?>">JOIN</option><option value="<?=FetchStrategy::CASCADE?>">CASCADE</option></select></td>
+	<td><select name="fetchStrategyId_add_onetoone" class="prop-select" style="width: 75px;"><option value="<?=FetchStrategy::JOIN?>">JOIN</option><option value="<?=FetchStrategy::CASCADE?>">CASCADE</option><option value="<?=FetchStrategy::LAZY?>">LAZY</option></select></td>
 	<td><select name="onDelete_add_onetoone" class="prop-select" style="width: 75px;"><?php foreach(Property::getOnDeleteActionList() as $actionName => $actionDescription) {?><option value="<?=$actionName?>"><?=$actionDescription?></option><?php }?></select></td>
 	<td class="center"><input type="checkbox" name="drop_add_onetoone" value="1" title="Удалить" style="display: none;"></td>
 </tr>
@@ -99,14 +101,16 @@
 <?php foreach($propertyList as $property) { ?>
 <?php if($property->getPropertyClass() != 'OneToManyProperty') continue;?>
 <tr id="property_row_<?=$property->getId()?>">
-	<td><input type="hidden" name="propertyClass_<?=$property->getId()?>" value="OneToManyProperty"><input type="text" class="item-name" name="propertyDescription_<?=$property->getId()?>" value="<?=$property->getPropertyDescription()?>"></td>
+<input type="hidden" name="propertyClass_<?=$property->getId()?>" value="OneToManyProperty">
+	<td><input type="text" class="item-name" name="propertyDescription_<?=$property->getId()?>" value="<?=$property->getPropertyDescription()?>"></td>
 	<td><input type="text" class="item-name" name="propertyName_<?=$property->getId()?>" value="<?=$property->getPropertyName()?>"></td>
 	<td><select name="fetchClass_<?=$property->getId()?>" class="prop-select" style="width: 210px;"><?php foreach($fetchClassList as $item) {?><option value="<?=$item->getItemName()?>"<?=$item->getItemName() == $property->getFetchClass() ? ' selected' : ''?>><?=$item->getItemDescription()?></option><?php }?></select></td>
 	<td class="center"><input type="checkbox" name="drop_<?=$property->getId()?>" value="1" title="Удалить"></td>
 </tr>
 <?php } ?>
 <tr id="property_row_add_onetomany">
-	<td><input type="hidden" name="propertyClass_add_onetomany" value="OneToManyProperty"><input type="text" class="item-name" name="propertyDescription_add_onetomany" value=""></td>
+<input type="hidden" name="propertyClass_add_onetomany" value="OneToManyProperty">
+	<td><input type="text" class="item-name" name="propertyDescription_add_onetomany" value=""></td>
 	<td><input type="text" class="item-name" name="propertyName_add_onetomany" value=""></td>
 	<td><select name="fetchClass_add_onetomany" class="prop-select" style="width: 210px;"><option value="">- Выберите объект -</option><?php foreach($fetchClassList as $item) {?><option value="<?=$item->getItemName()?>"><?=$item->getItemDescription()?></option><?php }?></select></td>
 	<td class="center"><input type="checkbox" name="drop_add_onetomany" value="1" title="Удалить" style="display: none;"></td>
@@ -130,7 +134,8 @@
 <?php foreach($propertyList as $property) { ?>
 <?php if($property->getPropertyClass() != 'ManyToManyProperty') continue;?>
 <tr id="property_row_<?=$property->getId()?>">
-	<td><input type="hidden" name="propertyClass_<?=$property->getId()?>" value="ManyToManyProperty"><input type="text" class="item-name" name="propertyDescription_<?=$property->getId()?>" value="<?=$property->getPropertyDescription()?>"></td>
+<input type="hidden" name="propertyClass_<?=$property->getId()?>" value="ManyToManyProperty">
+	<td><input type="text" class="item-name" name="propertyDescription_<?=$property->getId()?>" value="<?=$property->getPropertyDescription()?>"></td>
 	<td><input type="text" class="item-name" name="propertyName_<?=$property->getId()?>" value="<?=$property->getPropertyName()?>"></td>
 	<td><a id="parameterListButton_<?=$property->getId()?>" href="<?=$baseUrl?>?module=ParameterList&propertyId=<?=$property->getId()?>" target="_blank" title="Параметры поля"><img src="img/ico_popup.gif" alt="Параметры поля"></a></td>
 	<td><select name="fetchClass_<?=$property->getId()?>" class="prop-select" style="width: 210px;"><?php foreach($fetchClassList as $item) {?><option value="<?=$item->getItemName()?>"<?=$item->getItemName() == $property->getFetchClass() ? ' selected' : ''?>><?=$item->getItemDescription()?></option><?php }?></select></td>
@@ -138,7 +143,8 @@
 </tr>
 <?php } ?>
 <tr id="property_row_add_manytomany">
-	<td><input type="hidden" name="propertyClass_add_manytomany" value="ManyToManyProperty"><input type="text" class="item-name" name="propertyDescription_add_manytomany" value=""></td>
+<input type="hidden" name="propertyClass_add_manytomany" value="ManyToManyProperty">
+	<td><input type="text" class="item-name" name="propertyDescription_add_manytomany" value=""></td>
 	<td><input type="text" class="item-name" name="propertyName_add_manytomany" value=""></td>
 	<td><a id="parameterListButton_add_manytomany" href="" target="_blank" title="Параметры поля" style="display: none;"><img src="img/ico_popup.gif" alt="Параметры поля"></a></td>
 	<td><select name="fetchClass_add_manytomany" class="prop-select" style="width: 210px;"><option value="">- Выберите объект -</option><?php foreach($fetchClassList as $item) {?><option value="<?=$item->getItemName()?>"><?=$item->getItemDescription()?></option><?php }?></select></td>

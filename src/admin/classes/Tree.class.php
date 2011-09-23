@@ -105,7 +105,7 @@
 			return $tree;
 		}
 
-		public static function getLinkTree($itemList, $openIdList, $activeClass, $activeElement)
+		public static function getLinkTree($itemList, $openIdList, $activeElement, $activeClass)
 		{
 			$tree = array();
 
@@ -140,7 +140,7 @@
 						$tree[] = array(
 							'parentId' => $element->getParent()->getPolymorphicId(),
 							'elementId' => $element->getPolymorphicId(),
-							'elementName' => $element->getAlterName(),
+							'elementName' => $element->getElementName(),
 							'isActive' => $isActive,
 							'isOpen' => $isOpen,
 							'isRadio' => $isRadio,
@@ -150,55 +150,6 @@
 
 				} catch (BaseException $e) {}
 			}
-
-			return $tree;
-		}
-
-		public static function getLinkPlainList($node, $activeClass, $activeElement)
-		{
-			$tree = array();
-
-			try {
-
-				$item = Item::dao()->getItemByName($activeClass);
-				$itemClass = $item->getClass();
-
-				if($node instanceof Element) {
-
-					$elementList =
-						$itemClass->dao()->getChildren($node)->
-						addOrder($item->getOrderBy())->
-						getList();
-
-				} else {
-
-					$elementList =
-						$itemClass->dao()->getValid()->
-						addOrder($item->getOrderBy())->
-						getList();
-
-				}
-
-				foreach($elementList as $element) {
-
-					$isActive =
-						$activeElement instanceof Element
-						&& $element->getPolymorphicId() == $activeElement->getPolymorphicId()
-						? 1
-						: 0;
-
-					$tree[] = array(
-						'parentId' => $element->getParent()->getPolymorphicId(),
-						'elementId' => $element->getPolymorphicId(),
-						'elementName' => $element->getAlterName(),
-						'isActive' => $isActive,
-						'isOpen' => 0,
-						'isRadio' => 1,
-
-					);
-				}
-
-			} catch (BaseException $e) {}
 
 			return $tree;
 		}
@@ -244,7 +195,7 @@
 						$tree[] = array(
 							'parentId' => $element->getParent()->getPolymorphicId(),
 							'elementId' => $element->getPolymorphicId(),
-							'elementName' => $element->getAlterName(),
+							'elementName' => $element->getElementName(),
 							'isActive' => $isActive,
 							'isOpen' => $isOpen,
 							'isCheckbox' => $isCheckbox,

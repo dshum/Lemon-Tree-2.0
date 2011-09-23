@@ -1,167 +1,97 @@
 <?php
 	final class PluginManager extends Singleton implements Instantiatable
 	{
-		private $actionList = array();
-		private $filterList = array();
-		private $browsePluginList = array();
-		private $editPluginList = array();
+		private $itemPluginList = array();
+		private $itemFilterList = array();
+		private $itemActionList = array();
+		private $elementPluginList = array();
 
 		public static function me()
 		{
 			return Singleton::getInstance(__CLASS__);
 		}
 
-		public function addBeforeInsertAction($className, $actionName)
+		public function addItemPlugin($className, $pluginName)
 		{
-			$this->actionList[$className]['beforeInsert'] = $actionName;
+			$this->itemPluginList[$className] = $pluginName;
 
 			return $this;
 		}
 
-		public function addAfterInsertAction($className, $actionName)
+		public function addItemFilter($className, $filterName)
 		{
-			$this->actionList[$className]['afterInsert'] = $actionName;
+			$this->itemFilterList[$className] = $filterName;
 
 			return $this;
 		}
 
-		public function addBeforeUpdateAction($className, $actionName)
+		public function addItemAction($className,
+			$beforeInsert, $afterInsert,
+			$beforeUpdate, $afterUpdate,
+			$beforeDelete, $afterDelete
+		)
 		{
-			$this->actionList[$className]['beforeUpdate'] = $actionName;
-
-			return $this;
-		}
-
-		public function addAfterUpdateAction($className, $actionName)
-		{
-			$this->actionList[$className]['afterUpdate'] = $actionName;
-
-			return $this;
-		}
-
-		public function addBeforeDeleteAction($className, $actionName)
-		{
-			$this->actionList[$className]['beforeDelete'] = $actionName;
-
-			return $this;
-		}
-
-		public function addAfterDeleteAction($className, $actionName)
-		{
-			$this->actionList[$className]['afterDelete'] = $actionName;
-
-			return $this;
-		}
-
-		public function addFilter($className, $filterName)
-		{
-			$this->filterList[$className] = $filterName;
-
-			return $this;
-		}
-
-		public function addBrowsePlugin($id, $pluginName)
-		{
-			$this->browsePluginList[$id] = $pluginName;
-
-			return $this;
-		}
-
-		public function addEditPlugin($id, $pluginName)
-		{
-			$this->editPluginList[$id] = $pluginName;
-
-			return $this;
-		}
-
-		public function getFilter($className)
-		{
-			return
-				isset($this->filterList[$className])
-				? $this->filterList[$className]
-				: null;
-		}
-
-		public function getBeforeInsertAction($className)
-		{
-			return
-				isset($this->actionList[$className]['beforeInsert'])
-				? $this->actionList[$className]['beforeInsert']
-				: null;
-		}
-
-		public function getAfterInsertAction($className)
-		{
-			return
-				isset($this->actionList[$className]['afterInsert'])
-				? $this->actionList[$className]['afterInsert']
-				: null;
-		}
-
-		public function getBeforeUpdateAction($className)
-		{
-			return
-				isset($this->actionList[$className]['beforeUpdate'])
-				? $this->actionList[$className]['beforeUpdate']
-				: null;
-		}
-
-		public function getAfterUpdateAction($className)
-		{
-			return
-				isset($this->actionList[$className]['afterUpdate'])
-				? $this->actionList[$className]['afterUpdate']
-				: null;
-		}
-
-		public function getBeforeDeleteAction($className)
-		{
-			return
-				isset($this->actionList[$className]['beforeDelete'])
-				? $this->actionList[$className]['beforeDelete']
-				: null;
-		}
-
-		public function getAfterDeleteAction($className)
-		{
-			return
-				isset($this->actionList[$className]['afterDelete'])
-				? $this->actionList[$className]['afterDelete']
-				: null;
-		}
-
-		public function getBrowsePlugin($elementId)
-		{
-			if(isset($this->browsePluginList[$elementId])) {
-				return $this->browsePluginList[$elementId];
-			}
-
-			list($className, $id) = explode(
-				PrimitivePolymorphicIdentifier::DELIMITER,
-				$elementId
+			$this->itemActionList[$className] = array(
+				'beforeInsert' => $beforeInsert,
+				'afterInsert' => $afterInsert,
+				'beforeUpdate' => $beforeUpdate,
+				'afterUpdate' => $afterUpdate,
+				'beforeDelete' => $beforeDelete,
+				'afterDelete' => $afterDelete,
 			);
 
+			return $this;
+		}
+
+		public function addElementPlugin($elementId, $pluginName)
+		{
+			$this->elementPluginList[$elementId] = $pluginName;
+
+			return $this;
+		}
+
+		public function getItemPlugin($className)
+		{
 			return
-				isset($this->browsePluginList[$className])
-				? $this->browsePluginList[$className]
+				isset($this->itemPluginList[$className])
+				? $this->itemPluginList[$className]
 				: null;
 		}
 
-		public function getEditPlugin($elementId)
+		public function getItemFilter($className)
 		{
-			if(isset($this->editPluginList[$elementId])) {
-				return $this->editPluginList[$elementId];
-			}
-
-			list($className, $id) = explode(
-				PrimitivePolymorphicIdentifier::DELIMITER,
-				$elementId
-			);
-
 			return
-				isset($this->editPluginList[$className])
-				? $this->editPluginList[$className]
+				isset($this->itemFilterList[$className])
+				? $this->itemFilterList[$className]
 				: null;
+		}
+
+		public function getItemAction($className)
+		{
+			return
+				isset($this->itemActionList[$className])
+				? $this->itemActionList[$className]
+				: null;
+		}
+
+		public function getElementPlugin($elementId)
+		{
+			if(isset($this->elementPluginList[$elementId])) {
+
+				return $this->elementPluginList[$elementId];
+
+			} else {
+
+				list($className, $id) = explode(
+					PrimitivePolymorphicIdentifier::DELIMITER,
+					$elementId
+				);
+
+				return
+					isset($this->itemActionList[$className])
+					? $this->itemActionList[$className]
+					: null;
+			}
 		}
 	}
 ?>

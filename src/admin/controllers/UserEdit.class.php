@@ -58,8 +58,6 @@
 
 		public function add(HttpRequest $request)
 		{
-			$loggedUser = LoggedUser::getUser();
-
 			$model = Model::create();
 
 			$form = $this->makeAddForm($request);

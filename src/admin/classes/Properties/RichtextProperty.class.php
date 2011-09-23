@@ -5,6 +5,7 @@
 		{
 			parent::setParameters();
 
+			$this->addParameter('defaultCss', 'string', 'Файл CSS', '/f/style.css');
 			$this->addParameter('typograph', 'boolean', 'Типографика', true);
 
 			return $this;
@@ -28,7 +29,7 @@
 				addImportFilter(Filter::trim());
 
 			if($this->getParameterValue('typograph')) {
-				$primitive->addImportFilter(RussianTypograph::me());
+				$primitive->addImportFilter(MyRussianTypograph::me());
 			}
 
 			return $form->add($primitive);

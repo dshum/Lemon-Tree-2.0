@@ -1,2 +1,15 @@
-<input type="hidden" id="<?=$propertyName?>" name="<?=$propertyName?>" value="<?=$value instanceof Time ? $value->toString() : null?>">
-<?=$propertyDescription?>:&nbsp;<input class="prop-time" type="text" id="<?=$propertyName?>_hour" name="<?=$propertyName?>_hour" property="<?=$propertyName?>" time="true" max="23" value="<?=$value instanceof Time ? sprintf('%02d', $value->getHour()) : null?>" maxlength="2">&nbsp;:&nbsp;<input class="prop-time" type="text" id="<?=$propertyName?>_minute" name="<?=$propertyName?>_minute" property="<?=$propertyName?>" time="true" max="59" value="<?=$value instanceof Time ? sprintf('%02d', $value->getMinute()) : null?>" maxlength="2">&nbsp;:&nbsp;<input class="prop-time" type="text" id="<?=$propertyName?>_second" name="<?=$propertyName?>_second" property="<?=$propertyName?>" time="true" max="59" value="<?=$value instanceof Time ? sprintf('%02d', $value->getSecond()) : null?>" maxlength="2"><br><br>
+<script type="text/javascript">
+$(function() {
+	$('input:text[time=true]').change(function() {
+		setTime('<?=$propertyName?>');
+	}).keyup(function() {
+		setTime('<?=$propertyName?>');
+	}).mousewheel(function(event, delta) {
+		onTimeMousewheel($(this), delta);
+		setTime('<?=$propertyName?>');
+		return false;
+	});
+});
+</script>
+<input type="hidden" name="<?=$propertyName?>" value="<?=$value->toString()?>">
+<input class="prop-time" type="text" id="<?=$propertyName?>_hour" name="<?=$propertyName?>_hour" time="true" value="<?=$value->getHour()?>" maxlength="2">&nbsp;:&nbsp;<input class="prop-time" type="text" id="<?=$propertyName?>_minute" name="<?=$propertyName?>_minute" time="true" value="<?=$value->getMinute()?>" maxlength="2">&nbsp;:&nbsp;<input class="prop-time" type="text" id="<?=$propertyName?>_second" name="<?=$propertyName?>_second" time="true" value="<?=$value->getSecond()?>" maxlength="2"><br><br>
