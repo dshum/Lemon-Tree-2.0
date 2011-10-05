@@ -297,32 +297,40 @@
 
 			try {
 
-				$date = date('Y-m-d_H:i:s');
+				$date = date('Y-m-d_H-i-s');
 
 				if(file_exists(ONPHP_META_BUSINESS_DIR.$item->getItemName().EXT_CLASS)) {
-					rename(
+					copy(
 						ONPHP_META_BUSINESS_DIR.$item->getItemName().EXT_CLASS,
 						ONPHP_META_BUSINESS_DIR.$item->getItemName().EXT_CLASS.'.'.$date
 					);
+					unlink(ONPHP_META_BUSINESS_DIR.$item->getItemName().EXT_CLASS);
 				}
+
 				if(file_exists(ONPHP_META_DAO_DIR.$item->getItemName().'DAO'.EXT_CLASS)) {
-					rename(
+					copy(
 						ONPHP_META_DAO_DIR.$item->getItemName().'DAO'.EXT_CLASS,
 						ONPHP_META_DAO_DIR.$item->getItemName().'DAO'.EXT_CLASS.'.'.$date
 					);
+					unlink(ONPHP_META_DAO_DIR.$item->getItemName().'DAO'.EXT_CLASS);
 				}
+
 				if(file_exists(ONPHP_META_PROTO_DIR.'Proto'.$item->getItemName().EXT_CLASS)) {
-					rename(
+					copy(
 						ONPHP_META_PROTO_DIR.'Proto'.$item->getItemName().EXT_CLASS,
 						ONPHP_META_PROTO_DIR.'Proto'.$item->getItemName().EXT_CLASS.'.'.$date
 					);
+					unlink(ONPHP_META_PROTO_DIR.'Proto'.$item->getItemName().EXT_CLASS);
 				}
+
 				if(file_exists(ONPHP_META_AUTO_BUSINESS_DIR.'Auto'.$item->getItemName().EXT_CLASS)) {
 					unlink(ONPHP_META_AUTO_BUSINESS_DIR.'Auto'.$item->getItemName().EXT_CLASS);
 				}
+
 				if(file_exists(ONPHP_META_AUTO_DAO_DIR.'Auto'.$item->getItemName().'DAO'.EXT_CLASS)) {
 					unlink(ONPHP_META_AUTO_DAO_DIR.'Auto'.$item->getItemName().'DAO'.EXT_CLASS);
 				}
+
 				if(file_exists(ONPHP_META_AUTO_PROTO_DIR.'Auto'.'Proto'.$item->getItemName().EXT_CLASS)) {
 					unlink(ONPHP_META_AUTO_PROTO_DIR.'Auto'.'Proto'.$item->getItemName().EXT_CLASS);
 				}

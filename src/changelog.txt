@@ -1,3 +1,7 @@
+2011-10-05
+MetaConfiguration.class.php
+Added replace \\ to /.
+
 2008-01-31
 JsHttpRequest.js
 Added src="blank.html" to dynamical iframe.

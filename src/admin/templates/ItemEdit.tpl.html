@@ -24,14 +24,23 @@ $classTypeList = array(
 ob_start();
 $partViewer->view('ItemEdit.default');
 $contentDefault = ob_get_contents();
+$contentDefault = str_replace("\n", '', $contentDefault);
+$contentDefault = str_replace("\r", '', $contentDefault);
+$contentDefault = addcslashes($contentDefault, '\'');
 ob_end_clean();
 ob_start();
 $partViewer->view('ItemEdit.abstract');
 $contentAbstract = ob_get_contents();
+$contentAbstract = str_replace("\n", '', $contentAbstract);
+$contentAbstract = str_replace("\r", '', $contentAbstract);
+$contentAbstract = addcslashes($contentAbstract, '\'');
 ob_end_clean();
 ob_start();
 $partViewer->view('ItemEdit.virtual');
 $contentVirtual = ob_get_contents();
+$contentVirtual = str_replace("\n", '', $contentVirtual);
+$contentVirtual = str_replace("\r", '', $contentVirtual);
+$contentVirtual = addcslashes($contentVirtual, '\'');
 ob_end_clean();
 ?>
 
@@ -46,9 +55,9 @@ $(function(){
 		return false;
  	});
 
-	classTypeContent['default'] = '<?=addcslashes(str_replace("\n", '', $contentDefault), '\'')?>';
-	classTypeContent['abstract'] = '<?=addcslashes(str_replace("\n", '', $contentAbstract), '\'')?>';
-	classTypeContent['virtual'] = '<?=addcslashes(str_replace("\n", '', $contentVirtual), '\'')?>';
+	classTypeContent['default'] = '<?=$contentDefault?>';
+	classTypeContent['abstract'] = '<?=$contentAbstract?>';
+	classTypeContent['virtual'] = '<?=$contentVirtual?>';
 
 	$('input:radio[name=classType]').click(function(){
 		$('#item_block').hide().html(classTypeContent[this.value]).fadeIn('fast');
