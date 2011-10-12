@@ -23,7 +23,7 @@
 			try {
 				$elementPath = TextUtils::getPathFromUrl($elementPath);
 			} catch (BaseException $e) {
-				return '/';
+				return '/404';
 			}
 
 			$elementPath = '/'.trim($elementPath, '/');
@@ -31,7 +31,7 @@
 			$elementPath = get_magic_quotes_gpc() ? stripslashes($elementPath) : $elementPath;
 
 			if(!RegexpUtils::checkUrl($elementPath)) {
-				$elementPath = '/';
+				$elementPath = '/404';
 			}
 
 			return $elementPath;
