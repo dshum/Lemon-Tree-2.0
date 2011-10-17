@@ -12,6 +12,8 @@
 			'video/mpeg', 'video/mp4', 'video/quicktime', 'video/x-ms-wmv',
 			'application/zip', 'application/x-rar-compressed', 'application/x-tar',
 		);
+		private static $dir_mod = 0755;
+		private static $file_mod = 0644;
 
 		private $folder = null;
 
@@ -165,10 +167,16 @@
 				try {
 
 					if(!file_exists(PATH_LTDATA.$this->folder)) {
-						mkdir(PATH_LTDATA.$this->folder, 0755);
+						mkdir(PATH_LTDATA.$this->folder, self::$dir_mod);
 					}
 
-					$primitive->copyTo(PATH_LTDATA.$this->folder, $filename);
+					$primitive->copyToPath(
+						PATH_LTDATA.$this->folder.DIRECTORY_SEPARATOR.$filename
+					);
+					chmod(
+						PATH_LTDATA.$this->folder.DIRECTORY_SEPARATOR.$filename,
+						self::$file_mod
+					);
 
 					$setter = $this->property->setter();
 					$this->element->$setter($filename);
