@@ -21,7 +21,14 @@
 	<td><input type="text" class="item-name" name="propertyDescription_<?=$property->getId()?>" value="<?=$property->getPropertyDescription()?>"></td>
 	<td><input type="text" class="item-name" name="propertyName_<?=$property->getId()?>" value="<?=$property->getPropertyName()?>"></td>
 	<td><?php if($currentItem->getClassType() == 'default') {?><a id="parameterListButton_<?=$property->getId()?>" href="<?=$baseUrl?>?module=ParameterList&propertyId=<?=$property->getId()?>" target="_blank" title="Параметры поля"><img src="img/ico_popup.gif" alt="Параметры поля"></a><?php }?></td>
-	<td><select name="propertyClass_<?=$property->getId()?>" class="prop-select" style="width: 210px;"><?php foreach($propertyClassList as $propertyClass => $propertyDescription) { ?><option value="<?=$propertyClass?>"<?=$propertyClass == $property->getPropertyClass() ? ' selected' : ''?>><?=$propertyDescription?></option><?php } ?></select></td>
+	<td>
+<?php if($property->getPropertyClass() == 'VirtualProperty') {?>
+	<input type="hidden" name="propertyClass_<?=$property->getId()?>" value="VirtualProperty">
+	<select class="prop-select" style="width: 210px;" disabled="disabled"><option>Виртуальное поле</option></select>
+<?php } else {?>
+	<select name="propertyClass_<?=$property->getId()?>" class="prop-select" style="width: 210px;"><?php foreach($propertyClassList as $propertyClass => $propertyDescription) { ?><option value="<?=$propertyClass?>"<?=$propertyClass == $property->getPropertyClass() ? ' selected' : ''?>><?=$propertyDescription?></option><?php } ?></select>
+<?php }?>
+	</td>
 	<td class="center"><input type="checkbox" name="drop_<?=$property->getId()?>" value="1" title="Удалить"></td>
 </tr>
 <?php } ?>
@@ -31,7 +38,7 @@
 	<td><input type="text" class="item-name" name="propertyDescription_add_field" value=""></td>
 	<td><input type="text" class="item-name" name="propertyName_add_field" value=""></td>
 	<td><?php if($currentItem->getClassType() == 'default') {?><a id="parameterListButton_add_field" href="" target="_blank" title="Параметры поля" style="display: none;"><img src="img/ico_popup.gif" alt="Параметры поля"></a><?php }?></td>
-	<td><select name="propertyClass_add_field" class="prop-select" style="width: 210px;"><option value="">- Выберите тип поля -</option><?php foreach($propertyClassList as $propertyClass => $propertyDescription) { ?><option value="<?=$propertyClass?>"><?=$propertyDescription?></option><?php } ?></select></td>
+	<td><input type="hidden" name="propertyClass_add_field_hidden" value=""><select name="propertyClass_add_field" class="prop-select" style="width: 210px;"><option value="">- Выберите тип поля -</option><?php foreach($propertyClassList as $propertyClass => $propertyDescription) { ?><option value="<?=$propertyClass?>"><?=$propertyDescription?></option><?php } ?><option value="VirtualProperty">Виртуальное поле</option></select></td>
 	<td class="center"><input type="checkbox" name="drop_add_field" value="1" title="Удалить" style="display: none;"></td>
 </tr>
 </table>

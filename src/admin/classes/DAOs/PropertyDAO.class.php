@@ -165,6 +165,7 @@
 
 			if(
 				$item->isDefault()
+				&& $property->getPropertyClass() != 'VirtualProperty'
 				&& $property->getPropertyClass() != 'OneToManyProperty'
 				&& $property->getPropertyClass() != 'ManyToManyProperty'
 			) {
@@ -263,6 +264,7 @@
 
 			if(
 				$item->isDefault()
+				&& $property->getPropertyClass() != 'VirtualProperty'
 				&& $property->getPropertyClass() != 'OneToManyProperty'
 				&& $property->getPropertyClass() != 'ManyToManyProperty'
 				&& (
@@ -308,10 +310,13 @@
 
 			if(
 				$item->isDefault()
+				&& $property->getPropertyClass() != 'VirtualProperty'
 				&& $property->getPropertyClass() != 'OneToManyProperty'
 				&& $property->getPropertyClass() != 'ManyToManyProperty'
 			) {
+
 				# Drop table column
+
 				$db = DBPool::me()->getByDao($itemClass->dao());
 				$dialect = $db->getDialect();
 
@@ -341,7 +346,10 @@
 					echo ErrorMessageUtils::printMessage($e);
 				}
 
-			} elseif(!$item->isDefault()) {
+			} elseif(
+				!$item->isDefault()
+				|| $property->getPropertyClass() == 'VirtualProperty'
+			) {
 
 				$this->drop($property);
 
@@ -358,7 +366,9 @@
 				$item->isDefault()
 				&& $property->getPropertyClass() == 'ManyToManyProperty'
 			) {
+
 				# Drop helper table for N:N relation
+
 				$db = DBPool::me()->getByDao($itemClass->dao());
 				$dialect = $db->getDialect();
 

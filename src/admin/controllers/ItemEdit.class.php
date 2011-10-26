@@ -448,6 +448,7 @@
 			foreach($propertyClassList as $propertyClass => $propertyDescription) {
 				$allowedClassList[$propertyClass] = $propertyClass;
 			}
+			$allowedClassList['VirtualProperty'] = 'VirtualProperty';
 			$allowedClassList['OneToOneProperty'] = 'OneToOneProperty';
 			$allowedClassList['OneToManyProperty'] = 'OneToManyProperty';
 			$allowedClassList['ManyToManyProperty'] = 'ManyToManyProperty';
@@ -597,7 +598,7 @@
 			)->
 			add(
 				Primitive::choice('propertyClass_add_field')->
-				setList($propertyClassList)
+				setList($allowedClassList)
 			)->
 			add(
 				Primitive::boolean('isShow_add_onetoone')

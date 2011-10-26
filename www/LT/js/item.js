@@ -81,9 +81,20 @@ LT.Item = function() {
 		});
 
 		$('select[name=propertyClass_add_field]:first').each(function(){
-			this.name = 'propertyClass_'+added.id;
-			this.value = added.propertyClass;
-			this.options[0] = null;
+			if(added.propertyClass == 'VirtualProperty') {
+				this.name = null;
+				this.value = null;
+				this.disabled = 'disabled';
+				$('input[name=propertyClass_add_field_hidden]:first').each(function(){
+					this.name = 'propertyClass_'+added.id;
+					this.value = added.propertyClass;
+				});
+			} else {
+				this.name = 'propertyClass_'+added.id;
+				this.value = added.propertyClass;
+				$('select[name=propertyClass_'+added.id+'] option:first').remove();
+				$('select[name=propertyClass_'+added.id+'] option:last').remove();
+			}
 		});
 
 		$('input:checkbox[name=drop_add_field]:first').each(function(){

@@ -14,6 +14,7 @@
 		const TIMESTAMP_PROPERTY = 'TimestampProperty';
 		const TIME_PROPERTY = 'TimeProperty';
 		const PASSWORD_PROPERTY = 'PasswordProperty';
+		const VIRTUAL_PROPERTY = 'VirtualProperty';
 		const YANDEX_MAP_PROPERTY = 'YandexMapProperty';
 		const POINT_PROPERTY = 'PointProperty';
 		const ONE_TO_ONE_PROPERTY = 'OneToOneProperty';
