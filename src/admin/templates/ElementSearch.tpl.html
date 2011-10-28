@@ -264,8 +264,8 @@ $(function(){
 							str += '<td width="30%"></td>';
 						}
 						str += '</table>';
-
 					}
+
 					$('#itemBlock').hide().html(str).fadeIn('fast');
 					$('#elementId').val('');
 					$('#elementName').val('');
@@ -315,6 +315,65 @@ $(function(){
 		onTimeMousewheel($(this), delta);
 		setTime($(this).attr('property'));
 		return false;
+	});
+
+	$('input[onetoone=id]').livequery('click', function() {
+		if($(this).val() == 'ID') {
+			$(this).css('color', 'black').val('');
+		}
+	}).livequery('focus', function() {
+		if($(this).val() == 'ID') {
+			$(this).css('color', 'black').val('');
+		}
+	}).livequery('change', function() {
+		if($(this).val() == '') {
+			$(this).css('color', 'grey').val('ID');
+		}
+	}).livequery('blur', function() {
+		if($(this).val() == '') {
+			$(this).css('color', 'grey').val('ID');
+		}
+	});
+
+	$('input[onetoone=name]').livequery('click', function() {
+		if($(this).val() == 'Название') {
+			$(this).css('color', 'black').val('');
+		}
+	}).livequery('focus', function() {
+		if($(this).val() == 'Название') {
+			$(this).css('color', 'black').val('');
+		}
+	}).livequery('change', function() {
+		if($(this).val() == '') {
+			$(this).css('color', 'grey').val('Название');
+		}
+	}).livequery('blur', function() {
+		if($(this).val() == '') {
+			$(this).css('color', 'grey').val('Название');
+		}
+	}).livequery(function() {
+		var itemId = $(this).attr('itemId');
+		var propertyName = $(this).attr('propertyName');
+
+		$(this).autocomplete(
+			'<?=$selfUrl?>&action=hint&itemId='+itemId+'&print',
+			{
+				matchContains: true,
+				formatItem: function(row, i, max) {return row.name+' ('+row.id+')'},
+				formatMatch: function(row, i, max) {return row.name},
+				formatResult: function(row) {return row.name},
+				dataType: 'json',
+				parse: function(data) {
+					return $.map(data, function(row) {
+						return {data: row, value: row.name, result: row.name}
+					});
+				},
+				max: 25
+			}
+		).result(function(event, item) {
+			$('input[name='+propertyName+']').val(item.id);
+			$('input[name='+propertyName+'_name]').val(item.name);
+		});
 	});
 });
 

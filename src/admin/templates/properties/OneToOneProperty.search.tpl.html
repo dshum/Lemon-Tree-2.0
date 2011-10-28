@@ -1,36 +1,4 @@
-<script type="text/javascript">
-$(function() {
-	$('input[name=<?=$propertyName?>_name]').autocomplete(
-		'<?=$selfUrl?>&action=hint&itemId=<?=$fetchItem->getId()?>&print',
-		{
-			matchContains: true,
-			formatItem: function(row, i, max) {return row.name+' ('+row.id+')'},
-			formatMatch: function(row, i, max) {return row.name},
-			formatResult: function(row) {return row.name},
-			dataType: 'json',
-			parse: function(data) {
-				return $.map(data, function(row) {
-					return {data: row, value: row.name, result: row.name}
-				});
-			},
-			max: 25
-		}
-	).result(function(event, item) {
-		$('input[name=<?=$propertyName?>]').val(item.id);
-		$('input[name=<?=$propertyName?>_name]').val(item.name);
-	});
-
-	$('input[name=<?=$propertyName?>]').click(function() {
-		$(this).css('color', 'black').val('');
-	});
-
-	$('input[name=<?=$propertyName?>_name]').click(function() {
-		$(this).css('color', 'black').val('');
-	});
-});
-</script>
-
 <span switch="true" name="<?=$propertyName?>" class="dashed hand"><?=$propertyDescription?></span>:<br>
 <div id="<?=$propertyName?>_block" style="display: <?=$raw !== null || $name !== null ? 'block' : 'none'?>">
-<input type="text" class="prop" name="<?=$propertyName?>" value="<?=$raw ? $raw : 'ID'?>"<?=$raw === null && $name === null ? ' disabled="true"' : ''?> style="width: 10%;<?=$raw === null ? ' color: grey;' : ''?>">&nbsp;&nbsp;&nbsp;<input type="text" class="prop" name="<?=$propertyName?>_name" value="<?=$name ? $name : 'Название'?>"<?=$raw === null && $name === null ? ' disabled="true"' : ''?> style="width: 50%;<?=$name === null ? ' color: grey;' : ''?>">
+<input type="text" onetoone="id" class="prop" name="<?=$propertyName?>" value="<?=$raw ? $raw : 'ID'?>"<?=$raw === null && $name === null ? ' disabled="true"' : ''?> style="width: 20%;<?=$raw === null || $raw == 'ID' ? ' color: grey;' : ''?>">&nbsp;&nbsp;&nbsp;<input type="text" onetoone="name" itemId="<?=$fetchItem->getId()?>" propertyName="<?=$propertyName?>" class="prop" name="<?=$propertyName?>_name" value="<?=$name ? $name : 'Название'?>"<?=$raw === null && $name === null ? ' disabled="true"' : ''?> style="width: 50%;<?=$name === null || $name == 'Название' ? ' color: grey;' : ''?>">
 </div>
