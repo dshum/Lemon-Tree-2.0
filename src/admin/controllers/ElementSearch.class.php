@@ -9,6 +9,7 @@
 		public function __construct()
 		{
 			$this->
+			setMethodMapping('hint', 'hint')->
 			setMethodMapping('expand', 'expand')->
 			setMethodMapping('show', 'showList')->
 			setMethodMapping('save', 'saveList')->
@@ -25,7 +26,65 @@
 			return parent::handleRequest($request);
 		}
 
-		protected function expand($request)
+		protected function hint(HttpRequest $request)
+		{
+			$model = Model::create();
+
+			$loggedUser = LoggedUser::getUser();
+
+			$form =
+				Form::create()->
+				add(
+					Primitive::identifier('itemId')->
+					of('Item')->
+					required()
+				)->
+				add(
+					Primitive::string('q')->
+					required()->
+					setMin(2)
+				)->
+				import($request->getGet());
+
+			if(!$form->getErrors()) {
+
+				$item =  $form->getValue('itemId');
+				$query =  $form->getValue('q');
+
+				$itemClass = $item->getClass();
+
+				$elementList =
+					$itemClass->dao()->getValid()->
+					add(
+						Expression::like(
+							DBField::create('element_name', $itemClass->dao()->getTable()),
+							DBValue::create('%'.$query.'%')
+						)
+					)->
+					addOrder(
+						DBField::create('element_name', $itemClass->dao()->getTable())
+					)->
+					getList();
+
+				$hint = array();
+
+				foreach($elementList as $element) {
+					$hint[] = array(
+						'id' => $element->getId(),
+						'name' => $element->getElementName(),
+					);
+				}
+
+				$model->set('hint', $hint);
+			}
+
+			return
+				ModelAndView::create()->
+				setModel($model)->
+				setView('request/ElementSearch.hint');
+		}
+
+		protected function expand(HttpRequest $request)
 		{
 			$model = Model::create();
 
