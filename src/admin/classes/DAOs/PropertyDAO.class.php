@@ -149,6 +149,34 @@
 			} catch (DatabaseException $e) {}
 		}
 
+		public function dropByFetchClass(Item $item)
+		{
+			$db = DBPool::me()->getByDao($this);
+
+			$query =
+				OSQL::delete()->
+				from($this->getTable())->
+				where(
+					Expression::eq(
+						new DBField('fetch_class', $this->getTable()),
+						new DBValue($item->getItemName())
+					)
+				);
+
+			try {
+				$db->query($query);
+
+				$this->uncacheLists();
+
+				if(isset($this->propertyList[$item->getId()])) {
+					unset($this->propertyList[$item->getId()]);
+				}
+				if(isset($this->propertyMap[$item->getId()])) {
+					unset($this->propertyMap[$item->getId()]);
+				}
+			} catch (DatabaseException $e) {}
+		}
+
 		public function getPropertyByName(Item $item, $propertyName)
 		{
 			if(isset($this->propertyMap[$item->getId()][$propertyName])) {

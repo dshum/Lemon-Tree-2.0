@@ -260,6 +260,7 @@
 			if(isset($this->itemList[$item->getId()])) {
 
 				if($item->isDefault()) {
+
 					$itemClass = $item->getClass();
 
 					# Drop table
@@ -273,30 +274,32 @@
 						} catch (DatabaseException $e) {}
 					}
 
-					# Drop properties
-					Property::dao()->dropByItem($item);
-
-					# Drop binds
-					Bind2Item::dao()->dropByItem($item);
-					Bind2Item::dao()->dropByBindItem($item);
-					Bind2Element::dao()->dropByItem($item);
-
-					# Drop item
-					Item::dao()->drop($item);
-
-					if(isset($this->itemList[$item->getId()])) {
-						unset($this->itemList[$item->getId()]);
-					}
-					if(isset($this->itemMap[$item->getItemName()])) {
-						unset($this->itemMap[$item->getItemName()]);
-					}
-
-					# Drop auto files
-					Site::dropAuto($item);
-
-					# Drop data folder
-					// ...todo
 				}
+
+				# Drop properties
+				Property::dao()->dropByItem($item);
+				Property::dao()->dropByFetchClass($item);
+
+				# Drop binds
+				Bind2Item::dao()->dropByItem($item);
+				Bind2Item::dao()->dropByBindItem($item);
+				Bind2Element::dao()->dropByItem($item);
+
+				# Drop item
+				Item::dao()->drop($item);
+
+				if(isset($this->itemList[$item->getId()])) {
+					unset($this->itemList[$item->getId()]);
+				}
+				if(isset($this->itemMap[$item->getItemName()])) {
+					unset($this->itemMap[$item->getItemName()]);
+				}
+
+				# Drop auto files
+				Site::dropAuto($item);
+
+				# Drop data folder
+				// ...todo
 			}
 		}
 	}
