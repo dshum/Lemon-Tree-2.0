@@ -59,11 +59,18 @@
 			if(!$this->property->getFetchClass()) {
 				return $form;
 			}
-			$primitive =
+
+			$primitive1 =
 				Primitive::identifier($this->property->getPropertyName())->
 				of($this->property->getFetchClass());
 
-			return $form->add($primitive);
+			$primitive2 =
+				Primitive::string($this->property->getPropertyName().'_name');
+
+			return
+				$form->
+				add($primitive1)->
+				add($primitive2);
 		}
 
 		public function add2criteria(Criteria $criteria, Form $form)
@@ -212,12 +219,26 @@
 				? $form->getValue($propertyName)
 				: null;
 
+			$name =
+				$form->primitiveExists($propertyName.'_name')
+				? $form->getRawValue($propertyName.'_name')
+				: null;
+
+			$selfUrl = PATH_ADMIN_BROWSE.'?module=ElementSearch';
+
+			$fetchClass = $this->property->getFetchClass();
+
+			$fetchItem = Item::dao()->getItemByName($fetchClass);
+
 			$model =
 				Model::create()->
 				set('propertyName', $propertyName)->
 				set('propertyDescription', $propertyDescription)->
 				set('raw', $raw)->
-				set('value', $value);
+				set('value', $value)->
+				set('name', $name)->
+				set('selfUrl', $selfUrl)->
+				set('fetchItem', $fetchItem);
 
 			$viewName = 'properties/'.get_class($this).'.search';
 
