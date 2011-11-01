@@ -336,20 +336,24 @@ $(function(){
 	});
 
 	$('input[onetoone=name]').livequery('click', function() {
-		if($(this).val() == 'Название') {
+		var main = $(this).attr('main');
+		if($(this).val() == main) {
 			$(this).css('color', 'black').val('');
 		}
 	}).livequery('focus', function() {
-		if($(this).val() == 'Название') {
+		var main = $(this).attr('main');
+		if($(this).val() == main) {
 			$(this).css('color', 'black').val('');
 		}
 	}).livequery('change', function() {
+		var main = $(this).attr('main');
 		if($(this).val() == '') {
-			$(this).css('color', 'grey').val('Название');
+			$(this).css('color', 'grey').val(main);
 		}
 	}).livequery('blur', function() {
+		var main = $(this).attr('main');
 		if($(this).val() == '') {
-			$(this).css('color', 'grey').val('Название');
+			$(this).css('color', 'grey').val(main);
 		}
 	}).livequery(function() {
 		var itemId = $(this).attr('itemId');
