@@ -228,9 +228,11 @@ $(function() {
 		var propertyName = $(this).attr('propertyName');
 		var main = $('input[name='+propertyName+'_name]').attr('main');
 
-		$('input[name='+propertyName+']').val('');
-		$('input[name='+propertyName+'_name]').css('color', 'grey').val(main);
-		$('#'+propertyName+'_show').css('color', 'grey').html('Не определено');
+		if($('input[name='+propertyName+']').val()) {
+			$('input[name='+propertyName+']').val('');
+			$('input[name='+propertyName+'_name]').css('color', 'grey').val(main);
+			$('#'+propertyName+'_show').css('color', 'grey').html('Не определено');
+		}
 	});
 });
 

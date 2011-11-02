@@ -184,7 +184,11 @@
 
 			$fetchClass = $this->property->getFetchClass();
 
-			$fetchItem = Item::dao()->getItemByName($fetchClass);
+			try {
+				$fetchItem = Item::dao()->getItemByName($fetchClass);
+			} catch (ObjectNotFoundException $e) {
+				$fetchItem = null;
+			}
 
 			$model =
 				Model::create()->
@@ -207,6 +211,14 @@
 
 		public function getElementSearchView(Form $form)
 		{
+			$fetchClass = $this->property->getFetchClass();
+
+			try {
+				$fetchItem = Item::dao()->getItemByName($fetchClass);
+			} catch (ObjectNotFoundException $e) {
+				return null;
+			}
+
 			$propertyDescription = $this->property->getPropertyDescription();
 			if(mb_strlen($propertyDescription) > 50) {
 				$propertyDescription = mb_substr($propertyDescription, 0, 50).'...';
@@ -228,10 +240,6 @@
 				$form->primitiveExists($propertyName.'_name')
 				? $form->getRawValue($propertyName.'_name')
 				: null;
-
-			$fetchClass = $this->property->getFetchClass();
-
-			$fetchItem = Item::dao()->getItemByName($fetchClass);
 
 			$model =
 				Model::create()->
