@@ -220,7 +220,7 @@ $(function() {
 		).result(function(event, item) {
 			$('input[name='+propertyName+']').val(item.id);
 			$('input[name='+propertyName+'_name]').css('color', 'black').val(item.name);
-			$('#'+propertyName+'_show').html(item.name);
+			$('#'+propertyName+'_show').css('color', 'grey').html(item.name);
 		});
 	});
 
@@ -230,7 +230,7 @@ $(function() {
 
 		$('input[name='+propertyName+']').val('');
 		$('input[name='+propertyName+'_name]').css('color', 'grey').val(main);
-		$('#'+propertyName+'_show').html('Не определено');
+		$('#'+propertyName+'_show').css('color', 'grey').html('Не определено');
 	});
 });
 
