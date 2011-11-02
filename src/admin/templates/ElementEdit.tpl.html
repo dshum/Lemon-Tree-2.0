@@ -220,7 +220,17 @@ $(function() {
 		).result(function(event, item) {
 			$('input[name='+propertyName+']').val(item.id);
 			$('input[name='+propertyName+'_name]').css('color', 'black').val(item.name);
+			$('#'+propertyName+'_show').html(item.name);
 		});
+	});
+
+	$('span[onetoone=reset]').livequery('click', function() {
+		var propertyName = $(this).attr('propertyName');
+		var main = $('input[name='+propertyName+'_name]').attr('main');
+
+		$('input[name='+propertyName+']').val('');
+		$('input[name='+propertyName+'_name]').css('color', 'grey').val(main);
+		$('#'+propertyName+'_show').html('Не определено');
 	});
 });
 
