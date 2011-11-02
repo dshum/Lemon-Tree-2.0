@@ -1,4 +1,4 @@
-<?php if(!$readonly && $node instanceof Element && sizeof($tree)) {?>
+<?php if(!$readonly && sizeof($tree)) {?>
 
 <script type="text/javascript">
 $(function() {
@@ -41,33 +41,17 @@ $(function() {
 <div id="<?=$propertyName?>_branch_<?=$plainList ? 'root' : $node->getPolymorphicId()?>"></div>
 </div><br>
 
-<?php } else {?>
+<?php } elseif($value instanceof Root) {?>
 
-<script type="text/javascript">
-$(function() {
-	$('#<?=$propertyName?>_show').click(function() {
-		$(this).hide();
-		$('#<?=$propertyName?>').show().focus();
-	});
-});
-</script>
-
-<?=$propertyDescription?>:
-<?php 	if($value) {?>
-<?php 		if($value instanceof Root) {?>
 <input type="hidden" name="<?=$propertyName?>" value="<?=$value->getId()?>">
 <?=$value->getAlterName()?><br><br>
-<?php 		} else {?>
-<a href="<?=PATH_ADMIN_BROWSE.'?module=ElementEdit&elementId='.$value->getPolymorphicId()?>" title="<?=$value->getItem()->getItemDescription()?>"><?=$value->getAlterName()?></a>
-<?php 			if(!$readonly && !$plainList && empty($showItemList)) {?>
-(<span id="<?=$propertyName?>_show" class="dashed hand">ID <?=$value->getId()?></span><input type="text" id="<?=$propertyName?>" name="<?=$propertyName?>" value="<?=$value->getId()?>" class="prop-mini" style="width: 75px; display: none;">)
-<?php 			}?><br><br>
-<?php 		}?>
-<?php 	} else {?>
-Не определено
-<?php 		if(!$readonly && !$plainList && empty($showItemList)) {?>
-(<span id="<?=$propertyName?>_show" class="dashed hand">ID</span><input type="text" id="<?=$propertyName?>" name="<?=$propertyName?>" value="" class="prop-mini" style="width: 75px; display: none;">)
-<?php 		}?><br><br>
-<?php 	}?>
+
+<?php } else {?>
+
+<?=$propertyDescription?>:
+<input type="hidden" name="<?=$propertyName?>" value="<?=$value ? $value->getId() : null?>">
+<?php if($value) {?><a href="<?=PATH_ADMIN_BROWSE.'?module=ElementEdit&elementId='.$value->getPolymorphicId()?>" title="<?=$value->getItem()->getItemDescription()?>"><?=$value->getAlterName()?></a><?php } else {?>Не определено<?php } ?>
+<?php if(!$readonly && !$plainList && empty($showItemList)) {?>&nbsp;&nbsp;&nbsp;<input type="text" id="<?=$propertyName?>_name" onetoone="name" itemId="<?=$fetchItem->getId()?>" propertyName="<?=$propertyName?>" main="Введите ID или название" name="<?=$propertyName?>_name" value="Введите ID или название" class="prop-mini" style="width: 300px; color: grey;"><?php }?>
+<br><br>
 
 <?php }?>
