@@ -375,8 +375,8 @@ $(function(){
 				max: 25
 			}
 		).result(function(event, item) {
-			$('input[name='+propertyName+']').val(item.id);
-			$('input[name='+propertyName+'_name]').val(item.name);
+			$('input[name='+propertyName+']').css('color', 'black').val(item.id);
+			$('input[name='+propertyName+'_name]').css('color', 'black').val(item.name);
 		});
 	});
 });
