@@ -226,28 +226,16 @@
 
 			$propertyName = $this->property->getPropertyName();
 
-			$raw =
-				$form->primitiveExists($propertyName)
-				? $form->getRawValue($propertyName)
-				: null;
-
 			$value =
 				$form->primitiveExists($propertyName)
 				? $form->getValue($propertyName)
-				: null;
-
-			$name =
-				$form->primitiveExists($propertyName.'_name')
-				? $form->getRawValue($propertyName.'_name')
 				: null;
 
 			$model =
 				Model::create()->
 				set('propertyName', $propertyName)->
 				set('propertyDescription', $propertyDescription)->
-				set('raw', $raw)->
 				set('value', $value)->
-				set('name', $name)->
 				set('fetchItem', $fetchItem);
 
 			$viewName = 'properties/'.get_class($this).'.search';

@@ -297,10 +297,13 @@ $(function(){
 	$('span[switch=true]').livequery('click', function() {
 		var propertyName = $(this).attr('name');
 		var block = $('#'+propertyName+'_block');
+
 		if(block.css('display') == 'block') {
 			block.hide();
 			block.children('input').attr('disabled', true);
+			$('#'+propertyName+'_sign').hide();
 		} else {
+			$('#'+propertyName+'_sign').show();
 			block.children('input').removeAttr('disabled');
 			block.show();
 			block.children('input:text:first').focus();
@@ -317,45 +320,7 @@ $(function(){
 		return false;
 	});
 
-	$('input[onetoone=id]').livequery('click', function() {
-		if($(this).val() == 'ID') {
-			$(this).css('color', 'black').val('');
-		}
-	}).livequery('focus', function() {
-		if($(this).val() == 'ID') {
-			$(this).css('color', 'black').val('');
-		}
-	}).livequery('change', function() {
-		if($(this).val() == '') {
-			$(this).css('color', 'grey').val('ID');
-		}
-	}).livequery('blur', function() {
-		if($(this).val() == '') {
-			$(this).css('color', 'grey').val('ID');
-		}
-	});
-
-	$('input[onetoone=name]').livequery('click', function() {
-		var main = $(this).attr('main');
-		if($(this).val() == main) {
-			$(this).css('color', 'black').val('');
-		}
-	}).livequery('focus', function() {
-		var main = $(this).attr('main');
-		if($(this).val() == main) {
-			$(this).css('color', 'black').val('');
-		}
-	}).livequery('change', function() {
-		var main = $(this).attr('main');
-		if($(this).val() == '') {
-			$(this).css('color', 'grey').val(main);
-		}
-	}).livequery('blur', function() {
-		var main = $(this).attr('main');
-		if($(this).val() == '') {
-			$(this).css('color', 'grey').val(main);
-		}
-	}).livequery(function() {
+	$('input[onetoone=name]').livequery(function() {
 		var itemId = $(this).attr('itemId');
 		var propertyName = $(this).attr('propertyName');
 
@@ -363,6 +328,7 @@ $(function(){
 			'<?=$selfUrl?>&action=hint&itemId='+itemId+'&print',
 			{
 				matchContains: true,
+				mustMatch: true,
 				formatItem: function(row, i, max) {return row.name+' ('+row.id+')'},
 				formatMatch: function(row, i, max) {return row.name},
 				formatResult: function(row) {return row.name},
@@ -372,12 +338,21 @@ $(function(){
 						return {data: row, value: row.name, result: row.name}
 					});
 				},
+				minChars: 2,
 				max: 25
 			}
 		).result(function(event, item) {
-			$('input[name='+propertyName+']').css('color', 'black').val(item.id);
 			$('input[name='+propertyName+'_name]').css('color', 'black').val(item.name);
+			$('#'+propertyName+'_show').html(item.id);
 		});
+	});
+
+	$('span[onetoone=reset]').livequery('click', function() {
+		var propertyName = $(this).attr('propertyName');
+
+		$('input[name='+propertyName+']').val('');
+		$('#'+propertyName+'_show').html('не определен');
+		$('input[name='+propertyName+'_name]').val('');
 	});
 });
 

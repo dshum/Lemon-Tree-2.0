@@ -215,6 +215,7 @@ $(function() {
 						return {data: row, value: row.name, result: row.name}
 					});
 				},
+				minChars: 2,
 				max: 25
 			}
 		).result(function(event, item) {
@@ -230,9 +231,10 @@ $(function() {
 
 		if($('input[name='+propertyName+']').val()) {
 			$('input[name='+propertyName+']').val('');
-			$('input[name='+propertyName+'_name]').css('color', 'grey').val(main);
 			$('#'+propertyName+'_show').css('color', 'grey').html('Не определено');
 		}
+
+		$('input[name='+propertyName+'_name]').css('color', 'grey').val(main);
 	});
 });
 
