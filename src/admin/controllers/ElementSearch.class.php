@@ -56,9 +56,15 @@
 				$elementList =
 					$itemClass->dao()->getValid()->
 					add(
-						Expression::like(
-							DBField::create('element_name', $itemClass->dao()->getTable()),
-							DBValue::create('%'.$query.'%')
+						Expression::orBlock(
+							Expression::like(
+								DBField::create('id', $itemClass->dao()->getTable()),
+								DBValue::create('%'.$query.'%')
+							),
+							Expression::like(
+								DBField::create('element_name', $itemClass->dao()->getTable()),
+								DBValue::create('%'.$query.'%')
+							)
 						)
 					)->
 					addOrder(
