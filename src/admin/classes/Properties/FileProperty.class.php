@@ -23,7 +23,7 @@
 
 			$item = $property->getItem();
 			$itemClass = $item->getClass();
-			$this->folder = $itemClass->dao()->getTable();
+			$this->folder = $itemClass ? $itemClass->dao()->getTable() : null;
 		}
 
 		public function setParameters()
