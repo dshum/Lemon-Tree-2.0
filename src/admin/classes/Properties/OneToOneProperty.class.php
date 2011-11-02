@@ -182,6 +182,10 @@
 
 			}
 
+			$fetchClass = $this->property->getFetchClass();
+
+			$fetchItem = Item::dao()->getItemByName($fetchClass);
+
 			$model =
 				Model::create()->
 				set('propertyName', $this->property->getPropertyName())->
@@ -193,7 +197,8 @@
 				set('checked', $checked)->
 				set('showItemList', $showItemList)->
 				set('plainList', $plainList)->
-				set('tree', $tree);
+				set('tree', $tree)->
+				set('fetchItem', $fetchItem);
 
 			$viewName = 'properties/'.get_class($this).'.editElement';
 
@@ -224,8 +229,6 @@
 				? $form->getRawValue($propertyName.'_name')
 				: null;
 
-			$selfUrl = PATH_ADMIN_BROWSE.'?module=ElementSearch';
-
 			$fetchClass = $this->property->getFetchClass();
 
 			$fetchItem = Item::dao()->getItemByName($fetchClass);
@@ -237,7 +240,6 @@
 				set('raw', $raw)->
 				set('value', $value)->
 				set('name', $name)->
-				set('selfUrl', $selfUrl)->
 				set('fetchItem', $fetchItem);
 
 			$viewName = 'properties/'.get_class($this).'.search';

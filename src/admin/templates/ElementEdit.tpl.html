@@ -26,6 +26,7 @@ $(function() {
 		$('textarea[tinymce=true]').each(function() {
 			this.value = tinyMCE.get(this.name).getContent();
 		});
+		$('input[onetoone=name]').blur();
 <?php if($currentElement->getId()) {?>
 		LT.Common.ajaxSubmit(function(data){
 			if(data.propertyContent && data.propertyContent.length) {
@@ -170,22 +171,57 @@ $(function() {
 	}).keyup(function() {
 		setTimestamp($(this).attr('property'));
 	});
-	/*.mousewheel(function(event, delta) {
-		onTimeMousewheel($(this), delta);
-		setTimestamp($(this).attr('property'));
-		return false;
-	})*/
 
 	$('input:text[time=true]').change(function() {
 		setTime($(this).attr('property'));
 	}).keyup(function() {
 		setTime($(this).attr('property'));
 	});
-	/*.mousewheel(function(event, delta) {
-		onTimeMousewheel($(this), delta);
-		setTime($(this).attr('property'));
-		return false;
-	})*/
+
+	$('input[onetoone=name]').livequery('click', function() {
+		var main = $(this).attr('main');
+		if($(this).val() == main) {
+			$(this).css('color', 'black').val('');
+		}
+	}).livequery('focus', function() {
+		var main = $(this).attr('main');
+		if($(this).val() == main) {
+			$(this).css('color', 'black').val('');
+		}
+	}).livequery('change', function() {
+		var main = $(this).attr('main');
+		if($(this).val() == '') {
+			$(this).css('color', 'grey').val(main);
+		}
+	}).livequery('blur', function() {
+		var main = $(this).attr('main');
+		if($(this).val() == '') {
+			$(this).css('color', 'grey').val(main);
+		}
+	}).livequery(function() {
+		var itemId = $(this).attr('itemId');
+		var propertyName = $(this).attr('propertyName');
+
+		$(this).autocomplete(
+			'<?=$baseUrl?>?module=ElementSearch&action=hint&itemId='+itemId+'&print',
+			{
+				matchContains: true,
+				formatItem: function(row, i, max) {return row.name+' ('+row.id+')'},
+				formatMatch: function(row, i, max) {return row.name},
+				formatResult: function(row) {return row.name},
+				dataType: 'json',
+				parse: function(data) {
+					return $.map(data, function(row) {
+						return {data: row, value: row.name, result: row.name}
+					});
+				},
+				max: 25
+			}
+		).result(function(event, item) {
+			$('input[name='+propertyName+']').val(item.id);
+			$('input[name='+propertyName+'_name]').css('color', 'black').val(item.name);
+		});
+	});
 });
 
 var onTimeMousewheel = function(object, delta) {
