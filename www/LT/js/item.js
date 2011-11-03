@@ -84,7 +84,7 @@ LT.Item = function() {
 			if(added.propertyClass == 'VirtualProperty') {
 				this.name = null;
 				this.value = null;
-				this.disabled = 'disabled';
+				this.disabled = true;
 				$('input[name=propertyClass_add_field_hidden]:first').each(function(){
 					this.name = 'propertyClass_'+added.id;
 					this.value = added.propertyClass;
