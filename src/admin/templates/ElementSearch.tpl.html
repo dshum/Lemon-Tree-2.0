@@ -342,6 +342,7 @@ $(function(){
 				max: 25
 			}
 		).result(function(event, item) {
+			$('#'+propertyName).val(item.id);
 			$('input[name='+propertyName+'_name]').css('color', 'black').val(item.name);
 			$('#'+propertyName+'_show').html(item.id);
 		});
