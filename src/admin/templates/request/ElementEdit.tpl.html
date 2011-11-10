@@ -27,6 +27,7 @@
 	} elseif(isset($form) && $form->getErrors()) {
 
 		foreach($propertyList as $property) {
+			if(!$form->primitiveExists($property->getPropertyName())) continue;
 			$form->
 			addMissingLabel(
 				$property->getPropertyName(),
