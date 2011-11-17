@@ -327,8 +327,6 @@ $(function(){
 		$(this).autocomplete(
 			'<?=$selfUrl?>&action=hint&itemId='+itemId+'&print',
 			{
-				matchContains: true,
-				mustMatch: true,
 				formatItem: function(row, i, max) {return row.name+' ('+row.id+')'},
 				formatMatch: function(row, i, max) {return row.name},
 				formatResult: function(row) {return row.name},
@@ -338,13 +336,15 @@ $(function(){
 						return {data: row, value: row.name, result: row.name}
 					});
 				},
-				minChars: 2,
-				max: 25
+				minChars: 0,
+				max: 50
 			}
 		).result(function(event, item) {
 			$('#'+propertyName).val(item.id);
 			$('input[name='+propertyName+'_name]').css('color', 'black').val(item.name);
 			$('#'+propertyName+'_show').html(item.id);
+		}).blur(function(){
+			$(this).search();
 		});
 	});
 

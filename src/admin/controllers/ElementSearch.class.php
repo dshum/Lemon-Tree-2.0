@@ -40,9 +40,7 @@
 					required()
 				)->
 				add(
-					Primitive::string('q')->
-					required()->
-					setMin(2)
+					Primitive::string('q')
 				)->
 				import($request->getGet());
 
@@ -53,9 +51,15 @@
 
 				$itemClass = $item->getClass();
 
-				$elementList =
+				$elementListCriteria =
 					$itemClass->dao()->getValid()->
-					add(
+					addOrder(
+						DBField::create('element_name', $itemClass->dao()->getTable())
+					)->
+					setLimit(50);
+
+				if($query) {
+					$elementListCriteria->add(
 						Expression::orBlock(
 							Expression::like(
 								DBField::create('id', $itemClass->dao()->getTable()),
@@ -66,11 +70,10 @@
 								DBValue::create('%'.$query.'%')
 							)
 						)
-					)->
-					addOrder(
-						DBField::create('element_name', $itemClass->dao()->getTable())
-					)->
-					getList();
+					);
+				}
+
+				$elementList = $elementListCriteria->getList();
 
 				$hint = array();
 
