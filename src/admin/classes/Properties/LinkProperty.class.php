@@ -5,6 +5,8 @@
 		{
 			parent::setParameters();
 
+			$this->addParameter('showItems', 'itemList', 'Классы элементов', array());
+
 			return $this;
 		}
 
@@ -20,27 +22,17 @@
 
 		public function add2form(Form $form)
 		{
-			$primitive =
-				Primitive::string($this->property->getPropertyName())->
-				setMax(255)->
-				addImportFilter(Filter::trim())->
-				addImportFilter(Filter::stripTags());
-
-			return $form->add($primitive);
-		}
-
-		public function add2multiform(Form $form)
-		{
-			$primitiveName =
-				'edit_'.$this->element->getClass()
-				.'_'.$this->element->getId()
-				.'_'.$this->property->getPropertyName();
+			if(!$this->property->getFetchClass()) {
+				return $form;
+			}
 
 			$primitive =
-				Primitive::string($primitiveName)->
-				setMax(255)->
-				addImportFilter(Filter::trim())->
-				addImportFilter(Filter::stripTags());
+				Primitive::polymorphicIdentifier($this->property->getPropertyName())->
+				ofBase('Element');
+
+			if($this->property->getIsRequired()) {
+				$primitive->required();
+			}
 
 			return $form->add($primitive);
 		}
@@ -64,12 +56,24 @@
 
 		public function getEditElementView()
 		{
+			$required = $this->property->getIsRequired();
+			$readonly = $this->getParameterValue('readonly');
+			$showItemList = $this->getParameterValue('showItems');
+
+			$fetchItems = array();
+			foreach($showItemList as $showItem) {
+				$fetchItems[] = $showItem->getId();
+			}
+			$fetchItems = implode(',', $fetchItems);
+
 			$model =
 				Model::create()->
 				set('propertyName', $this->property->getPropertyName())->
 				set('propertyDescription', $this->property->getPropertyDescription())->
-				set('value', $this->value)->
-				set('element', $this->element());
+				set('value', $this->element())->
+				set('required', $required)->
+				set('readonly', $readonly)->
+				set('fetchItems', $fetchItems);
 
 			$viewName = 'properties/'.get_class($this).'.editElement';
 
