@@ -110,7 +110,7 @@
 		{
 			$elementList = $form->getValue($this->property->getPropertyName());
 			if($this->value instanceof ManyToManyLinked) {
-				$this->value->setList($elementList)->save();
+				$this->value->fetch()->setList($elementList)->save();
 			}
 		}
 
