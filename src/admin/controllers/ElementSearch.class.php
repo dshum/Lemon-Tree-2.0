@@ -75,13 +75,26 @@
 
 				$elementList = $elementListCriteria->getList();
 
+				$prev = null;
+				$k = 2;
 				$hint = array();
 
 				foreach($elementList as $element) {
+					$id = $element->getId();
+					$name = $element->getElementName();
+					$name = str_replace('&nbsp;', ' ', $name);
+					if($prev == $name) {
+						$name = $name.' '.$k;
+						$k++;
+					} else {
+						$name = $name;
+						$k = 2;
+					}
 					$hint[] = array(
-						'id' => $element->getId(),
-						'name' => $element->getElementName(),
+						'id' => $id,
+						'name' => $name,
 					);
+					$prev = $name;
 				}
 
 				$model->set('hint', $hint);
