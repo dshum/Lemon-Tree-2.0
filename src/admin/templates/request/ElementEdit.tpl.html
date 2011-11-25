@@ -48,12 +48,12 @@
 
 	}
 
-	if(isset($addElement) && $addElement == 'error') {
-		$error[] = 'Произошла ошибка при создании элемента.';
+	if(isset($addElement) && $addElement == 'error' && isset($message)) {
+		$error[] = 'Произошла ошибка при создании элемента.<br><br>'.$error;
 	}
 
-	if(isset($saveElement) && $saveElement == 'error') {
-		$error[] = 'Произошла ошибка при сохранении элемента.';
+	if(isset($saveElement) && $saveElement == 'error' && isset($message)) {
+		$error[] = 'Произошла ошибка при сохранении элемента.<br><br>'.$message;
 	}
 
 	if(isset($restrict) && $restrict == 'error') {

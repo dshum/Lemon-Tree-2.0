@@ -313,6 +313,7 @@
 
 			} catch (BaseException $e) {
 				$model->set('addElement', 'error');
+				$model->set('message', ErrorMessageUtils::printMessage($e));
 			}
 
 			return
@@ -440,6 +441,7 @@
 			} catch (BaseException $e) {
 				ErrorMessageUtils::sendMessage($e);
 				$model->set('saveElement', 'error');
+				$model->set('message', ErrorMessageUtils::printMessage($e));
 			}
 
 			return
