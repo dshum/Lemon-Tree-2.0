@@ -94,7 +94,7 @@
 						'id' => $id,
 						'name' => $name,
 					);
-					$prev = $name;
+					$prev = $element->getElementName();
 				}
 
 				$model->set('hint', $hint);
