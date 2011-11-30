@@ -240,6 +240,69 @@ $(function() {
 
 		$('input[name='+propertyName+'_name]').css('color', 'grey').val(main);
 	});
+
+	$('input[link=name]').livequery('click', function() {
+		var main = $(this).attr('main');
+		if($(this).val() == main) {
+			$(this).css('color', 'black').val('');
+		}
+
+	}).livequery('focus', function() {
+		var main = $(this).attr('main');
+		if($(this).val() == main) {
+			$(this).css('color', 'black').val('');
+		}
+	}).livequery('change', function() {
+		var main = $(this).attr('main');
+		if($(this).val() == '') {
+			$(this).css('color', 'grey').val(main);
+		}
+	}).livequery('blur', function() {
+		var main = $(this).attr('main');
+		if($(this).val() == '') {
+			$(this).css('color', 'grey').val(main);
+		}
+	}).livequery(function() {
+		var propertyId = $(this).attr('propertyId');
+		var propertyName = $(this).attr('propertyName');
+
+		$(this).autocomplete(
+			'<?=$baseUrl?>?module=ElementSearch&action=multihint&propertyId='+propertyId+'&print',
+			{
+				formatItem: function(row, i, max) {return row.name+' ('+row.id+')'},
+				formatMatch: function(row, i, max) {return row.name},
+				formatResult: function(row) {return row.name},
+				dataType: 'json',
+				parse: function(data) {
+					return $.map(data, function(row) {
+						return {data: row, value: row.name, result: row.name}
+					});
+				},
+				minChars: 0,
+				max: 50
+			}
+		).result(function(event, item) {
+			if(item) {
+				$('input[name='+propertyName+']').val(item.id);
+				$('input[name='+propertyName+'_name]').css('color', 'black').val(item.name);
+				$('#'+propertyName+'_show').css('color', 'grey').html(item.name);
+			}
+		}).blur(function(){
+			$(this).search();
+		});
+	});
+
+	$('span[link=reset]').livequery('click', function() {
+		var propertyName = $(this).attr('propertyName');
+		var main = $('input[name='+propertyName+'_name]').attr('main');
+
+		if($('input[name='+propertyName+']').val()) {
+			$('input[name='+propertyName+']').val('');
+			$('#'+propertyName+'_show').css('color', 'grey').html('Не определено');
+		}
+
+		$('input[name='+propertyName+'_name]').css('color', 'grey').val(main);
+	});
 });
 
 var onTimeMousewheel = function(object, delta) {

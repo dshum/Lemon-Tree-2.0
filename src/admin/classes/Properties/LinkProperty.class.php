@@ -22,10 +22,6 @@
 
 		public function add2form(Form $form)
 		{
-			if(!$this->property->getFetchClass()) {
-				return $form;
-			}
-
 			$primitive =
 				Primitive::polymorphicIdentifier($this->property->getPropertyName())->
 				ofBase('Element');
@@ -40,6 +36,24 @@
 		public function element()
 		{
 			return Element::getByPolymorphicId($this->value);
+		}
+
+		public function isUpdate()
+		{
+			return true;
+		}
+
+		public function set(Form $form)
+		{
+			if(
+				$this->getParameterValue('hidden') == false
+				&& $form->primitiveExists($this->property->getPropertyName())
+				&& $this->element instanceof Element
+			) {
+				$setter = $this->property->setter();
+				$value = $form->getRawValue($this->property->getPropertyName());
+				$this->element->$setter($value);
+			}
 		}
 
 		public function getElementListView()
@@ -68,12 +82,13 @@
 
 			$model =
 				Model::create()->
+				set('propertyId', $this->property->getId())->
 				set('propertyName', $this->property->getPropertyName())->
 				set('propertyDescription', $this->property->getPropertyDescription())->
 				set('value', $this->element())->
 				set('required', $required)->
 				set('readonly', $readonly)->
-				set('fetchItems', $fetchItems);
+				set('showItemList', $showItemList);
 
 			$viewName = 'properties/'.get_class($this).'.editElement';
 

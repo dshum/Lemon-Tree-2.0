@@ -10,6 +10,7 @@
 		{
 			$this->
 			setMethodMapping('hint', 'hint')->
+			setMethodMapping('multihint', 'multihint')->
 			setMethodMapping('expand', 'expand')->
 			setMethodMapping('show', 'showList')->
 			setMethodMapping('save', 'saveList')->
@@ -95,6 +96,95 @@
 						'name' => $name,
 					);
 					$prev = $element->getElementName();
+				}
+
+				$model->set('hint', $hint);
+			}
+
+			return
+				ModelAndView::create()->
+				setModel($model)->
+				setView('request/ElementSearch.hint');
+		}
+
+		protected function multihint(HttpRequest $request)
+		{
+			$model = Model::create();
+
+			$loggedUser = LoggedUser::getUser();
+
+			$form =
+				Form::create()->
+				add(
+					Primitive::identifier('propertyId')->
+					of('Property')->
+					required()
+				)->
+				add(
+					Primitive::string('q')
+				)->
+				import($request->getGet());
+
+			if(!$form->getErrors()) {
+
+				$property =  $form->getValue('propertyId');
+				$query =  $form->getValue('q');
+
+				$propertyClass = $property->getClass(null)->setParameters();
+
+				$showItemList = $propertyClass->getParameterValue('showItems');
+
+				$hint = array();
+
+				foreach($showItemList as $item) {
+
+					$itemClass = $item->getClass();
+
+					$elementListCriteria =
+						$itemClass->dao()->getValid()->
+						addOrder(
+							DBField::create('element_name', $itemClass->dao()->getTable())
+						)->
+						setLimit(50);
+
+					if($query) {
+						$elementListCriteria->add(
+							Expression::orBlock(
+								Expression::like(
+									DBField::create('id', $itemClass->dao()->getTable()),
+									DBValue::create('%'.$query.'%')
+								),
+								Expression::like(
+									DBField::create('element_name', $itemClass->dao()->getTable()),
+									DBValue::create('%'.$query.'%')
+								)
+							)
+						);
+					}
+
+					$elementList = $elementListCriteria->getList();
+
+					$prev = null;
+					$k = 2;
+
+					foreach($elementList as $element) {
+						$id = $element->getPolymorphicId();
+						$name = $element->getElementName();
+						$name = str_replace('&nbsp;', ' ', $name);
+						if($prev == $name) {
+							$name = $name.' '.$k;
+							$k++;
+						} else {
+							$name = $name;
+							$k = 2;
+						}
+						$hint[] = array(
+							'id' => $id,
+							'name' => $name,
+						);
+						$prev = $element->getElementName();
+					}
+
 				}
 
 				$model->set('hint', $hint);

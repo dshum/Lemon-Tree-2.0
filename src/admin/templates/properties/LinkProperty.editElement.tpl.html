@@ -1,5 +1,5 @@
 <?=$propertyDescription?>:
-<input type="hidden" name="<?=$propertyName?>" value="<?=$value ? $value->getId() : null?>">
+<input type="hidden" name="<?=$propertyName?>" value="<?=$value ? $value->getPolymorphicId() : null?>">
 <?php if($value) {?><span id="<?=$propertyName?>_show"><a href="<?=PATH_ADMIN_BROWSE.'?module=ElementEdit&elementId='.$value->getPolymorphicId()?>" title="<?=$value->getItem()->getItemDescription()?>"><?=$value->getAlterName()?></a></span><?php } else {?><span id="<?=$propertyName?>_show">Не определено</span><?php } ?>
-<?php if(!$readonly && $fetchItems) {?>&nbsp;&nbsp;<input type="text" id="<?=$propertyName?>_name" link="name" itemIds="<?=$fetchItems?>" propertyName="<?=$propertyName?>" main="Введите ID или название" name="<?=$propertyName?>_name" value="Введите ID или название" class="prop-mini" style="width: 300px; color: grey;">&nbsp;&nbsp;<span id="<?=$propertyName?>_reset" link="reset" propertyName="<?=$propertyName?>" class="dashed hand">Очистить</span><?php }?>
+<?php if(!$readonly && sizeof($showItemList)) {?>&nbsp;&nbsp;<input type="text" id="<?=$propertyName?>_name" link="name" propertyId="<?=$propertyId?>" propertyName="<?=$propertyName?>" main="Введите ID или название" name="<?=$propertyName?>_name" value="Введите ID или название" class="prop-mini" style="width: 300px; color: grey;">&nbsp;&nbsp;<span id="<?=$propertyName?>_reset" link="reset" propertyName="<?=$propertyName?>" class="dashed hand">Очистить</span><?php }?>
 <br><br>
