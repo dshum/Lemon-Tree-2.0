@@ -34,7 +34,7 @@ $(function() {
 <?php 	if($value) {?>
 <span id="<?=$propertyName?>_description" class="dashed hand"><?=$value->getAlterName()?></span><br>
 <?php 	} else {?>
-<span id="<?=$propertyName?>_description" class="dashed hand">Не определено</span><br>
+<span id="<?=$propertyName?>_description" class="dashed hand">Не определено 5</span><br>
 <?php 	}?>
 <div id="<?=$propertyName?>_block" class="prop_block" style="overflow-y: scroll; display: none;" overflow="true">
 <img src="img/p.gif" width="11" height="11" alt=""><input type="radio" id="<?=$propertyName?>_check_0" name="<?=$propertyName?>" value=""<?=$checked?> title="Выбрать"><label for="<?=$propertyName?>_check_0">&nbsp;Не определено</label>
@@ -52,7 +52,7 @@ $(function() {
 <?=$propertyDescription?>:
 <input type="hidden" name="<?=$propertyName?>" value="<?=$value ? $value->getId() : null?>">
 <?php if($value) {?><span id="<?=$propertyName?>_show"><a href="<?=PATH_ADMIN_BROWSE.'?module=ElementEdit&elementId='.$value->getPolymorphicId()?>" title="<?=$value->getItem()->getItemDescription()?>"><?=$value->getAlterName()?></a></span><?php } else {?><span id="<?=$propertyName?>_show">Не определено</span><?php } ?>
-<?php if(!$readonly && !$plainList && empty($showItemList)) {?>&nbsp;&nbsp;<input type="text" id="<?=$propertyName?>_name" onetoone="name" itemId="<?=$fetchItem ? $fetchItem->getId() : null?>" propertyName="<?=$propertyName?>" main="Введите ID или название" name="<?=$propertyName?>_name" value="Введите ID или название" class="prop-mini" style="width: 300px; color: grey;">&nbsp;&nbsp;<span id="<?=$propertyName?>_reset" onetoone="reset" propertyName="<?=$propertyName?>" class="dashed hand">Очистить</span><?php }?>
+<?php if(!$readonly) {?>&nbsp;&nbsp;<input type="text" id="<?=$propertyName?>_name" onetoone="name" itemId="<?=$fetchItem ? $fetchItem->getId() : null?>" propertyName="<?=$propertyName?>" main="Введите ID или название" name="<?=$propertyName?>_name" value="Введите ID или название" class="prop-mini" style="width: 300px; color: grey;">&nbsp;&nbsp;<span id="<?=$propertyName?>_reset" onetoone="reset" propertyName="<?=$propertyName?>" class="dashed hand">Очистить</span><?php }?>
 <br><br>
 
 <?php }?>

@@ -199,7 +199,6 @@
 				set('readonly', $readonly)->
 				set('node', $node)->
 				set('checked', $checked)->
-				set('showItemList', $showItemList)->
 				set('plainList', $plainList)->
 				set('tree', $tree)->
 				set('fetchItem', $fetchItem);
