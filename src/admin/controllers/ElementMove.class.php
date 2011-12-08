@@ -1,6 +1,8 @@
 <?php
 	final class ElementMove extends MethodMappedController
 	{
+		const DEST_LIMIT = 500;
+
 		public function __construct()
 		{
 			$this->
@@ -155,59 +157,80 @@
 			# Move element list
 			$moveElementList = Element::getListByPolymorphicIds($check);
 
-			# Show tree
+			# Destination
 			$itemElementList = array();
 
 			$sourceItem = $sourceElement->getItem();
 			$itemClass = $sourceItem->getClass();
-			$itemElementList[$sourceItem->getId()] =
+
+			$custom =
 				$itemClass->dao()->getValid()->
-				addOrder($sourceItem->getOrderBy())->
-				getList();
+				addProjection(Projection::count('id', 'count'))->
+				getCustom();
 
-			$checkList = array();
-			$itemParentList = array();
-			$tmpList = $itemElementList[$sourceItem->getId()];
+			$count = $custom['count'];
 
-			while(true) {
-				$parentList = array();
+			if($count > self::DEST_LIMIT) {
 
-				foreach($tmpList as $element) {
-					$parent = $element->getParent();
-					if(
-						$parent instanceof Element
-						&& !isset($checkList[$parent->getPolymorphicId()])
-						&& $parent->getItem()
-					) {
-						$itemParentList[$parent->getItem()->getId()][] = $parent->getId();
-						$parentList[] = $parent;
-						$checkList[$parent->getPolymorphicId()] = 1;
+				$mode = 'hint';
+
+				$itemElementList = array();
+
+			} else {
+
+				$mode = 'tree';
+
+				$itemElementList[$sourceItem->getId()] =
+					$itemClass->dao()->getValid()->
+					addOrder($sourceItem->getOrderBy())->
+					getList();
+
+				$checkList = array();
+				$itemParentList = array();
+				$tmpList = $itemElementList[$sourceItem->getId()];
+
+				while(true) {
+					$parentList = array();
+
+					foreach($tmpList as $element) {
+						$parent = $element->getParent();
+						if(
+							$parent instanceof Element
+							&& !isset($checkList[$parent->getPolymorphicId()])
+							&& $parent->getItem()
+						) {
+							$itemParentList[$parent->getItem()->getId()][] = $parent->getId();
+							$parentList[] = $parent;
+							$checkList[$parent->getPolymorphicId()] = 1;
+						}
 					}
+
+					if(empty($parentList)) break;
+
+					$tmpList = $parentList;
 				}
 
-				if(empty($parentList)) break;
+				foreach($itemParentList as $itemId => $elementIdList) {
+					if($itemId == $sourceItem->getId()) continue;
 
-				$tmpList = $parentList;
+					$item = Item::dao()->getItemById($itemId);
+					$itemClass = $item->getClass();
+
+					$itemElementList[$item->getId()] =
+						$itemClass->dao()->getValid()->
+						add(
+							Expression::in(
+								new DBField('id', $itemClass->dao()->getTable()),
+								$elementIdList
+							)
+						)->
+						addOrder($item->getOrderBy())->
+						getList();
+				}
+
 			}
 
-			foreach($itemParentList as $itemId => $elementIdList) {
-				if($itemId == $sourceItem->getId()) continue;
-
-				$item = Item::dao()->getItemById($itemId);
-				$itemClass = $item->getClass();
-
-				$itemElementList[$item->getId()] =
-					$itemClass->dao()->getValid()->
-					add(
-						Expression::in(
-							new DBField('id', $itemClass->dao()->getTable()),
-							$elementIdList
-						)
-					)->
-					addOrder($item->getOrderBy())->
-					getList();
-			}
-
+			$model->set('mode', $mode);
 			$model->set('moveElementList', $moveElementList);
 			$model->set('itemList', $itemList);
 			$model->set('sourceItem', $sourceItem);

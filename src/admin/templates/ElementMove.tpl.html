@@ -1,10 +1,18 @@
 <?php $partViewer->view("include/header");?>
 
 <script type="text/javascript" src="<?=PATH_WEB_JS?>elementmove.js"></script>
-<script type="text/javascript">
 
+<script type="text/javascript">
 $(function(){
 	var countChecked = <?=sizeof($moveElementList)?>;
+
+	LT.Common.mainForm = $('#ElementMoveForm');
+
+	LT.Common.mainForm.submit(function() {
+		return false;
+	});
+
+<?php if($mode == 'tree') {?>
 
 <?php
 foreach($itemList as $item) {
@@ -21,8 +29,6 @@ foreach($itemList as $item) {
 ?>
 
 	LT.ElementMove.buildTree();
-
-	LT.Common.mainForm = $('#ElementMoveForm');
 
 	$('a[id^=link_]').click(function(){
 		var element = this;
@@ -54,9 +60,90 @@ foreach($itemList as $item) {
 		return false;
 	});
 
-	LT.Common.mainForm.submit(function() {
+<?php } else {?>
+
+	$('#dest_hint').click(function() {
+		var main = $(this).attr('main');
+		if($(this).val() == main) {
+			$(this).css('color', 'black').val('');
+		}
+	}).focus(function() {
+		var main = $(this).attr('main');
+		if($(this).val() == main) {
+			$(this).css('color', 'black').val('');
+		}
+	}).change(function() {
+		var main = $(this).attr('main');
+		if($(this).val() == '') {
+			$(this).css('color', 'grey').val(main);
+		}
+	}).blur(function() {
+		var main = $(this).attr('main');
+		if($(this).val() == '') {
+			$(this).css('color', 'grey').val(main);
+		}
+	}).autocomplete(
+		'<?=$baseUrl?>?module=ElementSearch&action=hint&itemId=<?=$sourceItem->getId()?>&print',
+		{
+			formatItem: function(row, i, max) {return row.name+' ('+row.id+')'},
+			formatMatch: function(row, i, max) {return row.name},
+			formatResult: function(row) {return row.name},
+			dataType: 'json',
+			parse: function(data) {
+				return $.map(data, function(row) {
+					return {data: row, value: row.name, result: row.name}
+				});
+			},
+			minChars: 0,
+			max: 50
+		}
+	).result(function(event, item) {
+		if(item) {
+			$('#dest').val(item.id);
+			$('#dest_show').html(item.name);
+			$('#dest_hint').css('color', 'black').val(item.name);
+			$('#move_button').removeAttr('disabled');
+		}
+	}).blur(function(){
+		$(this).search();
+	});
+
+	$('#dest_reset').click(function() {
+		$('#dest').val('');
+		$('#dest_show').html('не определено');
+		$('#dest_hint').css('color', 'grey').val($('#dest_hint').attr('main'));
+		$('#move_button').attr('disabled', 'disabled');
+	});
+
+	$('#move_button').click(function() {
+		if(countChecked > 0) {
+			if(!confirm('Перенести выбранные элементы в раздел "'+$('#dest_show').html()+'"?')) {
+				return false;
+			}
+		} else {
+			alert('Не выбрано ни одного элемента.');
+			return false;
+		}
+
+		$(LT.Common.mainForm).each(function(){
+			this.action = LT.Common.baseUrl+'?module=ElementMove&action=move&targetId=<?=$sourceItem->getItemName()?>.'+$('#dest').val();
+		});
+
+		LT.Common.ajaxSubmit(function(data){
+			if(data.tree && data.tree.length) {
+				top.tree.LT.Tree.dropTree();
+				for(var i in data.tree) {
+					top.tree.LT.Tree.addElement(data.tree[i].parentId, data.tree[i].elementId, data.tree[i].elementName, data.tree[i].permissionId, data.tree[i].openFolder);
+				}
+				top.tree.LT.Tree.buildTree();
+			}
+			document.location.href = LT.Common.baseUrl+'?module=ViewBrowse&elementId=<?=$sourceItem->getItemName()?>.'+$('#dest').val();
+		});
+
 		return false;
 	});
+
+<?php }?>
 
 	$('#what_move').click(function(){
 		$('#table_move').each(function(){
@@ -110,8 +197,22 @@ foreach($itemList as $item) {
 
 <h2 class="h2_marg3">Куда переносим:</h2>
 <div class="move_records">
+<?php if($mode == 'tree') {?>
 <img src="img/root.png" width="43" height="56" alt="<?=Root::me()->getElementName()?>"><br>
 <div class="tree"><ul id="branch_<?=Root::me()->getPolymorphicId()?>"></ul></div>
+<?php } else {?>
+<div style="width: 60%;">
+<div class="record_block_top"><div><img src="img/edit01.gif" width="12" height="12" alt=""></div></div>
+<div class="record_block">
+<b><?=$sourceItem->getItemDescription()?></b>:
+<input type="hidden" id="dest" name="dest" value="">
+<span id="dest_show">не определено</span>&nbsp;&nbsp;<input type="text" id="dest_hint" name="dest_hint" main="Введите ID или название" value="Введите ID или название" class="prop-mini" style="width: 300px; color: grey;">&nbsp;&nbsp;<span id="dest_reset" class="dashed hand">Очистить</span>
+</div>
+<div class="record_block_bottom"><div><img src="img/edit04.gif" width="12" height="12" alt=""></div></div>
+<br>
+<input type="submit" id="move_button" value="Перенести" disabled="disabled">
+</div>
+<?php }?>
 </div>
 
 <div id="block_move" class="block_move">

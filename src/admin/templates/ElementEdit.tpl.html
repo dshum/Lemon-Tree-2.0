@@ -183,7 +183,6 @@ $(function() {
 		if($(this).val() == main) {
 			$(this).css('color', 'black').val('');
 		}
-
 	}).livequery('focus', function() {
 		var main = $(this).attr('main');
 		if($(this).val() == main) {
@@ -235,7 +234,7 @@ $(function() {
 
 		if($('input[name='+propertyName+']').val()) {
 			$('input[name='+propertyName+']').val('');
-			$('#'+propertyName+'_show').css('color', 'grey').html('Не определено');
+			$('#'+propertyName+'_show').css('color', 'grey').html('не определено');
 		}
 
 		$('input[name='+propertyName+'_name]').css('color', 'grey').val(main);
@@ -497,6 +496,7 @@ foreach ($propertyList as $property) {
 <?php 	}?>
 <?php } else {?>
 <input class="btn" type="submit" id="save_button" value="Ctrl+S Добавить">
+</form>
 <?php }?>
 
 <?php $partViewer->view("include/footer");?>
