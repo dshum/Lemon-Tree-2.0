@@ -141,12 +141,9 @@
 
 		public function getChildrenCount(Element $element)
 		{
-			$projection = new ProjectionChain();
-			$projection->add(Projection::count('id', 'count'));
-
 			$criteria =
 				$this->getChildren($element)->
-				setProjection($projection);
+				addProjection(Projection::count('id', 'count'));
 
 			return $criteria->getCustom('count');
 		}
