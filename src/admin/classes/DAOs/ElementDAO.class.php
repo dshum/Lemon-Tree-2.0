@@ -423,6 +423,20 @@
 			return $this->dropNode($currentElement);
 		}
 
+		public function cacheEmptyResult(SelectQuery $query, $expires = Cache::EXPIRES_FOREVER)
+		{
+			$className = $this->getObjectName();
+
+			$watermark =
+				Cache::me() instanceof WatermarkedPeer
+				? Cache::me()->mark($className)->getActualWatermark()
+				: null;
+
+			$key = $className.'_query_'.$query->getId().$watermark;
+
+			Cache::me()->mark($className)->add($key, Cache::NOT_FOUND, $expires);
+		}
+
 		private function hasDuplicates($id, $status, $elementPath)
 		{
 			$id = (int)$id;
