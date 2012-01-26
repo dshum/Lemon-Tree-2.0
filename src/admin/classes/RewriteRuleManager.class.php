@@ -54,7 +54,6 @@
 		public function regexp($search, $pattern)
 		{
 			$search = '/'.trim($search, '/');
-			$pattern = '/'.trim($pattern, '/');
 
 			return preg_match('~'.$pattern.'~i', $search);
 		}
