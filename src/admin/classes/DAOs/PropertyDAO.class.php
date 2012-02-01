@@ -358,39 +358,12 @@
 					.' DROP COLUMN '.$dialect->quoteField($columnName);
 
 				try {
-
 					$db->queryRaw($query);
-
-					$this->drop($property);
-
-					if(isset($this->propertyList[$item->getId()][$property->getId()])) {
-						unset($this->propertyList[$item->getId()][$property->getId()]);
-					}
-					if(isset($this->propertyMap[$item->getId()][$property->getPropertyName()])) {
-						unset($this->propertyMap[$item->getId()][$property->getPropertyName()]);
-					}
-
 				} catch (DatabaseException $e) {
-					echo ErrorMessageUtils::printMessage($e);
+					ErrorMessageUtils::sendMessage($e);
 				}
 
 			} elseif(
-				!$item->isDefault()
-				|| $property->getPropertyClass() == 'VirtualProperty'
-			) {
-
-				$this->drop($property);
-
-				if(isset($this->propertyList[$item->getId()][$property->getId()])) {
-					unset($this->propertyList[$item->getId()][$property->getId()]);
-				}
-				if(isset($this->propertyMap[$item->getId()][$property->getPropertyName()])) {
-					unset($this->propertyMap[$item->getId()][$property->getPropertyName()]);
-				}
-
-			}
-
-			if(
 				$item->isDefault()
 				&& $property->getPropertyClass() == 'ManyToManyProperty'
 			) {
@@ -411,7 +384,18 @@
 
 				try {
 					$db->queryRaw($query);
-				} catch (DatabaseException $e) {}
+				} catch (DatabaseException $e) {
+					ErrorMessageUtils::sendMessage($e);
+				}
+			}
+
+			$this->drop($property);
+
+			if(isset($this->propertyList[$item->getId()][$property->getId()])) {
+				unset($this->propertyList[$item->getId()][$property->getId()]);
+			}
+			if(isset($this->propertyMap[$item->getId()][$property->getPropertyName()])) {
+				unset($this->propertyMap[$item->getId()][$property->getPropertyName()]);
 			}
 		}
 	}
