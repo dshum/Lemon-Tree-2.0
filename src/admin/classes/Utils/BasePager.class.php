@@ -17,6 +17,7 @@
 		protected $pageCount = 0;
 		protected $pageList = array();
 		protected $pageLimit = null;
+		protected $offset = null;
 
 		public function setPerpage($perpage)
 		{
@@ -42,6 +43,13 @@
 			return $this;
 		}
 
+		public function setOffset($offset)
+		{
+			$this->offset = $offset;
+
+			return $this;
+		}
+
 		public function getPerpage()
 		{
 			return $this->perpage;
@@ -55,6 +63,11 @@
 		public function getPageLimit()
 		{
 			return $this->pageLimit;
+		}
+
+		public function getOffset()
+		{
+			return $this->offset;
 		}
 
 		public function getTotal()
