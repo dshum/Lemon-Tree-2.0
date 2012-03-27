@@ -1,0 +1,17 @@
+<?=$propertyDescription?>: <?=RussianTextUtils::friendlyFileSize(strlen($value))?><br>
+<script type="text/javascript">
+$(function() {
+	$('input:file[name=<?=$propertyName?>]').change(function() {
+		$('input:checkbox[name=<?=$propertyName?>_drop]').each(function() {this.checked = false;});
+	});
+	$('input:checkbox[name=<?=$propertyName?>_drop]').click(function() {
+		if(this.checked) {
+			$('input:file[name=<?=$propertyName?>]').val('');
+		}
+	});
+});
+</script>
+<input type="file" name="<?=$propertyName?>" value="<?=$value?>" class="file-field"><br>
+<small class="red">Максимальный размер файла <?=number_format(BinaryProperty::SIZE, 0, '.', ' ')?> байт</small><br>
+<?php if($value) {?><div class="file_del_check"><input type="checkbox" id="<?=$propertyName?>_drop" name="<?=$propertyName?>_drop" value="1" title="Очистить"><label for="<?=$propertyName?>_drop">Очистить</label></div><?php }?>
+<br>
