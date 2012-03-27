@@ -104,6 +104,10 @@
 					? ($this->currentPage - 1) * $this->perpage
 					: 0;
 
+				if($this->getOffset() + $offset > 0) {
+					$offset += $this->getOffset();
+				}
+
 				$this->query->limit($this->perpage, $offset);
 			}
 		}

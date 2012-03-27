@@ -418,6 +418,7 @@
 		public function dropElement(Element $currentElement)
 		{
 			$currentItem = $currentElement->getItem();
+
 			if(!$currentItem || !$currentElement->checkRestriction()) return false;
 
 			return $this->dropNode($currentElement);
