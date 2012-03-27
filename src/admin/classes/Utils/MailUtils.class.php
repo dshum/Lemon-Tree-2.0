@@ -11,7 +11,6 @@
 		private $view = null;
 		private $encoding = null;
 		private $attachments = array();
-		private $sendmailAdditionalArgs	= null;
 
 		private $body = null;
 
@@ -47,13 +46,6 @@
 		public function setEncoding($encoding)
 		{
 			$this->encoding = $encoding;
-
-			return $this;
-		}
-
-		public function setSendmailAdditionalArgs($sendmailAdditionalArgs)
-		{
-			$this->sendmailAdditionalArgs = $sendmailAdditionalArgs;
 
 			return $this;
 		}
@@ -200,9 +192,7 @@
 
 			}
 
-			$sendmailAdditionalArgs = $this->sendmailAdditionalArgs;
-
-			mail($to, $subject, $body, $headers, $sendmailAdditionalArgs);
+			mail($to, $subject, $body, $headers);
 		}
 
 		private function prepareContext()

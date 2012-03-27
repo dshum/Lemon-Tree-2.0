@@ -7,10 +7,10 @@ Query total: <?=sizeof(Site::getSQLReport())?><br><br>
 <?php foreach(Site::getSQLReport() as $sql) {?>
 <b><?=$sql[1]?> sec</b>
 <?=str_replace(
-	array('COUNT', 'FROM', 'WHERE'),
-	array('<b>COUNT</b>', '<b style="color: green">FROM</b>', '<b style="color: brown">WHERE</b>'),
+	array('COUNT', 'FROM', 'JOIN', 'WHERE'),
+	array('<b>COUNT</b>', '<b style="color: green">FROM</b>', '<b style="color: blue">JOIN</b>', '<b style="color: brown">WHERE</b>'),
 	$sql[0]
-)?><br>
+)?><br><br>
 <?php }?>
 </p></small>
 <?php }?>

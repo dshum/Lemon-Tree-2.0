@@ -64,6 +64,7 @@
 
 			$query->
 			dropFields()->
+			dropOrder()->
 			get(
 				new SQLFunction(
 					'COUNT',
