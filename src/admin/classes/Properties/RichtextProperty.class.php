@@ -1,6 +1,8 @@
 <?php
 	final class RichtextProperty extends BaseProperty
 	{
+		const SIZE = 65536;
+
 		public function setParameters()
 		{
 			parent::setParameters();
@@ -24,7 +26,7 @@
 		{
 			$primitive =
 				Primitive::string($this->property->getPropertyName())->
-				setMax(65536)->
+				setMax(self::SIZE)->
 				addImportFilter(Filter::trim());
 
 			if($this->getParameterValue('typograph')) {

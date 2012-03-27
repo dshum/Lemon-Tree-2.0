@@ -134,6 +134,13 @@
 
 		public function set(Form $form)
 		{
+			if(
+				$this->getParameterValue('hidden') == true
+				|| $this->getParameterValue('readonly') == true
+			) {
+				return false;
+			}
+
 			$file = $form->getValue($this->property->getPropertyName());
 			$drop = $form->getValue($this->property->getPropertyName().'_drop');
 
