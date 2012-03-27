@@ -1,3 +1,7 @@
+<?php if(YandexMapManager::me()->getKey()) {?>
+<script src="http://api-maps.yandex.ru/1.1/index.xml?key=<?=YandexMapManager::me()->getKey()?>" type="text/javascript"></script>
+<?php }?>
+<script type="text/javascript" src="<?=PATH_WEB_JS?>yandexmap.js"></script>
 <script type="text/javascript">
 $(function() {
 	LT.YandexMap.init('<?=$propertyName?>', <?=$centerX?>, <?=$centerY?>, <?=$scale?>);

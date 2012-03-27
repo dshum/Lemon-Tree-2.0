@@ -11,7 +11,7 @@ $(function() {
 	});
 });
 </script>
-<input type="file" name="<?=$propertyName?>" value="<?=$value?>" class="file-field"><br>
+<input type="file" name="<?=$propertyName?>" value="" class="file-field"><br>
 <small class="red">Максимальный размер файла <?=number_format(BinaryProperty::SIZE, 0, '.', ' ')?> байт</small><br>
 <?php if($value) {?><div class="file_del_check"><input type="checkbox" id="<?=$propertyName?>_drop" name="<?=$propertyName?>_drop" value="1" title="Очистить"><label for="<?=$propertyName?>_drop">Очистить</label></div><?php }?>
 <br>

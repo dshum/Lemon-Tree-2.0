@@ -11,11 +11,6 @@ $defaultShortname =
 <script type="text/javascript" src="<?=PATH_WEB_JS?>multilinktree.js"></script>
 <script type="text/javascript" src="<?=PATH_WEB_JS?>point.js"></script>
 <script type="text/javascript" src="<?=PATH_WEB_JS?>tinymce/jscripts/tiny_mce/tiny_mce.js"></script>
-<?php if(YandexMapManager::me()->getKey()) {?>
-<script src="http://api-maps.yandex.ru/1.1/index.xml?key=<?=YandexMapManager::me()->getKey()?>" type="text/javascript"></script>
-<?php }?>
-<script type="text/javascript" src="<?=PATH_WEB_JS?>yandexmap.js"></script>
-
 <script type="text/javascript">
 $(function() {
 	var currentShortName = '';
