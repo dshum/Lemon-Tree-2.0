@@ -172,7 +172,10 @@
 
 			$exception = get_class($e);
 
-			$trace = nl2br($e->getTraceAsString());
+			$trace =
+				strpos($e->getMessage(), 'Access denied for user') === false
+				? nl2br($e->getTraceAsString())
+				: null;
 
 			$str = <<<HTML
 Class: $exception<br>
