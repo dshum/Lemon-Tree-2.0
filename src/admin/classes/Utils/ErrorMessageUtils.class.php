@@ -173,7 +173,7 @@
 			$exception = get_class($e);
 
 			$trace =
-				strpos($e->getMessage(), 'Access denied for user') === false
+				strpos($e->getMessage(), 'mysql_connect') === false
 				? nl2br($e->getTraceAsString())
 				: null;
 

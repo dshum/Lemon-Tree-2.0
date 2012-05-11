@@ -6,6 +6,9 @@
 	try {
 		Site::initMicroTime();
 
+		Item::dao()->uncacheLists();
+		Property::dao()->uncacheLists();
+
 		Item::dao()->setItemList();
 		Property::dao()->setPropertyList();
 
