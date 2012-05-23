@@ -9,6 +9,11 @@
 	{
 		public static function sendMessage(Exception $e)
 		{
+			if(
+				$e instanceof DatabaseException
+				|| strpos($e->getMessage(), 'mysql_connect') !== false
+			) return false;
+
 			$server =
 				isset($_SERVER['HTTP_HOST'])
 				? $_SERVER['HTTP_HOST']
