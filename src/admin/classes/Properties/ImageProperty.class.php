@@ -8,6 +8,7 @@
 			'image/pjpeg',
 		);
 		private static $thumbnail_prefix = 'thumbnail_';
+		private static $original_prefix = 'original_';
 		private static $dir_mod = 0755;
 		private static $file_mod = 0644;
 
@@ -30,11 +31,12 @@
 			$this->addParameter('maxWidth', 'integer', 'Максимальная ширина изображения (пиксели)', 800);
 			$this->addParameter('maxHeight', 'integer', 'Максимальная высота изображения (пиксели)', 600);
 			$this->addParameter('keepOriginalName', 'boolean', 'Не изменять название файла', false);
+			$this->addParameter('keepOriginalFile', 'boolean', 'Сохранять оригинальный файл', false);
 			$this->addParameter('resizeWidth', 'integer', 'Изменить ширину изображения до', 0);
 			$this->addParameter('resizeHeight', 'integer', 'Изменить высоту изображения до', 0);
 			$this->addParameter('thumbnailWidth', 'integer', 'Ширина тумбнайла', 0);
 			$this->addParameter('thumbnailHeight', 'integer', 'Высота тумбнайла', 0);
-			$this->addParameter('jpegQuality', 'integer', 'Качество JPG, %', 60);
+			$this->addParameter('jpegQuality', 'integer', 'Качество JPG, %', 80);
 
 			return $this;
 		}
@@ -202,6 +204,66 @@
 			return round($this->thumbnail_filesize() / 1024, $precision);
 		}
 
+		public function original_path()
+		{
+			return PATH_WEB_LTDATA.$this->folder.'/'.self::$original_prefix.$this->value;
+		}
+
+		public function original_abspath()
+		{
+			return PATH_LTDATA.$this->folder.DIRECTORY_SEPARATOR.self::$original_prefix.$this->value;
+		}
+
+		public function original_src()
+		{
+			return $this->original_path();
+		}
+
+		public function original_width()
+		{
+			try {
+				list($width, $height, $type, $attr) = getimagesize($this->original_abspath());
+				return $width;
+			} catch (BaseException $e) {
+				return 0;
+			}
+		}
+
+		public function original_height()
+		{
+			try {
+				list($width, $height, $type, $attr) = getimagesize($this->original_abspath());
+				return $height;
+			} catch (BaseException $e) {
+				return 0;
+			}
+		}
+
+		public function original_exists()
+		{
+			return $this->value && file_exists($this->original_abspath());
+		}
+
+		public function original_filename()
+		{
+			return self::$original_prefix.$this->value;
+		}
+
+		public function original_filesize()
+		{
+			return $this->original_exists() ? filesize($this->original_abspath()) : 0;
+		}
+
+		public function original_filesize_kb($precision = 0)
+		{
+			return round($this->original_filesize() / 1024, $precision);
+		}
+
+		public function original_filesize_mb($precision = 0)
+		{
+			return round($this->original_filesize() / 1024 / 1024, $precision);
+		}
+
 		public function filemtime()
 		{
 			return $this->exists() ? filemtime($this->abspath()) : null;
@@ -238,6 +300,12 @@
 				set('thumbnail_height', $this->thumbnail_height())->
 				set('thumbnail_filesize_kb', $this->thumbnail_filesize_kb(1))->
 				set('thumbnail_filename', $this->thumbnail_filename())->
+				set('original_exists', $this->original_exists())->
+				set('original_path', $this->original_path())->
+				set('original_width', $this->original_width())->
+				set('original_height', $this->original_height())->
+				set('original_filesize_kb', $this->original_filesize_kb(1))->
+				set('original_filename', $this->original_filename())->
 				set('maxFilesizeKb', $this->getParameterValue('maxFilesizeKb'))->
 				set('maxWidth', $this->getParameterValue('maxWidth'))->
 				set('maxHeight', $this->getParameterValue('maxHeight'));
@@ -275,9 +343,6 @@
 
 				if($this->getParameterValue('keepOriginalName')) {
 					$filename = RussianTextUtils::toTranslit($name);
-				} elseif($this->value) {
-					$array = explode(".", $this->value);
-					$filename = array_shift($array).'.'.$ext;
 				} else {
 					$filename = sprintf(
 						'%s_%s.%s',
@@ -309,6 +374,7 @@
 							$thumbnailHeight,
 							$jpegQuality
 						);
+
 						chmod(
 							PATH_LTDATA.$this->folder.DIRECTORY_SEPARATOR.self::$thumbnail_prefix.$filename,
 							self::$file_mod
@@ -323,6 +389,7 @@
 						$resizeWidth > 0
 						|| $resizeHeight > 0
 					) {
+
 						ImageUtils::resizeAndCopyImage(
 							$file,
 							PATH_LTDATA.$this->folder.DIRECTORY_SEPARATOR.$filename,
@@ -330,15 +397,36 @@
 							$resizeHeight,
 							$jpegQuality
 						);
+
 						chmod(
 							PATH_LTDATA.$this->folder.DIRECTORY_SEPARATOR.$filename,
 							self::$file_mod
 						);
+
+						if(
+							$this->getParameterValue('keepOriginalFile')
+							&& is_readable($file)
+							&& is_writable(PATH_LTDATA.$this->folder)
+						) {
+							copy(
+								$file,
+								PATH_LTDATA.$this->folder.DIRECTORY_SEPARATOR.self::$original_prefix.$filename
+							);
+
+							chmod(
+								PATH_LTDATA.$this->folder.DIRECTORY_SEPARATOR.self::$original_prefix.$filename,
+								self::$file_mod
+							);
+						}
+
 						unlink($file);
+
 					} else {
+
 						$primitive->copyToPath(
 							PATH_LTDATA.$this->folder.DIRECTORY_SEPARATOR.$filename
 						);
+
 						chmod(
 							PATH_LTDATA.$this->folder.DIRECTORY_SEPARATOR.$filename,
 							self::$file_mod
@@ -355,18 +443,25 @@
 		public function drop()
 		{
 			try {
+
 				if(file_exists(PATH_LTDATA.$this->folder.DIRECTORY_SEPARATOR.$this->value)) {
 					unlink(PATH_LTDATA.$this->folder.DIRECTORY_SEPARATOR.$this->value);
 				}
+
 				if(file_exists(PATH_LTDATA.$this->folder.DIRECTORY_SEPARATOR.self::$thumbnail_prefix.$this->value)) {
 					unlink(PATH_LTDATA.$this->folder.DIRECTORY_SEPARATOR.self::$thumbnail_prefix.$this->value);
 				}
+
+				if(file_exists(PATH_LTDATA.$this->folder.DIRECTORY_SEPARATOR.self::$original_prefix.$this->value)) {
+					unlink(PATH_LTDATA.$this->folder.DIRECTORY_SEPARATOR.self::$original_prefix.$this->value);
+				}
+
 			} catch (BaseException $e) {}
 		}
 
 		private function getExtension($name)
 		{
-			$array = explode(".", $name);
+			$array = explode('.', $name);
 			return (sizeof($array) > 1) ? strtolower(array_pop($array)) : null;
 		}
 	}

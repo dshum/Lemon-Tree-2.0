@@ -2,10 +2,13 @@
 <?php if($exists) {?>
 <table><tr valign="top">
 <td><span class="mini">Загружено изображение: <a class="dark_grey" href="<?=$path?>" target="_blank"><?=$filename?></a>, <span title="Размер изображения"><?=$width?>&#215;<?=$height?></span> пикселов, <?=$filesize_kb?> Кб</span><br>
-<img class="pict" src="<?=$path?>?random='.md5(rand()).'" width="<?=$width?>" height="<?=$height?>" alt=""><br></td>
+<?php 	if($original_exists) {?>
+<span class="mini">Загружен оригинал изображения: <a class="dark_grey" href="<?=$original_path?>" target="_blank"><?=$original_filename?></a>, <span title="Размер изображения"><?=$original_width?>&#215;<?=$original_height?></span> пикселов, <?=$original_filesize_kb?> Кб</span><br>
+<?php 	}?>
+<img class="pict" src="<?=$path?>" width="<?=$width?>" height="<?=$height?>" alt=""><br></td>
 <?php 	if($thumbnail_exists) {?>
 <td><span class="mini">Загружен тумбнайл: <a class="dark_grey" href="<?=$thumbnail_path?>" target="_blank"><?=$thumbnail_filename?></a>, <span title="Размер изображения"><?=$thumbnail_width?>&#215;<?=$thumbnail_height?></span> пикселов, <?=$thumbnail_filesize_kb?> Кб</span><br>
-<img class="pict" src="<?=$thumbnail_path?>?random='.md5(rand()).'" width="<?=$thumbnail_width?>" height="<?=$thumbnail_height?>" alt=""><br></td>
+<img class="pict" src="<?=$thumbnail_path?>" width="<?=$thumbnail_width?>" height="<?=$thumbnail_height?>" alt=""><br></td>
 <?php 	}?>
 </tr></table>
 <?php }?>
