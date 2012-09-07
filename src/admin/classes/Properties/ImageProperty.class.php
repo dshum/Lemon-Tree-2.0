@@ -202,6 +202,11 @@
 			return round($this->thumbnail_filesize() / 1024, $precision);
 		}
 
+		public function filemtime()
+		{
+			return $this->exists() ? filemtime($this->abspath()) : null;
+		}
+
 		public function getElementListView()
 		{
 			$model =

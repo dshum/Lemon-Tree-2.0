@@ -77,6 +77,25 @@
 			return $this;
 		}
 
+		private function encodeAddress($address, $encoding)
+		{
+			if(strpos($address, ' ') !== false) {
+				$list = explode(' ', $address);
+				$email = array_pop($list);
+				$name = implode(' ', $list);
+				$name = trim($name, '"');
+				$name = mb_convert_encoding($name, $encoding);
+				$name =
+					"=?".$encoding."?B?"
+					.base64_encode($name)
+					."?=";
+				$email = trim($email, '<>');
+				$address = $name.' <'.$email.'>';
+			}
+
+			return $address;
+		}
+
 		public function send()
 		{
 			$this->prepareContext();
@@ -89,15 +108,15 @@
 
 			$siteEncoding = mb_get_info('internal_encoding');
 
+			$to = $this->header['To'];
+			$cc = $this->header['Cc'];
+			$bcc = $this->header['Bcc'];
+			$from = $this->header['From'];
+			$replyTo = $this->header['Reply-to'];
+
 			if(!$this->encoding || $this->encoding == $siteEncoding) {
 
 				$encoding = $siteEncoding;
-
-				$to = $this->header['To'];
-				$cc = $this->header['Cc'];
-				$bcc = $this->header['Bcc'];
-				$from = $this->header['From'];
-				$replyTo = $this->header['Reply-to'];
 
 				$subject =
 					"=?".$encoding."?B?"
@@ -109,12 +128,6 @@
 			} else {
 
 				$encoding = $this->encoding;
-
-				$to = mb_convert_encoding($this->header['To'], $encoding);
-				$cc = mb_convert_encoding($this->header['Cc'], $encoding);
-				$bcc = mb_convert_encoding($this->header['Bcc'], $encoding);
-				$from = mb_convert_encoding($this->header['From'], $encoding);
-				$replyTo = mb_convert_encoding($this->header['Reply-to'], $encoding);
 
 				$body = $this->body;
 
@@ -142,6 +155,12 @@
 				);
 			}
 
+			$to = $this->encodeAddress($to, $encoding);
+			$cc = $this->encodeAddress($cc, $encoding);
+			$bcc = $this->encodeAddress($bcc, $encoding);
+			$from = $this->encodeAddress($from, $encoding);
+			$replyTo = $this->encodeAddress($replyTo, $encoding);
+
 			$headers = null;
 
 			if($from) {
@@ -162,6 +181,7 @@
 			}
 
 			$headers .= 'Date: '.date('r').EOL;
+			$headers .= 'Message-Id: '.md5(rand()).'@'.HTTP_HOST.EOL;
 
 			if(sizeof($this->attachments)) {
 

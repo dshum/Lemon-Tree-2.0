@@ -26,6 +26,10 @@
 				return '/404';
 			}
 
+			if(strpos($elementPath, '//') !== false) {
+				return '/404';
+			}
+
 			$elementPath = '/'.trim($elementPath, '/');
 			$elementPath = strtolower($elementPath);
 			$elementPath = get_magic_quotes_gpc() ? stripslashes($elementPath) : $elementPath;
@@ -39,6 +43,7 @@
 
 		public static function setLastModified()
 		{
+			return false;
 			try {
 				self::$lastModified = filemtime(ONPHP_TEMP_PATH.'last-modified');
 			} catch (BaseException $e) {
@@ -48,6 +53,7 @@
 
 		public static function updateLastModified()
 		{
+			return false;
 			self::$lastModified = time();
 			touch(ONPHP_TEMP_PATH.'last-modified', self::$lastModified);
 		}
