@@ -11,6 +11,8 @@ Code: <?=$e->getCode()?><br>
 Trace: <?=nl2br($e->getTraceAsString())?><br>
 <br>
 
+<?php if($count) {?><?=$count?> error(s) per <?=$diff?> sec<br><br><?php }?>
+
 Server: <?=$server?><br>
 URI: <?=$uri?><br>
 IP: <?=$ip?><br>

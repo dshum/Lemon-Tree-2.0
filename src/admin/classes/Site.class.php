@@ -44,6 +44,7 @@
 		public static function setLastModified()
 		{
 			return false;
+
 			try {
 				self::$lastModified = filemtime(ONPHP_TEMP_PATH.'last-modified');
 			} catch (BaseException $e) {
@@ -54,6 +55,7 @@
 		public static function updateLastModified()
 		{
 			return false;
+
 			self::$lastModified = time();
 			touch(ONPHP_TEMP_PATH.'last-modified', self::$lastModified);
 		}

@@ -212,7 +212,9 @@
 
 				try {
 					$db->queryRaw($query);
-				} catch (DatabaseException $e) {}
+				} catch (DatabaseException $e) {
+					ErrorMessageUtils::sendMessage($e);
+				}
 			}
 
 			if(
@@ -252,7 +254,9 @@
 
 				try {
 					$db->query($query);
-				} catch (DatabaseException $e) {}
+				} catch (DatabaseException $e) {
+					ErrorMessageUtils::sendMessage($e);
+				}
 
 				$query =
 					'CREATE UNIQUE INDEX pair ON '.$tableName
@@ -260,7 +264,9 @@
 
 				try {
 					$db->queryRaw($query);
-				} catch (DatabaseException $e) {}
+				} catch (DatabaseException $e) {
+					ErrorMessageUtils::sendMessage($e);
+				}
 			}
 
 			# Property order
@@ -312,6 +318,10 @@
 				$oldColumName = $oldPropertyClass->getColumnName();
 				$columnName = $propertyClass->column()->toDialectString($dialect);
 
+				if($propertyClass instanceof FloatProperty) {
+					$columnName = str_replace('FLOAT(11)', 'DOUBLE', $columnName);
+				}
+
 				$query =
 					'ALTER TABLE '.$dialect->quoteTable($tableName)
 					.' CHANGE COLUMN '.$dialect->quoteField($oldColumName)
@@ -319,7 +329,9 @@
 
 				try {
 					$db->queryRaw($query);
-				} catch (DatabaseException $e) {}
+				} catch (DatabaseException $e) {
+					ErrorMessageUtils::sendMessage($e);
+				}
 			}
 
 			# Save property
