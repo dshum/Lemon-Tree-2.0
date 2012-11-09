@@ -34,7 +34,7 @@
 			return null;
 		}
 
-		public function getElementSearchView()
+		public function getElementSearchView(Form $form)
 		{
 			return null;
 		}

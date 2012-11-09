@@ -173,57 +173,42 @@ $(function() {
 		setTime($(this).attr('property'));
 	});
 
-	$('input[onetoone=name]').livequery('click', function() {
+	$('input[onetoone=name]').live('click', function() {
 		var main = $(this).attr('main');
-		if($(this).val() == main) {
-			$(this).css('color', 'black').val('');
-		}
-	}).livequery('focus', function() {
-		var main = $(this).attr('main');
-		if($(this).val() == main) {
-			$(this).css('color', 'black').val('');
-		}
-	}).livequery('change', function() {
-		var main = $(this).attr('main');
-		if($(this).val() == '') {
-			$(this).css('color', 'grey').val(main);
-		}
-	}).livequery('blur', function() {
-		var main = $(this).attr('main');
-		if($(this).val() == '') {
-			$(this).css('color', 'grey').val(main);
-		}
-	}).livequery(function() {
 		var itemId = $(this).attr('itemId');
 		var propertyName = $(this).attr('propertyName');
 
-		$(this).autocomplete(
-			'<?=$baseUrl?>?module=ElementSearch&action=hint&itemId='+itemId+'&print',
-			{
-				formatItem: function(row, i, max) {return row.name+' ('+row.id+')'},
-				formatMatch: function(row, i, max) {return row.name},
-				formatResult: function(row) {return row.name},
-				dataType: 'json',
-				parse: function(data) {
-					return $.map(data, function(row) {
-						return {data: row, value: row.name, result: row.name}
-					});
-				},
-				minChars: 0,
-				max: 50
-			}
-		).result(function(event, item) {
-			if(item) {
-				$('input[name='+propertyName+']').val(item.id);
-				$('input[name='+propertyName+'_name]').css('color', 'black').val(item.name);
-				$('#'+propertyName+'_show').css('color', 'grey').html(item.name);
-			}
-		}).blur(function(){
-			$(this).search();
+		if($(this).val() == main) {
+			$(this).css('color', 'black').val('');
+		}
+
+		$(this).autocomplete({
+			source: '<?=$baseUrl?>?module=ElementSearch&action=hint&itemId='+itemId+'&print',
+			select: function(event, ui) {
+				$('input[name='+propertyName+']').val(ui.item.id);
+				$('input[name='+propertyName+'_name]').css('color', 'black').val(ui.item.value);
+				$('#'+propertyName+'_show').css('color', 'grey').html(ui.item.value);
+			},
+			minLength: 0
 		});
+	}).live('focus', function() {
+		var main = $(this).attr('main');
+		if($(this).val() == main) {
+			$(this).css('color', 'black').val('');
+		}
+	}).live('change', function() {
+		var main = $(this).attr('main');
+		if($(this).val() == '') {
+			$(this).css('color', 'grey').val(main);
+		}
+	}).live('blur', function() {
+		var main = $(this).attr('main');
+		if($(this).val() == '') {
+			$(this).css('color', 'grey').val(main);
+		}
 	});
 
-	$('span[onetoone=reset]').livequery('click', function() {
+	$('span[onetoone=reset]').live('click', function() {
 		var propertyName = $(this).attr('propertyName');
 		var main = $('input[name='+propertyName+'_name]').attr('main');
 
@@ -235,58 +220,43 @@ $(function() {
 		$('input[name='+propertyName+'_name]').css('color', 'grey').val(main);
 	});
 
-	$('input[link=name]').livequery('click', function() {
+	$('input[link=name]').live('click', function() {
 		var main = $(this).attr('main');
 		if($(this).val() == main) {
 			$(this).css('color', 'black').val('');
 		}
 
-	}).livequery('focus', function() {
+	}).live('focus', function() {
 		var main = $(this).attr('main');
-		if($(this).val() == main) {
-			$(this).css('color', 'black').val('');
-		}
-	}).livequery('change', function() {
-		var main = $(this).attr('main');
-		if($(this).val() == '') {
-			$(this).css('color', 'grey').val(main);
-		}
-	}).livequery('blur', function() {
-		var main = $(this).attr('main');
-		if($(this).val() == '') {
-			$(this).css('color', 'grey').val(main);
-		}
-	}).livequery(function() {
 		var propertyId = $(this).attr('propertyId');
 		var propertyName = $(this).attr('propertyName');
 
-		$(this).autocomplete(
-			'<?=$baseUrl?>?module=ElementSearch&action=multihint&propertyId='+propertyId+'&print',
-			{
-				formatItem: function(row, i, max) {return row.name+' ('+row.id+')'},
-				formatMatch: function(row, i, max) {return row.name},
-				formatResult: function(row) {return row.name},
-				dataType: 'json',
-				parse: function(data) {
-					return $.map(data, function(row) {
-						return {data: row, value: row.name, result: row.name}
-					});
-				},
-				minChars: 0,
-				max: 50
-			}
-		).result(function(event, item) {
-			if(item) {
-				$('input[name='+propertyName+']').val(item.id);
-				$('input[name='+propertyName+'_name]').css('color', 'black').val(item.name);
-				$('#'+propertyName+'_show').css('color', 'grey').html(item.name);
-			}
-		}).blur(function(){
-			$(this).search();
+		if($(this).val() == main) {
+			$(this).css('color', 'black').val('');
+		}
+
+		$(this).autocomplete({
+			source: '<?=$baseUrl?>?module=ElementSearch&action=multihint&propertyId='+propertyId+'&print',
+			select: function(event, ui) {
+				$('input[name='+propertyName+']').val(ui.item.id);
+				$('input[name='+propertyName+'_name]').css('color', 'black').val(ui.item.value);
+				$('#'+propertyName+'_show').css('color', 'grey').html(ui.item.value);
+			},
+			minLength: 0
 		});
+	}).live('change', function() {
+		var main = $(this).attr('main');
+		if($(this).val() == '') {
+			$(this).css('color', 'grey').val(main);
+		}
+	}).live('blur', function() {
+		var main = $(this).attr('main');
+		if($(this).val() == '') {
+			$(this).css('color', 'grey').val(main);
+		}
 	});
 
-	$('span[link=reset]').livequery('click', function() {
+	$('span[link=reset]').live('click', function() {
 		var propertyName = $(this).attr('propertyName');
 		var main = $('input[name='+propertyName+'_name]').attr('main');
 

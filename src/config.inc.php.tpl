@@ -6,7 +6,7 @@
 /* $Id$ */
 
 	define('LT_NAME', 'Lemon Tree 2.0');
-	define('LT_VERSION', '2.2.2');
+	define('LT_VERSION', '2.2.2.new');
 
 	// Environment varyables
 

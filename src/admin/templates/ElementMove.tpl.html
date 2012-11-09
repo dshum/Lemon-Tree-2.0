@@ -82,30 +82,17 @@ foreach($itemList as $item) {
 		if($(this).val() == '') {
 			$(this).css('color', 'grey').val(main);
 		}
-	}).autocomplete(
-		'<?=$baseUrl?>?module=ElementSearch&action=hint&itemId=<?=$sourceItem->getId()?>&print',
-		{
-			formatItem: function(row, i, max) {return row.name+' ('+row.id+')'},
-			formatMatch: function(row, i, max) {return row.name},
-			formatResult: function(row) {return row.name},
-			dataType: 'json',
-			parse: function(data) {
-				return $.map(data, function(row) {
-					return {data: row, value: row.name, result: row.name}
-				});
-			},
-			minChars: 0,
-			max: 50
-		}
-	).result(function(event, item) {
-		if(item) {
-			$('#dest').val(item.id);
-			$('#dest_show').html(item.name);
-			$('#dest_hint').css('color', 'black').val(item.name);
-			$('#move_button').removeAttr('disabled');
-		}
-	}).blur(function(){
-		$(this).search();
+	}).autocomplete({
+		source: '<?=$baseUrl?>?module=ElementSearch&action=hint&itemId=<?=$sourceItem->getId()?>&print',
+		select: function(event, ui) {
+			if(ui.item) {
+				$('#dest').val(ui.item.id);
+				$('#dest_show').html(ui.item.value);
+				$('#dest_hint').css('color', 'black').val(ui.item.value);
+				$('#move_button').removeAttr('disabled');
+			}
+		},
+		minLength: 0
 	});
 
 	$('#dest_reset').click(function() {

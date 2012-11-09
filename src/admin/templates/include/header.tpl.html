@@ -3,16 +3,15 @@
 <title><?=LT_NAME?></title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta name="Robots" content="noindex">
-<link href="<?=PATH_ADMIN?>css/style.css" type="text/css" rel="stylesheet">
+<link href="<?=PATH_ADMIN?>css/style.css?20121101" type="text/css" rel="stylesheet">
+<link href="<?=PATH_WEB_JS?>jquery/jquery-ui-1.9.1.custom.min.css" type="text/css" rel="stylesheet">
 <link href="<?=PATH_WEB_JS?>calendarview/jquery.calendar.css" type="text/css" rel="stylesheet">
-<link href="<?=PATH_WEB_JS?>autocomplete/jquery.autocomplete.css" type="text/css" rel="stylesheet">
 <link href="<?=PATH_WEB_JS?>colorbox/jquery.colorbox.css" type="text/css" rel="stylesheet">
-<script type="text/javascript" src="<?=PATH_WEB_JS?>jquery/jquery-1.3.2.min.js"></script>
+<script type="text/javascript" src="<?=PATH_WEB_JS?>jquery/jquery-1.8.2.js"></script>
+<script type="text/javascript" src="<?=PATH_WEB_JS?>jquery/jquery-ui-1.9.1.custom.min.js"></script>
 <script type="text/javascript" src="<?=PATH_WEB_JS?>jquery/jquery.form.js"></script>
-<script type="text/javascript" src="<?=PATH_WEB_JS?>jquery/jquery.livequery.js"></script>
 <script type="text/javascript" src="<?=PATH_WEB_JS?>jquery/jquery.mousewheel.min.js"></script>
 <script type="text/javascript" src="<?=PATH_WEB_JS?>calendarview/jquery.calendar.js"></script>
-<script type="text/javascript" src="<?=PATH_WEB_JS?>autocomplete/jquery.autocomplete.min.js"></script>
 <script type="text/javascript" src="<?=PATH_WEB_JS?>colorbox/jquery.colorbox.min.js"></script>
 <script type="text/javascript" src="<?=PATH_WEB_JS?>common.js"></script>
 <script type="text/javascript" src="<?=PATH_WEB_JS?>alert.js"></script>
@@ -24,6 +23,10 @@ $(function() {
 
 });
 </script>
+<style>
+.ui-autocomplete {max-height: 140px; overflow-y: auto; overflow-x: hidden;}
+.ui-autocomplete-loading {background: white url('<?=PATH_WEB_IMG?>ac-loader.gif') right center no-repeat;}
+</style>
 </head>
 
 <body onkeypress="return LT.Common.onCtrlS(event)" onkeydown="return LT.Common.onCtrlS(event)">

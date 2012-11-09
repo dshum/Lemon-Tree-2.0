@@ -41,14 +41,14 @@
 					required()
 				)->
 				add(
-					Primitive::string('q')
+					Primitive::string('term')
 				)->
 				import($request->getGet());
 
 			if(!$form->getErrors()) {
 
 				$item =  $form->getValue('itemId');
-				$query =  $form->getValue('q');
+				$query =  $form->getValue('term');
 
 				$itemClass = $item->getClass();
 
@@ -57,7 +57,7 @@
 					addOrder(
 						DBField::create('element_name', $itemClass->dao()->getTable())
 					)->
-					setLimit(50);
+					setLimit(20);
 
 				if($query) {
 					$elementListCriteria->add(
@@ -93,7 +93,7 @@
 					}
 					$hint[] = array(
 						'id' => $id,
-						'name' => $name,
+						'value' => $name,
 					);
 					$prev = $element->getElementName();
 				}
@@ -145,7 +145,7 @@
 						addOrder(
 							DBField::create('element_name', $itemClass->dao()->getTable())
 						)->
-						setLimit(50);
+						setLimit(20);
 
 					if($query) {
 						$elementListCriteria->add(
@@ -180,7 +180,7 @@
 						}
 						$hint[] = array(
 							'id' => $id,
-							'name' => $name,
+							'value' => $name,
 						);
 						$prev = $element->getElementName();
 					}
@@ -533,17 +533,23 @@
 					of('Item')->
 					required()
 				)->
-				import($_GET);
+				import($request->getGet());
 
 			if(!$form0->getErrors()) {
 
 				$currentItem = $form0->getValue('itemId');
 				$itemClass = $currentItem->getClass();
 
-				if($search['last'][0] != $currentItem->getId()) {
-					array_unshift($search['last'], $currentItem->getId());
-					array_pop($search['last']);
+				$last = array($currentItem->getId());
+				foreach($search['last'] as $itemId) {
+					if(
+						$currentItem->getId() != $itemId
+						&& sizeof($last) < $this->lastMaxNumber
+					) {
+						$last[] = $itemId;
+					}
 				}
+				$search['last'] = $last;
 
 				$loggedUser->setParameter('search', $search);
 
@@ -947,16 +953,19 @@
 				Form::create()->
 				add(
 					Primitive::integer('elementId')->
+					addImportFilter(Filter::trim())->
 					setMin(0)
 				)->
 				add(
 					Primitive::string('elementName')->
-					setMin(3)->
+					addImportFilter(Filter::trim())->
+					setMin(1)->
 					setMax(255)
 				)->
 				add(
 					Primitive::string('shortName')->
-					setMin(3)->
+					addImportFilter(Filter::trim())->
+					setMin(1)->
 					setMax(50)
 				)->
 				add(
