@@ -17,7 +17,7 @@ $(function(){
 			if(data.changed) {
 				for(var elementId in data.changed) {
 					for(var propertyName in data.changed[elementId]) {
-						$('td[editable=true][elementid='+elementId+'][propertyname='+propertyName+']').each(function(){
+						$('td[editable=true][elementid="'+elementId+'"][propertyname="'+propertyName+'"]').each(function(){
 							$(this).html(data.changed[elementId][propertyName]);
 						});
 					}

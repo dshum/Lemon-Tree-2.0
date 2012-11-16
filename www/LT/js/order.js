@@ -19,8 +19,9 @@ LT.Order = function() {
 				this.options[i].selected = false;
 				this.options[i - 1].selected = true;
 
-				var order1 = $('input:hidden[name=orderList['+this.options[i].value+']]');
-				var order2 = $('input:hidden[name=orderList['+this.options[i - 1].value+']]');
+				var order1 = $('input:hidden[name="orderList['+this.options[i].value+']"]');
+				var order2 = $('input:hidden[name="orderList['+this.options[i - 1].value+']"]');
+
 				var v1 = order1.attr('value');
 				var v2 = order2.attr('value');
 
@@ -48,8 +49,9 @@ LT.Order = function() {
 				this.options[i].selected = false;
 				this.options[i + 1].selected = true;
 
-				var order1 = $('input:hidden[name=orderList['+this.options[i].value+']]');
-				var order2 = $('input:hidden[name=orderList['+this.options[i + 1].value+']]');
+				var order1 = $('input:hidden[name="orderList['+this.options[i].value+']"]');
+				var order2 = $('input:hidden[name="orderList['+this.options[i + 1].value+']"]');
+
 				var v1 = order1.attr('value');
 				var v2 = order2.attr('value');
 
