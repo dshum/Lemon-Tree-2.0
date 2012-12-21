@@ -19,8 +19,12 @@
 $(function() {
 	LT.Common.selfUrl = '<?=$selfUrl?>';
 	LT.Common.baseUrl = '<?=$baseUrl?>';
+
 //	LT.Common.setTimeExpire(3600);
 
+	$('#multisite').change(function() {
+		top.document.location.href = $(this).val()+'<?=FOLDER_LT?>';
+	});
 });
 </script>
 <style>
@@ -35,6 +39,12 @@ $(function() {
 <tr>
 
 <td nowrap><a href="<?=$baseUrl?>" title="<?=LT_NAME.' ver. '.LT_VERSION?>"><img src="<?=PATH_WEB_IMG?>logo.png" width="154" height="40" class="logo"></a></td>
+
+<?php if(Site::getMultiSite()) {?>
+<td nowrap style="padding: 0 0 0 20px;"><select id="multisite" style="font-size: 18px;">
+<?php 	foreach(Site::getMultiSite() as $url => $name) {?><option value="<?=$url?>"<?=$url == PATH_WEB ? ' selected' : ''?>><?=$name?></option><?php }?>
+</select></td>
+<?php }?>
 
 <td width="99%"></td>
 
@@ -61,7 +71,7 @@ $(function() {
 <td><img src="img/separator.gif" width="1" height="32" alt="" class="separator"></td>
 
 <td width="70" align="right">
-<form name="LogoutForm" action="<?=PATH_ADMIN?>?module=Prompt&action=logout" method="post" target="_top">
+<form name="LogoutForm" action="<?=PATH_ADMIN?>?action=logout" method="post" target="_top">
 <input class="btn-sm" type="submit" value="Выход">
 </form>
 </td>

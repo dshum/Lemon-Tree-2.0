@@ -472,5 +472,27 @@
 
 			return $permission;
 		}
+
+		public function getUser()
+		{
+			if (!$this->user && $this->userId) {
+				try {
+					$this->user = User::dao()->getById($this->userId);
+				} catch (ObjectNotFoundException $e) {}
+			}
+
+			return $this->user;
+		}
+
+		public function getGroup()
+		{
+			if (!$this->group && $this->groupId) {
+				try {
+					$this->group = Group::dao()->getById($this->groupId);
+				} catch (ObjectNotFoundException $e) {}
+			}
+
+			return $this->group;
+		}
 	}
 ?>

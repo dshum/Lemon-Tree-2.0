@@ -32,7 +32,6 @@
 
 		if(
 			Session::get(User::LABEL) instanceof User
-			&& $module != 'Prompt'
 		) {
 			$controllerName = 'Main';
 		} else {

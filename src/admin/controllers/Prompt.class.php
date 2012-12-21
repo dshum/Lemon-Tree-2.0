@@ -5,9 +5,8 @@
 		{
 			$this->
 			setMethodMapping('login', 'login')->
-			setMethodMapping('logout', 'logout')->
-			setMethodMapping('form', 'form')->
-			setDefaultAction('form');
+			setMethodMapping('show', 'show')->
+			setDefaultAction('show');
 		}
 
 		public function handleRequest(HttpRequest $request)
@@ -72,18 +71,7 @@
 				setView('Prompt');
 		}
 
-		public function logout(HttpRequest $request)
-		{
-			LoggedUser::dropUser();
-
-			Session::drop(User::LABEL);
-
-			return
-				ModelAndView::create()->
-				setView(new RedirectToView('Prompt'));
-		}
-
-		public function form(HttpRequest $request)
+		public function show(HttpRequest $request)
 		{
 			$model = Model::create();
 

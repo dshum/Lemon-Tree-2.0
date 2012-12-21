@@ -6,6 +6,7 @@
 		private static $levels = array();
 		private static $lastModified = null;
 		private static $initMicroTime = array(0, 0);
+		private static $multiSite = array();
 
 		public static function init()
 		{
@@ -142,6 +143,17 @@
 					$label.': '.round($time, 6)
 					.' - '.round(memory_get_usage() / 1024 / 1024, 2).' Mb<br>';
 			}
+		}
+
+		public static function addMultiSite($url, $name)
+		{
+			$url = trim($url, '/').'/';
+			self::$multiSite[$url] = $name;
+		}
+
+		public static function getMultiSite()
+		{
+			return self::$multiSite;
 		}
 
 		public static function generateAuto()
