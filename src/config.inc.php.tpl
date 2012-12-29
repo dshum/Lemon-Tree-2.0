@@ -14,12 +14,16 @@
 		define('HTTP_HOST', $_SERVER['HTTP_HOST']);
 	}
 
-	if(!defined('DOCUMENT_ROOT')) {
-		define('DOCUMENT_ROOT', $_SERVER['DOCUMENT_ROOT'].DIRECTORY_SEPARATOR);
+	if(!defined('HTTP_REFERER')) {
+		if(isset($_SERVER['HTTP_REFERER'])) {
+			define('HTTP_REFERER', $_SERVER['HTTP_REFERER']);
+		} else {
+			define('HTTP_REFERER', null);
+		}
 	}
 
-	if(!defined('HTTP_REFERER')) {
-		define('HTTP_REFERER', $_SERVER['HTTP_REFERER']);
+	if(!defined('DOCUMENT_ROOT')) {
+		define('DOCUMENT_ROOT', $_SERVER['DOCUMENT_ROOT'].DIRECTORY_SEPARATOR);
 	}
 
 	// Paths
