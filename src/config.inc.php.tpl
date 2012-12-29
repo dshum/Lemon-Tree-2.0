@@ -18,6 +18,10 @@
 		define('DOCUMENT_ROOT', $_SERVER['DOCUMENT_ROOT'].DIRECTORY_SEPARATOR);
 	}
 
+	if(!defined('HTTP_REFERER')) {
+		define('HTTP_REFERER', $_SERVER['HTTP_REFERER']);
+	}
+
 	// Paths
 
 	define('PATH_LT_BASE', realpath(dirname(__FILE__)).DIRECTORY_SEPARATOR);
