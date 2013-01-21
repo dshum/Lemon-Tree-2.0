@@ -57,6 +57,7 @@
 				foreach($moveElementList as $element) {
 
 					$item = $element->getItem();
+					$original = clone $element;
 
 					# Before move action
 					try {

@@ -4,6 +4,33 @@
 		const MAX_NUMBER_OF_DROP_ELEMENTS = 100;
 		const ERROR_TOO_MANY_ELEMENTS = 1;
 
+		public function getItem()
+		{
+			$item = Item::dao()->getItemByName($this->getObjectName());
+
+			return $item;
+		}
+
+		public function getFolderName()
+		{
+			return $this->getTable();
+		}
+
+		public function getHashFolderName()
+		{
+			return null;
+		}
+
+		public function getFolderPath()
+		{
+			return PATH_LTDATA.$this->getFolderName().DIRECTORY_SEPARATOR;
+		}
+
+		public function getFolderWebPath()
+		{
+			return PATH_WEB_LTDATA.$this->getFolderName().DIRECTORY_SEPARATOR;
+		}
+
 		public function getByElementPath($elementPath)
 		{
 			return

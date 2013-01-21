@@ -20,7 +20,11 @@
 
 			$item = $property->getItem();
 			$itemClass = $item->getClass();
-			$this->folder = $itemClass ? $itemClass->dao()->getTable() : null;
+
+			$this->folder = $itemClass ? $itemClass->dao()->getFolderName() : null;
+			$this->hash = $itemClass ? $itemClass->dao()->getHashFolderName() : null;
+			$this->folderPath = $itemClass ? $itemClass->dao()->getFolderPath() : null;
+			$this->folderWebPath = $itemClass ? $itemClass->dao()->getFolderWebPath() : null;
 		}
 
 		public function setParameters()
@@ -330,6 +334,7 @@
 			if($drop) {
 
 				$this->drop();
+
 				$setter = $this->property->setter();
 				$this->element->$setter(null);
 
@@ -358,10 +363,16 @@
 						mkdir(PATH_LTDATA.$this->folder, self::$dir_mod);
 					}
 
-					$jpegQuality = $this->getParameterValue('jpegQuality');
+					if($this->hash) {
+						if(!file_exists(PATH_LTDATA.$this->folder.DIRECTORY_SEPARATOR.$this->hash)) {
+							mkdir(PATH_LTDATA.$this->folder.DIRECTORY_SEPARATOR.$this->hash, self::$dir_mod);
+						}
+						$filename = $this->hash.DIRECTORY_SEPARATOR.$filename;
+					}
 
 					$thumbnailWidth = $this->getParameterValue('thumbnailWidth');
 					$thumbnailHeight = $this->getParameterValue('thumbnailHeight');
+					$jpegQuality = $this->getParameterValue('jpegQuality');
 
 					if(
 						$thumbnailWidth > 0

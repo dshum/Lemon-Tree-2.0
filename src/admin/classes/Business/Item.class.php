@@ -102,21 +102,6 @@
 				: '';
 		}
 
-		public function getFolderName()
-		{
-			return $this->getDefaultTableName();
-		}
-
-		public function getFolderPath()
-		{
-			return PATH_LTDATA.$this->getFolderName().DIRECTORY_SEPARATOR;
-		}
-
-		public function getFolderWebPath()
-		{
-			return PATH_WEB_LTDATA.$this->getFolderName().DIRECTORY_SEPARATOR;
-		}
-
 		public function getColumnName()
 		{
 			$itemName = $this->getItemName();
