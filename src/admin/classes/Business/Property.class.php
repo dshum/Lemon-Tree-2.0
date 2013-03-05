@@ -21,6 +21,7 @@
 		const ONE_TO_MANY_PROPERTY = 'OneToManyProperty';
 		const MANY_TO_MANY_PROPERTY = 'ManyToManyProperty';
 		const BINARY_PROPERTY = 'BinaryProperty';
+		const SERIALIZED_PROPERTY = 'SerializedProperty';
 
 		const PARAMETER_ROW_DELIMETER = EOL;
 		const PARAMETER_VALUE_DELIMETER = ':';
@@ -42,6 +43,7 @@
 			self::YANDEX_MAP_PROPERTY => 'Яндекс.Карты',
 			self::POINT_PROPERTY => 'Координаты точки',
 			self::BINARY_PROPERTY => 'Двоичные данные',
+			self::SERIALIZED_PROPERTY => 'Сериализованный массив',
 		);
 
 		private static $parameterClassMap = array(

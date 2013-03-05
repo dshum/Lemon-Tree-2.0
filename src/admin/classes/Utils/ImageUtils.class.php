@@ -20,7 +20,7 @@
 					$truecolor = true;
 					break;
 				case 2:
-					$image = imagecreatefromjpeg($source);
+					$image = @imagecreatefromjpeg($source);
 					$truecolor = imageistruecolor($image);
 					break;
 				case 3:

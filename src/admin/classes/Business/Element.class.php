@@ -93,31 +93,31 @@
 			foreach($propertyList as $property) {
 				if($property->getIsParent()) {
 					$getter = $property->getter();
-					if($this->$getter() instanceof Element) {
-						try {
-							$parent = $this->$getter();
+					try {
+						$parent = $this->$getter();
+						if($parent instanceof Element) {
 							return
 								$this->getStatus() == 'trash'
 								&& $parent->getStatus() != 'trash'
 								? Root::trash()
 								: $parent;
-						} catch (ObjectNotFoundException $e) {}
-					}
+						}
+					} catch (ObjectNotFoundException $e) {}
 				}
 			}
 
 			foreach($propertyList as $property) {
 				$getter = $property->getter();
-				if($this->$getter() instanceof Element) {
-					try {
-						$parent = $this->$getter();
+				try {
+					$parent = $this->$getter();
+					if($parent instanceof Element) {
 						return
 							$this->getStatus() == 'trash'
 							&& $parent->getStatus() != 'trash'
 							? Root::trash()
 							: $parent;
-					} catch (ObjectNotFoundException $e) {}
-				}
+					}
+				} catch (ObjectNotFoundException $e) {}
 			}
 
 			return Root::me();

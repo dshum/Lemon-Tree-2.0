@@ -25,6 +25,8 @@ $(function() {
 	$('#multisite').change(function() {
 		top.document.location.href = $(this).val()+'<?=FOLDER_LT?>';
 	});
+
+	top.document.title = '<?=$adminTitle?>';
 });
 </script>
 <style>

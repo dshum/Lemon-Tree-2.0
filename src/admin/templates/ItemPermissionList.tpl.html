@@ -14,18 +14,18 @@ $(function() {
 		var itemId = $(this).attr('itemid');
 		var permissionId = $(this).attr('permissionid');
 
-		$('div[id^='+permissionType+'_'+itemId+'_]').each(function() {
+		$('div[id^="'+permissionType+'_'+itemId+'_"]').each(function() {
 			$(this).removeClass('radio_on');
 			$(this).addClass('radio_off');
 		});
 
-		$('div[id^='+permissionType+'_'+itemId+'_'+permissionId+']').each(function() {
+		$('div[id^="'+permissionType+'_'+itemId+'_'+permissionId+'"]').each(function() {
 			$(this).removeClass('radio_off');
 			$(this).addClass('radio_on');
 		});
 
-		$('input:hidden[name='+permissionType+'['+itemId+']]').each(function() {
-			this.value = permissionId;
+		$('input:hidden[name="'+permissionType+'['+itemId+']"]').each(function() {
+			$(this).val(permissionId);
 		});
 	});
 });

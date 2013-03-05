@@ -13,17 +13,17 @@ $(function() {
 		var elementId = $(this).attr('elementid');
 		var permissionId = $(this).attr('permissionid');
 
-		$('div[id^=permission_'+elementId+'_]').each(function() {
+		$('div[id^="permission_'+elementId+'_"]').each(function() {
 			$(this).removeClass('radio_on');
 			$(this).addClass('radio_off');
 		});
 
-		$('div[id^=permission_'+elementId+'_'+permissionId+']').each(function() {
+		$('div[id^="permission_'+elementId+'_'+permissionId+'"]').each(function() {
 			$(this).removeClass('radio_off');
 			$(this).addClass('radio_on');
 		});
 
-		$('input:hidden[name=permission['+elementId+']]').each(function() {
+		$('input:hidden[name="permission['+elementId+']"]').each(function() {
 			this.value = permissionId;
 		});
 	});
@@ -99,7 +99,7 @@ foreach($itemList as $item) {
 <input type="hidden" name="permission[<?=$element->getPolymorphicId()?>]" value="<?=$permission?>">
 <tr>
 <td><img src="<?=$item->getIsFolder() ? 'img/folder8bit.png' : 'img/file8bit.png'?>" width="18" height="18" alt=""></td>
-<td class="left" nowrap><a href="<?=$selfUrl?>&groupId=<?=$currentGroup->getId()?>&elementId=<?=$element->getPolymorphicId()?>"><?=$element->getElementName()?></a></td>
+<td class="left"><a href="<?=$selfUrl?>&groupId=<?=$currentGroup->getId()?>&elementId=<?=$element->getPolymorphicId()?>"><?=$element->getElementName()?></a></td>
 <?php foreach(Permission::getPermissionNameList() as $id => $name) {?>
 <td radio="true" elementid="<?=$element->getPolymorphicId()?>" permissionid="<?=$id?>"><div id="permission_<?=$element->getPolymorphicId()?>_<?=$id?>" class="<?=$id == $permission ? 'radio_on' : 'radio_off'?>"><spacer type="block"></div></td>
 <?php }?>

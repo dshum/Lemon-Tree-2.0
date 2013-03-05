@@ -50,6 +50,16 @@
 
 		}
 
+		$adminTitle = LT_NAME.' : '.$controllerName;
+		$requestUri = $request->getServerVar('REQUEST_URI');
+		$urlQuery = parse_url($requestUri, PHP_URL_QUERY);
+		$urlQuery = str_replace('module='.$controllerName, '', $urlQuery);
+		$urlQuery = trim($urlQuery, '&');
+		if($urlQuery) {
+			$urlQuery = str_replace('&', ', ', $urlQuery);
+			$adminTitle .= ' : '.$urlQuery;
+		}
+
 		$controller = new $controllerName;
 
 		$modelAndView = $controller->handleRequest($request);
@@ -89,9 +99,11 @@
 
 		if(!$view instanceof RedirectView) {
 			$model->
+			set('controllerName', $controllerName)->
 			set('selfUrl', PATH_ADMIN_BROWSE.'?module='.$controllerName)->
 			set('baseUrl', PATH_ADMIN_BROWSE)->
-			set('loggedUser', $loggedUser);
+			set('loggedUser', $loggedUser)->
+			set('adminTitle', $adminTitle);
 		}
 
 		$view->render($model);

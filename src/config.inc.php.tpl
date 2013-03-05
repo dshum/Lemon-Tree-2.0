@@ -171,6 +171,7 @@
 	);
 
 	include PATH_ADMIN_CLASSES.'Utils'.DIRECTORY_SEPARATOR.'RussianTypograph.class.php';
+	include PATH_ADMIN_CLASSES.'Utils'.DIRECTORY_SEPARATOR.'RussianTextUtils.class.php';
 
 	mb_internal_encoding(DEFAULT_ENCODING);
 	mb_regex_encoding(DEFAULT_ENCODING);
