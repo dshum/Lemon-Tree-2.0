@@ -401,7 +401,7 @@ $(function() {
 
 <!-- path block -->
 <div class="path_top"><div><img src="img/path01.gif" width="5" height="8" alt=""></div></div>
-<div class="path">
+<div class="path" admintitle="<?=$currentElement->getElementName().' : '.$currentElement->getPolymorphicId()?>">
 <?php
 if(
 	$currentElement->getPolymorphicId() == Root::me()->getPolymorphicId()

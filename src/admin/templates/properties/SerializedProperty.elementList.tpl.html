@@ -1,0 +1,12 @@
+<?php
+try {
+	$array = unserialize($value);
+	ob_start();
+	print_r($array);
+	$html = ob_get_contents();
+	ob_end_clean();
+	echo '<pre>'.$html.'</pre>';
+} catch (BaseException $e) {
+	echo 'Некорректные данные.';
+}
+?>

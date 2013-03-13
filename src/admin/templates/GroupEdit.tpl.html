@@ -23,7 +23,7 @@ $(function() {
 
 <!-- path block -->
 <div class="path_top"><div><img src="img/path01.gif" width="5" height="8" alt=""></div></div>
-<div class="path">
+<div class="path" admintitle="<?=$currentGroup->getId() ? 'Редактирование группы : '.$currentGroup->getGroupDescription() : $parentGroup->getGroupDescription().' : Добавление группы'?>">
 <a href="<?=$selfUrl?>">Управление пользователями</a> &nbsp;<img src="img/path_arr2.gif" alt="">
 <?php
 if(sizeof($parentList)) {

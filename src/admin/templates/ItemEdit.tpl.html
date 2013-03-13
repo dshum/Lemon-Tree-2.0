@@ -11,7 +11,7 @@ $classTypeList = array(
 ?>
 
 <div class="path_top"><div><img src="img/path01.gif" width="5" height="8" alt=""></div></div>
-<div class="path">
+<div class="path" admintitle="Управление объектами : <?=$mode == "edit" ? 'Редактирование объекта '.$currentItem->getItemName() : 'Создание объекта'?>">
 <a href="<?=$baseUrl?>?module=ItemList">Управление объектами</a> <img src="img/path_arr2.gif" alt=""> <?php if($mode == "edit") {?>Объект <?=$currentItem->getItemName()?><?php } else { ?>Новый объект<?php } ?>
 </div>
 <div class="path_bottom"><div><img src="img/path04.gif" width="5" height="8" alt=""></div></div>

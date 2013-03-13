@@ -54,8 +54,8 @@ $(function() {
 
 <!-- path block -->
 <div class="path_top"><div><img src="img/path01.gif" width="5" height="8" alt=""></div></div>
-<div class="path">
-<?php if(sizeof($currentUser)) {?>
+<div class="path" admintitle="<?=isset($currentUser) ? 'Журнал операций пользователя : '.$currentGroup->getGroupDescription().' : '.$currentUser->getUserName() : 'Журнал операций пользователей'?>">
+<?php if(isset($currentUser)) {?>
 <a href="<?=$baseUrl?>?module=GroupList">Управление пользователями</a> &nbsp;<img src="img/path_arr2.gif" alt="">
 <?php 	foreach($parentList as $parent) {?>
 <a href="<?=$baseUrl?>?module=GroupList&groupId=<?=$parent->getId()?>"><?=$parent->getGroupDescription()?></a> &nbsp;<img src="img/path_arr2.gif" alt="">

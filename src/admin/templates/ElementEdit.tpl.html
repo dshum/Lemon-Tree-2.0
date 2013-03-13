@@ -338,7 +338,7 @@ function fileManagerCallback(propertyName, url, type, window) {
 
 <!-- path block -->
 <div class="path_top"><div><img src="img/path01.gif" width="5" height="8" alt=""></div></div>
-<div class="path">
+<div class="path" admintitle="<?=$mode == 'edit' ? 'Редактирование элемента : '.$currentElement->getElementName().' : '.$currentElement->getPolymorphicId() : $currentElement->getParent()->getElementName().' : Добавление элемента'?>">
 <?php
 if($currentElement->getStatus() == 'trash') {
 ?>
