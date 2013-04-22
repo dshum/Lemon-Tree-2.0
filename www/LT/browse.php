@@ -99,7 +99,6 @@
 
 		if(!$view instanceof RedirectView) {
 			$model->
-			set('controllerName', $controllerName)->
 			set('selfUrl', PATH_ADMIN_BROWSE.'?module='.$controllerName)->
 			set('baseUrl', PATH_ADMIN_BROWSE)->
 			set('loggedUser', $loggedUser)->

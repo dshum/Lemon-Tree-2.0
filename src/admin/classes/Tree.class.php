@@ -65,7 +65,7 @@
 					$itemClass = $item->getClass();
 
 					$elementList =
-						Criteria::create($itemClass->dao())->
+						$itemClass->dao()->getValid()->
 						addOrder($item->getOrderBy())->
 						getList();
 
@@ -115,7 +115,7 @@
 					$itemClass = $item->getClass();
 
 					$elementList =
-						Criteria::create($itemClass->dao())->
+						$itemClass->dao()->getValid()->
 						addOrder($item->getOrderBy())->
 						getList();
 
@@ -220,7 +220,7 @@
 					$itemClass = $item->getClass();
 
 					$elementList =
-						Criteria::create($itemClass->dao())->
+						$itemClass->dao()->getValid()->
 						addOrder($item->getOrderBy())->
 						getList();
 

@@ -13,42 +13,45 @@
 		Item::dao()->setItemList();
 		Property::dao()->setPropertyList();
 
-		try {
+		if(defined('Constants::SITE_NAME')) {
 
-			$dicts = array(
-				Bind2Item::dao(),
-				ItemPermission::dao(),
-				ElementPermission::dao(),
-				Group::dao(),
-				ServiceSection::dao(),
-				BannerRubric::dao(),
-				BannerCategory::dao(),
-				BannerDuration::dao(),
-				PaymentState::dao(),
-				SiteUserCategory::dao(),
-				LoadingState::dao(),
-				BuildingCondition::dao(),
-				FlatCondition::dao(),
-				CountryType::dao(),
-				RoomNumber::dao(),
-				PlotType::dao(),
-				CommerceRubric::dao(),
-				CommerceType::dao(),
-				GarageType::dao(),
-				AreaUnit::dao(),
-				PriceUnit::dao(),
-				Lavatory::dao(),
-				LegalForm::dao(),
-				Manager::dao(),
-//				PageTemplate::dao(),
-			);
+			try {
 
-			foreach ($dicts as $dao) {
-				$dao->uncacheLists();
+				$dicts = array(
+					Bind2Item::dao(),
+					ItemPermission::dao(),
+					ElementPermission::dao(),
+					Group::dao(),
+					ServiceSection::dao(),
+					BannerRubric::dao(),
+					BannerCategory::dao(),
+					BannerDuration::dao(),
+					PaymentState::dao(),
+					SiteUserCategory::dao(),
+					LoadingState::dao(),
+					BuildingCondition::dao(),
+					FlatCondition::dao(),
+					CountryType::dao(),
+					RoomNumber::dao(),
+					PlotType::dao(),
+					CommerceRubric::dao(),
+					CommerceType::dao(),
+					GarageType::dao(),
+					AreaUnit::dao(),
+					PriceUnit::dao(),
+					Lavatory::dao(),
+					LegalForm::dao(),
+					Manager::dao(),
+				);
+
+				foreach ($dicts as $dao) {
+					$dao->uncacheLists();
+				}
+
+			} catch (BaseException $e) {
+				echo ErrorMessageUtils::printMessage($e);
 			}
 
-		} catch (BaseException $e) {
-			echo ErrorMessageUtils::printMessage($e);
 		}
 
 		Site::generateAuto();

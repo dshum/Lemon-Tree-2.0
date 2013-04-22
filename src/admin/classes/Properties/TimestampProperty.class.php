@@ -18,6 +18,13 @@
 			return '<property name="'.$this->property->getPropertyName().'" type="Timestamp" required="false" />';
 		}
 
+		public function column()
+		{
+			$dataType = $this->getDataType();
+
+			return DBColumn::create($dataType, $this->getColumnName());
+		}
+
 		public function add2form(Form $form)
 		{
 			return $form->
