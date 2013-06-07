@@ -179,8 +179,6 @@
 				}
 			}
 
-			die('123');
-
 			return
 				ModelAndView::create()->
 				setModel($model)->
