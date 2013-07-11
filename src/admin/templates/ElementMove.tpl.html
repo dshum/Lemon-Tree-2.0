@@ -34,28 +34,28 @@ foreach($itemList as $item) {
 		var element = this;
 
 		if(countChecked > 0) {
-			if(!confirm('Перенести выбранные элементы в раздел "'+$(this).attr('elementname')+'"?')) {
-				return false;
-			}
-		} else {
-			alert('Не выбрано ни одного элемента.');
-			return false;
-		}
+			LT.Alert.confirm(
+				'Перенести выбранные элементы в раздел "'+$(this).attr('elementname')+'"?',
+				function() {
+					$(LT.Common.mainForm).each(function(){
+						this.action = LT.Common.baseUrl+'?module=ElementMove&action=move&targetId='+$(element).attr('elementid');
+					});
 
-		$(LT.Common.mainForm).each(function(){
-			this.action = LT.Common.baseUrl+'?module=ElementMove&action=move&targetId='+$(element).attr('elementid');
-		});
-
-		LT.Common.ajaxSubmit(function(data){
-			if(data.tree && data.tree.length) {
-				top.tree.LT.Tree.dropTree();
-				for(var i in data.tree) {
-					top.tree.LT.Tree.addElement(data.tree[i].parentId, data.tree[i].elementId, data.tree[i].elementName, data.tree[i].permissionId, data.tree[i].openFolder);
+					LT.Common.ajaxSubmit(function(data){
+						if(data.tree && data.tree.length) {
+							top.tree.LT.Tree.dropTree();
+							for(var i in data.tree) {
+								top.tree.LT.Tree.addElement(data.tree[i].parentId, data.tree[i].elementId, data.tree[i].elementName, data.tree[i].permissionId, data.tree[i].openFolder);
+							}
+							top.tree.LT.Tree.buildTree();
+						}
+						document.location.href = LT.Common.baseUrl+'?module=ViewBrowse&elementId='+$(element).attr('elementid');
+					});
 				}
-				top.tree.LT.Tree.buildTree();
-			}
-			document.location.href = LT.Common.baseUrl+'?module=ViewBrowse&elementId='+$(element).attr('elementid');
-		});
+			);
+		} else {
+			LT.Alert.alert('Не выбрано ни одного элемента.');
+		}
 
 		return false;
 	});
@@ -104,28 +104,28 @@ foreach($itemList as $item) {
 
 	$('#move_button').click(function() {
 		if(countChecked > 0) {
-			if(!confirm('Перенести выбранные элементы в раздел "'+$('#dest_show').html()+'"?')) {
-				return false;
-			}
-		} else {
-			alert('Не выбрано ни одного элемента.');
-			return false;
-		}
+			LT.Alert.confirm(
+				'Перенести выбранные элементы в раздел "'+$('#dest_show').html()+'"?',
+				function() {
+					$(LT.Common.mainForm).each(function(){
+						this.action = LT.Common.baseUrl+'?module=ElementMove&action=move&targetId=<?=$sourceItem->getItemName()?>.'+$('#dest').val();
+					});
 
-		$(LT.Common.mainForm).each(function(){
-			this.action = LT.Common.baseUrl+'?module=ElementMove&action=move&targetId=<?=$sourceItem->getItemName()?>.'+$('#dest').val();
-		});
-
-		LT.Common.ajaxSubmit(function(data){
-			if(data.tree && data.tree.length) {
-				top.tree.LT.Tree.dropTree();
-				for(var i in data.tree) {
-					top.tree.LT.Tree.addElement(data.tree[i].parentId, data.tree[i].elementId, data.tree[i].elementName, data.tree[i].permissionId, data.tree[i].openFolder);
+					LT.Common.ajaxSubmit(function(data){
+						if(data.tree && data.tree.length) {
+							top.tree.LT.Tree.dropTree();
+							for(var i in data.tree) {
+								top.tree.LT.Tree.addElement(data.tree[i].parentId, data.tree[i].elementId, data.tree[i].elementName, data.tree[i].permissionId, data.tree[i].openFolder);
+							}
+							top.tree.LT.Tree.buildTree();
+						}
+						document.location.href = LT.Common.baseUrl+'?module=ViewBrowse&elementId=<?=$sourceItem->getItemName()?>.'+$('#dest').val();
+					});
 				}
-				top.tree.LT.Tree.buildTree();
-			}
-			document.location.href = LT.Common.baseUrl+'?module=ViewBrowse&elementId=<?=$sourceItem->getItemName()?>.'+$('#dest').val();
-		});
+			);
+		} else {
+			LT.Alert.alert('Не выбрано ни одного элемента.');
+		}
 
 		return false;
 	});
@@ -150,7 +150,7 @@ foreach($itemList as $item) {
 		});
 	});
 
-	$('input:checkbox[name=check[]]').click(function() {
+	$('input:checkbox[name="check[]"]').click(function() {
 		if(this.checked) {
 			$(this).parents('tr').addClass('light');
 			countChecked++;

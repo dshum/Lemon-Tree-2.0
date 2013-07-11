@@ -91,11 +91,15 @@ $(function(){
 
 	LT.Common.mainForm.submit(function() {
 		if(LT.Item.countChecked > 0) {
-			if(!confirm('Внимание! Информация, содержащаяся в выбранных полях, будет потеряна.')) {
-				return false;
-			}
+			LT.Alert.confirm(
+				'Внимание! Информация, содержащаяся в выбранных полях, будет потеряна.',
+				function() {
+					LT.Item.saveItem()
+				}
+			);
+		} else {
+			LT.Item.saveItem();
 		}
-		LT.Item.saveItem();
 		return false;
  	});
 

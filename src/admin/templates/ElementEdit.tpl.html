@@ -88,18 +88,20 @@ $(function() {
 
 <?php if($currentElement->getId() && $permission >= Permission::PERMISSION_DROP_ID) {?>
  	$('#browse_drop').click(function(){
-		if(!confirm('Удалить элемент?')) {
-			return false;
-		}
-		var url = LT.Common.selfUrl+'&action=drop&elementId=<?=$currentElement->getPolymorphicId()?>';
-		LT.Common.ajaxPost(url, {}, function(data){
-			if(data.dropped && data.dropped.length && top.tree) {
-				top.tree.LT.Tree.dropNode(data.dropped);
+		LT.Alert.confirm(
+			'Удалить элемент?',
+			function() {
+				var url = LT.Common.selfUrl+'&action=drop&elementId=<?=$currentElement->getPolymorphicId()?>';
+				LT.Common.ajaxPost(url, {}, function(data){
+					if(data.dropped && data.dropped.length && top.tree) {
+						top.tree.LT.Tree.dropNode(data.dropped);
+					}
+					if(data.returnElementId) {
+						document.location.href = LT.Common.baseUrl+'?module=ViewBrowse&elementId='+data.returnElementId;
+					}
+				});
 			}
-			if(data.returnElementId) {
-				document.location.href = LT.Common.baseUrl+'?module=ViewBrowse&elementId='+data.returnElementId;
-			}
-		});
+		);
 	}).mousedown(function(){
 		$(this).css({backgroundPosition: '0 -54px'});
 	}).mouseup(function(){
@@ -112,22 +114,24 @@ $(function() {
 
 	$('#browse_move').click(function(){
 <?php 	if($currentElement->getStatus() == 'trash') {?>
-		if(!confirm('Восстановить элемент?')) {
-			return false;
-		}
-		var url = LT.Common.selfUrl+'&action=restore&elementId=<?=$currentElement->getPolymorphicId()?>';
-		LT.Common.ajaxPost(url, {}, function(data){
-			if(data.tree && data.tree.length && top.tree) {
-				top.tree.LT.Tree.dropTree();
-				for(var i in data.tree) {
-					top.tree.LT.Tree.addElement(data.tree[i].parentId, data.tree[i].elementId, data.tree[i].elementName, data.tree[i].permissionId, data.tree[i].openFolder);
-				}
-				top.tree.LT.Tree.buildTree();
+		LT.Alert.confirm(
+			'Восстановить элемент?',
+			function() {
+				var url = LT.Common.selfUrl+'&action=restore&elementId=<?=$currentElement->getPolymorphicId()?>';
+				LT.Common.ajaxPost(url, {}, function(data){
+					if(data.tree && data.tree.length && top.tree) {
+						top.tree.LT.Tree.dropTree();
+						for(var i in data.tree) {
+							top.tree.LT.Tree.addElement(data.tree[i].parentId, data.tree[i].elementId, data.tree[i].elementName, data.tree[i].permissionId, data.tree[i].openFolder);
+						}
+						top.tree.LT.Tree.buildTree();
+					}
+					if(data.returnElementId) {
+						document.location.href = LT.Common.baseUrl+'?module=ViewBrowse&elementId='+data.returnElementId;
+					}
+				});
 			}
-			if(data.returnElementId) {
-				document.location.href = LT.Common.baseUrl+'?module=ViewBrowse&elementId='+data.returnElementId;
-			}
-		});
+		);
 <?php 	} else {?>
 		LT.Common.mainForm.each(function() {
 			this.action = LT.Common.baseUrl+'?module=ElementMove';
