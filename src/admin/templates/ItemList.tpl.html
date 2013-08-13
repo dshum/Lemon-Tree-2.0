@@ -38,20 +38,22 @@ $(function() {
 
 	$('#items_delete').click(function(){
 		if(countChecked) {
-			if(!confirm('Внимание! Все элементы выбранных классов будут удалены. Продолжить?')) {
-				return false;
-			}
+			LT.Alert.confirm(
+				'Внимание! Все элементы выбранных классов будут удалены. Продолжить?',
+				function() {
+					LT.Common.ajaxSubmit(function(data){
+						if(data.dropped) {
+							for(var i in data.dropped) {
+								$('#item_row_'+data.dropped[i]).remove();
+							}
+						}
+					});
+				}
+			);
 		} else {
-			alert('Не выбрано ни одного объекта.');
+			LT.Alert.alert('Не выбрано ни одного объекта.');
 			return false;
 		}
-		LT.Common.ajaxSubmit(function(data){
-			if(data.dropped) {
-				for(var i in data.dropped) {
-					$('#item_row_'+data.dropped[i]).remove();
-				}
-			}
-		});
 		return false;
 	}).mousedown(function(){
 		$(this).css({backgroundPosition: '0 -54px'});

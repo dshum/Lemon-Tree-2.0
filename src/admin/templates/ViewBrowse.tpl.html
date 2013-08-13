@@ -82,25 +82,25 @@ $(function() {
 
 	$('#browse_drop').click(function(){
 		if(countChecked > 0) {
-			if(!confirm('Удалить выбранные элементы?')) {
-				return false;
-			}
-		} else {
-			return false;
-		}
+			LT.Alert.confirm(
+				'Удалить выбранные элементы?',
+				function() {
+					LT.Common.mainForm.each(function(){
+						this.action = LT.Common.selfUrl+'&elementId=<?=$currentElement->getPolymorphicId()?>&action=drop';
+					});
 
-		LT.Common.mainForm.each(function(){
-			this.action = LT.Common.selfUrl+'&elementId=<?=$currentElement->getPolymorphicId()?>&action=drop';
-		});
-
-		LT.Common.ajaxSubmit(function(data){
-			if(data.dropped && data.dropped.length) {
-				for(var i in data.dropped) {
-					top.tree.LT.Tree.dropNode(data.dropped[i]);
+					LT.Common.ajaxSubmit(function(data){
+						if(data.dropped && data.dropped.length) {
+							for(var i in data.dropped) {
+								top.tree.LT.Tree.dropNode(data.dropped[i]);
+							}
+							document.location.href = document.location.href;
+						}
+					});
 				}
-				document.location.href = document.location.href;
-			}
-		});
+			);
+		}
+		return false;
 	}).mousedown(function(){
 		if(countChecked > 0) {
 			$(this).css({backgroundPosition: '0 -54px'});
@@ -122,37 +122,37 @@ $(function() {
 	$('#browse_move').click(function(){
 <?php if($currentElement->getStatus() == 'trash') {?>
 		if(countChecked > 0) {
-			if(!confirm('Восстановить выбранные элементы?')) {
-				return false;
-			}
-		} else {
-			return false;
-		}
+			LT.Alert.confirm(
+				'Восстановить выбранные элементы?',
+				function() {
+					LT.Common.mainForm.each(function(){
+						this.action =
+							LT.Common.selfUrl
+							+'&elementId=<?=$currentElement->getPolymorphicId()?>&action=restore';
+					});
 
-		LT.Common.mainForm.each(function(){
-			this.action =
-				LT.Common.selfUrl
-				+'&elementId=<?=$currentElement->getPolymorphicId()?>&action=restore';
-		});
-
-		LT.Common.ajaxSubmit(function(data){
-			if(data.tree && data.tree.length) {
-				top.tree.LT.Tree.dropTree();
-				for(var i in data.tree) {
-					top.tree.LT.Tree.addElement(
-						data.tree[i].parentId,
-						data.tree[i].elementId,
-						data.tree[i].elementName,
-						data.tree[i].permissionId,
-						data.tree[i].openFolder
-					);
+					LT.Common.ajaxSubmit(function(data){
+						if(data.tree && data.tree.length) {
+							top.tree.LT.Tree.dropTree();
+							for(var i in data.tree) {
+								top.tree.LT.Tree.addElement(
+									data.tree[i].parentId,
+									data.tree[i].elementId,
+									data.tree[i].elementName,
+									data.tree[i].permissionId,
+									data.tree[i].openFolder
+								);
+							}
+							top.tree.LT.Tree.buildTree();
+						}
+						if(data.restored && data.restored.length) {
+							document.location.href = document.location.href;
+						}
+					});
 				}
-				top.tree.LT.Tree.buildTree();
-			}
-			if(data.restored && data.restored.length) {
-				document.location.href = document.location.href;
-			}
-		});
+			);
+		}
+		return false;
 <?php } else {?>
 		if(countChecked > 0) {
 			LT.Common.mainForm.each(function(){

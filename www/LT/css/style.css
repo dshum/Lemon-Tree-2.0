@@ -130,7 +130,7 @@ div.checkbox_off {position: relative; top: -3px; width: 13px; height: 14px; back
 .hand {cursor: pointer; cursor: hand;}
 .pager {float: left; margin: 5px 0 0 0; font-size: 11px;}
 .pager span {float: left; padding: 2px 0;}
-.pager a, .pager b, .pager i {float: left; font-style: normal; cursor: pointer; cursor: hand; padding: 2px 0; width: 25px; text-align: center; margin: 0 1px 2px 1px; background: #EEFFEE; text-decoration: none;}
+.pager a, .pager b, .pager i {float: left; font-style: normal; cursor: pointer; cursor: hand; padding: 3px; text-align: center; margin: 0 1px 2px 1px; background: #EEFFEE; text-decoration: none;}
 .pager a:hover, .pager i.pager_over {cursor: pointer; cursor: hand; text-decoration: none; color: #000; background: #FFFADB;}
 .pager a#prev_page, .pager a#next_page {background: none; font-size: 14px; padding: 0;}
 .pager a:hover#prev_page, .pager a:hover#next_page {color: #000;}

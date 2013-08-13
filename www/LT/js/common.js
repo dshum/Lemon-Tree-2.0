@@ -106,7 +106,7 @@ LT.Common = function() {
 			for(var i in data.error) {
 				str += data.error[i]+'<br>';
 			}
-			LT.Alert.alert({html: str});
+			LT.Alert.alert(str);
 		} else if(customOnSuccess) {
 			$(customOnSuccess(data));
 			customOnSuccess = null;

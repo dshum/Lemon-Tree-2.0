@@ -52,25 +52,25 @@ $(function(){
 
 	$('#browse_drop').click(function(){
 		if(countChecked > 0) {
-			if(!confirm('Удалить выбранные элементы?')) {
-				return false;
-			}
-		} else {
-			return false;
-		}
+			LT.Alert.confirm(
+				'Удалить выбранные элементы?',
+				function() {
+					LT.Common.mainForm.each(function(){
+						this.action = LT.Common.selfUrl+'&action=drop';
+					});
 
-		LT.Common.mainForm.each(function(){
-			this.action = LT.Common.selfUrl+'&action=drop';
-		});
-
-		LT.Common.ajaxSubmit(function(data){
-			if(data.dropped && data.dropped.length) {
-				for(var i in data.dropped) {
-					top.tree.LT.Tree.dropNode(data.dropped[i]);
+					LT.Common.ajaxSubmit(function(data){
+						if(data.dropped && data.dropped.length) {
+							for(var i in data.dropped) {
+								top.tree.LT.Tree.dropNode(data.dropped[i]);
+							}
+							document.location.href = document.location.href;
+						}
+					});
 				}
-				document.location.href = document.location.href;
-			}
-		});
+			);
+		}
+		return false;
 	}).mousedown(function(){
 		if(countChecked > 0) {
 			$(this).css({backgroundPosition: '0 -54px'});
