@@ -289,12 +289,17 @@
 					ErrorMessageUtils::sendMessage($e);
 				}
 
-				if($element->getStatus() == 'trash') {
-					$result =  $element->dao()->dropElement($element);
-					$actionTypeId = UserActionType::ACTION_TYPE_DROP_ELEMENT_LIST_ID;
-				} else {
-					$result =  $element->dao()->moveElementToTrash($element);
-					$actionTypeId = UserActionType::ACTION_TYPE_DROP_ELEMENT_LIST_TO_TRASH_ID;
+				try {
+					if($element->getStatus() == 'trash') {
+						$result = $element->dao()->dropElement($element);
+						$actionTypeId = UserActionType::ACTION_TYPE_DROP_ELEMENT_LIST_ID;
+					} else {
+						$result = $element->dao()->moveElementToTrash($element);
+						$actionTypeId = UserActionType::ACTION_TYPE_DROP_ELEMENT_LIST_TO_TRASH_ID;
+					}
+				} catch (BaseException $e) {
+					$result = null;
+					$model->set('drop', 'error');
 				}
 
 				if($result) {

@@ -8,7 +8,7 @@
 			return
 				ModelAndView::create()->
 				setModel(Model::create())->
-				setView('redirect:'.$this->redirectUrl);
+				setView('redirect:'.$this->getRedirectUrl());
 		}
 
 		public function setRedirectUrl($redirectUrl = PATH_WEB)
