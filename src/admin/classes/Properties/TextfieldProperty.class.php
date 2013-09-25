@@ -27,7 +27,7 @@
 				Primitive::string($this->property->getPropertyName())->
 				setMax(255)->
 				addImportFilter(Filter::trim())->
-				addImportFilter(Filter::stripTags()->setAllowableTags('<a><b><i><u><strong><em><sup><sub>'));
+				addImportFilter(Filter::stripTags()->setAllowableTags('<a><b><i><u><strong><em><sup><sub><meta>'));
 
 			if($this->getParameterValue('typograph')) {
 				$primitive->addImportFilter(RussianTypograph::me());
