@@ -4,8 +4,8 @@
 		private $rewriteRuleList = array();
 		private $currentElement = null;
 		private $firstpageControllerName = null;
-		private $defaultControllerName = null;
-		private $controllerName = 'error';
+		private $defaultControllerName = 'error';
+		private $controller = null;
 
 		public static function me()
 		{
@@ -28,34 +28,6 @@
 			$this->firstpageControllerName = $controllerName;
 
 			return $this;
-		}
-
-		public function plain($search, $pattern)
-		{
-			$search = trim($search, '/');
-			$pattern = trim($pattern, '/');
-
-			if($search == $pattern) return true;
-
-			$searchArray = explode('/', $search);
-			$patternArray = explode('/', $pattern);
-
-			if(sizeof($searchArray) != sizeof($patternArray)) return false;
-
-			foreach($patternArray as $key => $value) {
-				if($value == '*') continue;
-				if($value == $searchArray[$key]) continue;
-				return false;
-			}
-
-			return true;
-		}
-
-		public function regexp($search, $pattern)
-		{
-			$search = '/'.trim($search, '/');
-
-			return preg_match('~'.$pattern.'~i', $search);
 		}
 
 		public function addRule($pattern, $className, $controllerName)
@@ -82,6 +54,28 @@
 			return $this;
 		}
 
+		public function addRedirectRule($pattern, $redirect)
+		{
+			$this->rewriteRuleList[] = array(
+				'method' => 'redirect',
+				'pattern' => $pattern,
+				'redirect' => $redirect,
+			);
+
+			return $this;
+		}
+
+		public function addRegexpRedirectRule($pattern, $redirect)
+		{
+			$this->rewriteRuleList[] = array(
+				'method' => 'regexpRedirect',
+				'pattern' => $pattern,
+				'redirect' => $redirect,
+			);
+
+			return $this;
+		}
+
 		public function check($rewriteRule, $search)
 		{
 			$method = $rewriteRule['method'];
@@ -92,13 +86,13 @@
 
 		public function import($elementPath)
 		{
-			if($elementPath == '/') {
+			$firstpageControllerName = $this->getFirstpageControllerName();
 
-				$this->controllerName = $this->getFirstpageControllerName();
+			if($elementPath == '/' && $firstpageControllerName) {
+
+				$this->controller = new $firstpageControllerName;
 
 			} else {
-
-				$this->controllerName = $this->getDefaultControllerName();
 
 				$rewriteRuleList = $this->getRewriteRuleList();
 
@@ -106,20 +100,42 @@
 
 					if($this->check($rewriteRule, $elementPath)) {
 
-						$className = $rewriteRule['className'];
-						$controllerName = $rewriteRule['controllerName'];
+						if(
+							$rewriteRule['method'] == 'redirect'
+							|| $rewriteRule['method'] == 'regexpRedirect'
+						) {
 
-						$item = Item::dao()->getItemByName($className);
-						$itemClass = $item->getClass();
-						$currentElement = $itemClass->dao()->getByElementPath($elementPath);
-
-						if($currentElement instanceof Element) {
-							$this->currentElement = $currentElement;
-							$this->controllerName = $controllerName;
+							$this->currentElement = null;
+							$this->controller = new RedirectController;
+							$this->controller->setRedirectUrl($rewriteRule['redirect']);
 							break;
+
+						} else {
+
+							$className = $rewriteRule['className'];
+							$controllerName = $rewriteRule['controllerName'];
+
+							$item = Item::dao()->getItemByName($className);
+							$itemClass = $item->getClass();
+							$currentElement = $itemClass->dao()->getByElementPath($elementPath);
+
+							if($currentElement instanceof Element) {
+								$this->currentElement = $currentElement;
+								$this->controller = new $controllerName;
+								break;
+							}
+
 						}
+
 					}
+
 				}
+
+			}
+
+			if(!$this->controller) {
+				$defaultControllerName = $this->getDefaultControllerName();
+				$this->controller = new $defaultControllerName;
 			}
 
 			return $this;
@@ -170,14 +186,52 @@
 			return $this->currentElement;
 		}
 
-		public function getControllerName()
-		{
-			return $this->controllerName;
-		}
-
 		public function getController()
 		{
-			return new $this->controllerName;
+			return $this->controller;
+		}
+
+		public function getControllerName()
+		{
+			return get_class($this->getController());
+		}
+
+		private function plain($search, $pattern)
+		{
+			$search = trim($search, '/');
+			$pattern = trim($pattern, '/');
+
+			if($search == $pattern) return true;
+
+			$searchArray = explode('/', $search);
+			$patternArray = explode('/', $pattern);
+
+			if(sizeof($searchArray) != sizeof($patternArray)) return false;
+
+			foreach($patternArray as $key => $value) {
+				if($value == '*') continue;
+				if($value == $searchArray[$key]) continue;
+				return false;
+			}
+
+			return true;
+		}
+
+		private function regexp($search, $pattern)
+		{
+			$search = '/'.trim($search, '/');
+
+			return preg_match('~'.$pattern.'~i', $search);
+		}
+
+		private function redirect($search, $pattern)
+		{
+			return $this->plain($search, $pattern);
+		}
+
+		private function regexpRedirect($search, $pattern)
+		{
+			return $this->regexp($search, $pattern);
 		}
 	}
 ?>
