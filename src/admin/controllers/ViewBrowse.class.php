@@ -495,6 +495,7 @@
 
 				if(
 					$pluginView instanceof RedirectView
+					|| sizeof($request->getPost())
 					|| $request->hasGetVar('print')
 				) {
 					return $pluginModelAndView;

@@ -1,27 +1,42 @@
-<?php if(!$readonly && $node instanceof Element && sizeof($tree)) {?>
+<?php if(!$readonly && sizeof($tree)) {?>
 
 <script type="text/javascript">
 $(function() {
-<?php foreach($tree as $element) {?>
+<?php 	if($plainList) {?>
+
+<?php 		foreach($tree as $element) {?>
+	LT.MultilinkTree.addPlainElement('<?=$propertyName?>', '<?=$element['elementId']?>', '<?=addslashes($element['elementName'])?>', <?=$element['isActive']?>);
+<?php 		}?>
+	LT.MultilinkTree.buildPlainList('<?=$propertyName?>', 'root');
+
+<?php 	} elseif($node instanceof Element) {?>
+
+<?php		 foreach($tree as $element) {?>
 	LT.MultilinkTree.addElement('<?=$propertyName?>', '<?=$element['parentId']?>', '<?=$element['elementId']?>', '<?=addslashes($element['elementName'])?>', <?=$element['isActive']?>, <?=$element['isOpen']?>, <?=$element['isCheckbox']?>);
-<?php }?>
+<?php 		}?>
 	LT.MultilinkTree.buildBranch('<?=$propertyName?>', '<?=$node->getPolymorphicId()?>');
+<?php	 }?>
 });
 </script>
 
 <?=$propertyDescription?>:
 <div id="<?=$propertyName?>_block" class="prop_block" style="overflow-y: scroll; display: block;" overflow="true">
-<div id="<?=$propertyName?>_branch_<?=$node->getPolymorphicId()?>"></div>
+<div id="<?=$propertyName?>_branch_<?=$plainList ? 'root' : $node->getPolymorphicId()?>"></div>
 </div><br>
 
 <?php } else {?>
 
 <?=$propertyDescription?>:
+<div id="<?=$propertyName?>_block" class="prop_block" style="overflow-y: scroll; display: block;" overflow="true">
 <?php 	if(sizeof($list)) {?>
-<?php foreach($list as $k => $element) {?><?=$k ? ', ' : ''?><a href="<?=PATH_ADMIN_BROWSE.'?module=ElementEdit&elementId='.$element->getPolymorphicId()?>" title="<?=$element->getItem()->getItemDescription()?>"><?=$element->getElementName()?></a><?php }?>
+<?php 		foreach($list as $element) {?>
+<?php if(!$readonly) {?><input type="checkbox" id="<?=$propertyName?>_check_<?=$element->getId()?>" name="<?=$propertyName?>[]" value="<?=$element->getId()?>" checked="true">&nbsp;<?php }?><a href="<?=PATH_ADMIN_BROWSE.'?module=ElementEdit&elementId='.$element->getPolymorphicId()?>" title="<?=$fetchItem->getItemDescription()?>"><?=$element->getElementName()?></a><br>
+<?php 		}?>
 <?php 	} else {?>
-Не задано
+<span id="<?=$propertyName?>_undefined">Не задано</span>
 <?php 	}?>
+</div>
+<?php if(!$readonly) {?><input type="hidden" id="<?=$propertyName?>_hidden_id" value=""><input type="hidden" id="<?=$propertyName?>_hidden_name" value=""><span id="<?=$propertyName?>_show" main="<?=$fetchItem->getItemDescription()?>"><?=$fetchItem->getItemDescription()?></span>&nbsp;&nbsp;<input type="text" id="<?=$propertyName?>_name" onetoone="name" itemId="<?=$fetchItem ? $fetchItem->getId() : null?>" propertyName="<?=$propertyName?>" main="Введите ID или название" name="<?=$propertyName?>_name" value="Введите ID или название" class="prop-mini" style="width: 300px; color: grey;">&nbsp;&nbsp;<span id="<?=$propertyName?>_add" onetoone="add" propertyName="<?=$propertyName?>" elementHref="<?=PATH_ADMIN_BROWSE.'?module=ElementEdit&elementId='.$fetchItem->getItemName()?>." elementTitle="<?=$fetchItem->getItemDescription()?>" class="dashed hand">Добавить</span><?php }?>
 <br><br>
 
 <?php }?>

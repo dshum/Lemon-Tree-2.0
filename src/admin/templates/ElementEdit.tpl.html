@@ -189,9 +189,11 @@ $(function() {
 		$(this).autocomplete({
 			source: '<?=$baseUrl?>?module=ElementSearch&action=hint&itemId='+itemId+'&print',
 			select: function(event, ui) {
-				$('input[name='+propertyName+']').val(ui.item.id);
 				$('input[name='+propertyName+'_name]').css('color', 'black').val(ui.item.value);
 				$('#'+propertyName+'_show').css('color', 'grey').html(ui.item.value);
+				$('input[name='+propertyName+']').val(ui.item.id);
+				$('#'+propertyName+'_hidden_id').val(ui.item.id);
+				$('#'+propertyName+'_hidden_name').val(ui.item.value);
 			},
 			minLength: 0
 		});
@@ -224,8 +226,36 @@ $(function() {
 		$('input[name='+propertyName+'_name]').css('color', 'grey').val(main);
 	});
 
+	$('span[onetoone=add]').live('click', function() {
+		var propertyName = $(this).attr('propertyName');
+
+		if($('#'+propertyName+'_hidden_id').val()) {
+			var id = $('#'+propertyName+'_hidden_id').val();
+			var name = $('#'+propertyName+'_hidden_name').val();
+
+			var elementHref = $(this).attr('elementHref');
+			var elementTitle = $(this).attr('elementTitle');
+			var main = $('input[name='+propertyName+'_name]').attr('main');
+			var main2 = $('#'+propertyName+'_show').attr('main');
+
+			var html =
+				'<input type="checkbox" id="'+propertyName+'_check_'+id
+				+'" name="'+propertyName+'[]" value="'+id
+				+'" checked="true">&nbsp;<a href="'+elementHref+id
+				+'" title="'+elementTitle+'">'+name+'</a><br>';
+
+			$('input[name='+propertyName+'_name]').css('color', 'grey').val(main);
+			$('#'+propertyName+'_show').css('color', 'black').html(main2);
+			$('#'+propertyName+'_hidden_id').val('');
+			$('#'+propertyName+'_hidden_name').val('');
+			$('#'+propertyName+'_undefined').remove();
+			$('#'+propertyName+'_block').append(html);
+		}
+	});
+
 	$('input[link=name]').live('click', function() {
 		var main = $(this).attr('main');
+
 		if($(this).val() == main) {
 			$(this).css('color', 'black').val('');
 		}

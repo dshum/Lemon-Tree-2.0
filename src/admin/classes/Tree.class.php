@@ -107,7 +107,10 @@
 
 		public static function getLinkTree($itemList, $openIdList, $activeClass, $activeElement)
 		{
+			$map = array();
 			$tree = array();
+			$prev = 0;
+			$flag = true;
 
 			foreach($itemList as $item) {
 
@@ -120,38 +123,70 @@
 						getList();
 
 					foreach($elementList as $element) {
-
-						$isActive =
-							$activeElement instanceof Element
-							&& $element->getPolymorphicId() == $activeElement->getPolymorphicId()
-							? 1
-							: 0;
-
-						$isOpen =
-							isset($openIdList[$element->getPolymorphicId()])
-							? 1
-							: 0;
-
-						$isRadio =
-							$element->getClass() == $activeClass
-							? 1
-							: 0;
-
-						$tree[] = array(
-							'parentId' => $element->getParent()->getPolymorphicId(),
-							'elementId' => $element->getPolymorphicId(),
-							'elementName' => $element->getAlterName(),
-							'isActive' => $isActive,
-							'isOpen' => $isOpen,
-							'isRadio' => $isRadio,
-
-						);
+						$tree[$element->getParent()->getPolymorphicId()][$element->getPolymorphicId()] = $element;
+						$tree2[$element->getParent()->getPolymorphicId()][$element->getPolymorphicId()] = 1;
+						$prev++;
 					}
 
 				} catch (BaseException $e) {}
 			}
 
-			return $tree;
+			while ($flag) {
+				$curr = 0;
+				foreach ($tree as $parentId => $elementList) {
+					foreach ($elementList as $elementId => $element) {
+						$curr++;
+						if (!isset($tree[$elementId]) || !sizeof($tree[$elementId])) {
+							if ($element->getClass() != $activeClass) {
+								unset($tree[$parentId][$elementId]);
+								$curr--;
+							}
+						}
+					}
+				}
+				if($curr == $prev) {
+					$flag = false;
+				} else {
+					$prev = $curr;
+				}
+			}
+
+			foreach ($tree as $parentId => $elementList) {
+				if (!sizeof($tree[$parentId])) {
+					unset($tree[$parentId]);
+				}
+			}
+
+			foreach ($tree as $parentId => $elementList) {
+				foreach ($elementList as $elementId => $element) {
+					$isActive =
+						$activeElement instanceof Element
+						&& $element->getPolymorphicId() == $activeElement->getPolymorphicId()
+						? 1
+						: 0;
+
+					$isOpen =
+						isset($openIdList[$element->getPolymorphicId()])
+						? 1
+						: 0;
+
+					$isRadio =
+						$element->getClass() == $activeClass
+						? 1
+						: 0;
+
+					$map[] = array(
+						'parentId' => $element->getParent()->getPolymorphicId(),
+						'elementId' => $element->getPolymorphicId(),
+						'elementName' => $element->getAlterName(),
+						'isActive' => $isActive,
+						'isOpen' => $isOpen,
+						'isRadio' => $isRadio,
+					);
+				}
+			}
+
+			return $map;
 		}
 
 		public static function getLinkPlainList($node, $activeClass, $activeElement)
@@ -180,7 +215,6 @@
 				}
 
 				foreach($elementList as $element) {
-
 					$isActive =
 						$activeElement instanceof Element
 						&& $element->getPolymorphicId() == $activeElement->getPolymorphicId()
@@ -194,7 +228,6 @@
 						'isActive' => $isActive,
 						'isOpen' => 0,
 						'isRadio' => 1,
-
 					);
 				}
 
@@ -205,7 +238,10 @@
 
 		public static function getMultilinkTree($itemList, $openIdList, $activeList, $activeClass)
 		{
+			$map = array();
 			$tree = array();
+			$prev = 0;
+			$flag = true;
 
 			$activeIdList = array();
 			foreach($activeList as $activeElement) {
@@ -225,35 +261,118 @@
 						getList();
 
 					foreach($elementList as $element) {
-
-						$isActive =
-							in_array($element->getPolymorphicId(), $activeIdList)
-							? 1
-							: 0;
-
-						$isOpen =
-							isset($openIdList[$element->getPolymorphicId()])
-							? 1
-							: 0;
-
-						$isCheckbox =
-							$element->getClass() == $activeClass
-							? 1
-							: 0;
-
-						$tree[] = array(
-							'parentId' => $element->getParent()->getPolymorphicId(),
-							'elementId' => $element->getPolymorphicId(),
-							'elementName' => $element->getAlterName(),
-							'isActive' => $isActive,
-							'isOpen' => $isOpen,
-							'isCheckbox' => $isCheckbox,
-
-						);
+						$tree[$element->getParent()->getPolymorphicId()][$element->getPolymorphicId()] = $element;
+						$tree2[$element->getParent()->getPolymorphicId()][$element->getPolymorphicId()] = 1;
+						$prev++;
 					}
 
 				} catch (BaseException $e) {}
 			}
+
+			while ($flag) {
+				$curr = 0;
+				foreach ($tree as $parentId => $elementList) {
+					foreach ($elementList as $elementId => $element) {
+						$curr++;
+						if (!isset($tree[$elementId]) || !sizeof($tree[$elementId])) {
+							if ($element->getClass() != $activeClass) {
+								unset($tree[$parentId][$elementId]);
+								$curr--;
+							}
+						}
+					}
+				}
+				if($curr == $prev) {
+					$flag = false;
+				} else {
+					$prev = $curr;
+				}
+			}
+
+			foreach ($tree as $parentId => $elementList) {
+				if (!sizeof($tree[$parentId])) {
+					unset($tree[$parentId]);
+				}
+			}
+
+			foreach ($tree as $parentId => $elementList) {
+				foreach ($elementList as $elementId => $element) {
+					$isActive =
+						in_array($element->getPolymorphicId(), $activeIdList)
+						? 1
+						: 0;
+
+					$isOpen =
+						isset($openIdList[$element->getPolymorphicId()])
+						? 1
+						: 0;
+
+					$isCheckbox =
+						$element->getClass() == $activeClass
+						? 1
+						: 0;
+
+					$map[] = array(
+						'parentId' => $element->getParent()->getPolymorphicId(),
+						'elementId' => $element->getPolymorphicId(),
+						'elementName' => $element->getAlterName(),
+						'isActive' => $isActive,
+						'isOpen' => $isOpen,
+						'isCheckbox' => $isCheckbox,
+					);
+				}
+			}
+
+			return $map;
+		}
+
+		public static function getMultilinkPlainList($node, $activeClass, $activeElements)
+		{
+			$tree = array();
+
+			try {
+
+				$item = Item::dao()->getItemByName($activeClass);
+				$itemClass = $item->getClass();
+
+				if($node instanceof Element) {
+
+					$elementList =
+						$itemClass->dao()->getChildren($node)->
+						addOrder($item->getOrderBy())->
+						getList();
+
+				} else {
+
+					$elementList =
+						$itemClass->dao()->getValid()->
+						addOrder($item->getOrderBy())->
+						getList();
+
+				}
+
+				foreach($elementList as $element) {
+					$isActive = 0;
+					foreach ($activeElements as $activeElement) {
+						if(
+							$activeElement instanceof Element
+							&& $element->getPolymorphicId() == $activeElement->getPolymorphicId()
+						) {
+							$isActive = 1;
+						}
+					}
+
+					$tree[] = array(
+						'parentId' => $element->getParent()->getPolymorphicId(),
+						'elementId' => $element->getPolymorphicId(),
+						'elementName' => $element->getAlterName(),
+						'isActive' => $isActive,
+						'isOpen' => 0,
+						'isCheckbox' => 1,
+					);
+				}
+
+			} catch (BaseException $e) {}
 
 			return $tree;
 		}

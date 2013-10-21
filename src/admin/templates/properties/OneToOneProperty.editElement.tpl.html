@@ -2,21 +2,21 @@
 
 <script type="text/javascript">
 $(function() {
-<?php if($plainList) {?>
+<?php 	if($plainList) {?>
 
-<?php 	foreach($tree as $element) {?>
+<?php 		foreach($tree as $element) {?>
 	LT.LinkTree.addPlainElement('<?=$propertyName?>', '<?=$element['elementId']?>', '<?=addslashes($element['elementName'])?>', <?=$element['isActive']?>);
-<?php 	}?>
+<?php 		}?>
 	LT.LinkTree.buildPlainList('<?=$propertyName?>', 'root');
 
-<?php } else {?>
+<?php 	} elseif($node instanceof Element) {?>
 
-<?php 	foreach($tree as $element) {?>
+<?php 		foreach($tree as $element) {?>
 	LT.LinkTree.addElement('<?=$propertyName?>', '<?=$element['parentId']?>', '<?=$element['elementId']?>', '<?=addslashes($element['elementName'])?>', <?=$element['isActive']?>, <?=$element['isOpen']?>, <?=$element['isRadio']?>);
-<?php 	}?>
+<?php 		}?>
 	LT.LinkTree.buildBranch('<?=$propertyName?>', '<?=$node->getPolymorphicId()?>');
 
-<?php }?>
+<?php 	}?>
 
 	$('#<?=$propertyName?>_description').click(function() {
 		$('#<?=$propertyName?>_block').slideToggle('fast');

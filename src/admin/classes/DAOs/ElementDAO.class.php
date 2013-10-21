@@ -226,6 +226,14 @@
 			$parent = $element->getParent();
 			$item = $element->getItem();
 
+			$loggedUser = LoggedUser::getUser();
+
+			if($loggedUser instanceof User) {
+				$element->
+				setGroup($loggedUser->getGroup())->
+				setUser($loggedUser);
+			}
+
 			$elementPathPrefix = $parent->getElementPath().'/';
 
 			$rand = substr(md5(rand()), 0, 16);

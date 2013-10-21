@@ -66,25 +66,25 @@ LT.LinkTree = function() {
 
 				if(branch[propertyName][elementId] && branch[propertyName][elementId].length) {
 					var open = element.isOpen ? 'true' : 'false';
-					var a = $('<a class="plus" elementid="'+elementId+'" open="'+open+'"></a>').appendTo(div).click(function() {
+					var a = $('<a class="plus" elementid="'+elementId+'" opened="'+open+'"></a>').appendTo(div).click(function() {
 						var elementId = $(this).attr('elementid');
 						var escapedElementId = escapeId(elementId);
-						var open = $(this).attr('open');
-						if(open == 'true') {
+						var opened = $(this).attr('opened');
+						if(opened == 'true') {
 							$('#'+propertyName+'_plus_'+escapedElementId).attr('src', 'img/ico_plus.gif');
 							$('#'+propertyName+'_branch_'+escapedElementId).slideUp('fast');
-							$(this).attr('open', 'false');
+							$(this).attr('opened', 'false');
 						} else {
 							$('#'+propertyName+'_plus_'+escapedElementId).attr('src', 'img/ico_minus.gif');
 							$('#'+propertyName+'_branch_'+escapedElementId).slideDown('fast');
-							$(this).attr('open', 'true');
+							$(this).attr('opened', 'true');
 						}
 						return false;
 					});
 					if(element.isOpen) {
-						var img = $('<img id="'+propertyName+'_plus_'+elementId+'" width="13" height="13" src="img/ico_minus.gif" alt="Свернуть ветку" titile="Свернуть ветку" />').appendTo(a);
+						var img = $('<img id="'+propertyName+'_plus_'+elementId+'" width="13" height="13" src="img/ico_minus.gif" alt="Свернуть ветку" title="Свернуть ветку" />').appendTo(a);
 					} else {
-						var img = $('<img id="'+propertyName+'_plus_'+elementId+'" width="13" height="13" src="img/ico_plus.gif" alt="Раскрыть ветку" titile="Раскрыть ветку" />').appendTo(a);
+						var img = $('<img id="'+propertyName+'_plus_'+elementId+'" width="13" height="13" src="img/ico_plus.gif" alt="Раскрыть ветку" title="Раскрыть ветку" />').appendTo(a);
 					}
 				} else {
 					var img = $('<img width="11" height="11" src="img/p.gif" />').appendTo(div);
