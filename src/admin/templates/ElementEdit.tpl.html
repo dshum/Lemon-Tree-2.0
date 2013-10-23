@@ -192,8 +192,6 @@ $(function() {
 				$('input[name='+propertyName+'_name]').css('color', 'black').val(ui.item.value);
 				$('#'+propertyName+'_show').css('color', 'grey').html(ui.item.value);
 				$('input[name='+propertyName+']').val(ui.item.id);
-				$('#'+propertyName+'_hidden_id').val(ui.item.id);
-				$('#'+propertyName+'_hidden_name').val(ui.item.value);
 			},
 			minLength: 0
 		});
@@ -226,7 +224,44 @@ $(function() {
 		$('input[name='+propertyName+'_name]').css('color', 'grey').val(main);
 	});
 
-	$('span[onetoone=add]').live('click', function() {
+	$('input[manytomany=name]').live('click', function() {
+		var main = $(this).attr('main');
+		var itemId = $(this).attr('itemId');
+		var propertyName = $(this).attr('propertyName');
+
+		if($(this).val() == main) {
+			$(this).css('color', 'black').val('');
+		}
+
+		$(this).autocomplete({
+			source: '<?=$baseUrl?>?module=ElementSearch&action=hint&itemId='+itemId+'&print',
+			select: function(event, ui) {
+				$('input[name='+propertyName+'_name]').css('color', 'black').val(ui.item.value);
+				$('#'+propertyName+'_show').css('color', 'grey').html('&nbsp;'+ui.item.value);
+				$('input[name='+propertyName+']').val(ui.item.id);
+				$('#'+propertyName+'_hidden_id').val(ui.item.id);
+				$('#'+propertyName+'_hidden_name').val(ui.item.value);
+			},
+			minLength: 0
+		});
+	}).live('focus', function() {
+		var main = $(this).attr('main');
+		if($(this).val() == main) {
+			$(this).css('color', 'black').val('');
+		}
+	}).live('change', function() {
+		var main = $(this).attr('main');
+		if($(this).val() == '') {
+			$(this).css('color', 'grey').val(main);
+		}
+	}).live('blur', function() {
+		var main = $(this).attr('main');
+		if($(this).val() == '') {
+			$(this).css('color', 'grey').val(main);
+		}
+	});
+
+	$('span[manytomany=add]').live('click', function() {
 		var propertyName = $(this).attr('propertyName');
 
 		if($('#'+propertyName+'_hidden_id').val()) {

@@ -26,7 +26,7 @@ $(function() {
 
 <?php } else {?>
 
-<?=$propertyDescription?>:
+<?=$propertyDescription?>:<?php if(!$readonly) {?><input type="hidden" id="<?=$propertyName?>_hidden_id" value=""><input type="hidden" id="<?=$propertyName?>_hidden_name" value=""><span id="<?=$propertyName?>_show" main=""></span>&nbsp;&nbsp;<input type="text" id="<?=$propertyName?>_name" manytomany="name" itemId="<?=$fetchItem ? $fetchItem->getId() : null?>" propertyName="<?=$propertyName?>" main="Введите ID или название" name="<?=$propertyName?>_name" value="Введите ID или название" class="prop-mini" style="width: 300px; color: grey;">&nbsp;&nbsp;<span id="<?=$propertyName?>_add" manytomany="add" propertyName="<?=$propertyName?>" elementHref="<?=PATH_ADMIN_BROWSE.'?module=ElementEdit&elementId='.$fetchItem->getItemName()?>." elementTitle="<?=$fetchItem->getItemDescription()?>" class="dashed hand">Добавить</span><?php }?>
 <div id="<?=$propertyName?>_block" class="prop_block" style="overflow-y: scroll; display: block;" overflow="true">
 <?php 	if(sizeof($list)) {?>
 <?php 		foreach($list as $element) {?>
@@ -36,7 +36,6 @@ $(function() {
 <span id="<?=$propertyName?>_undefined">Не задано</span>
 <?php 	}?>
 </div>
-<?php if(!$readonly) {?><input type="hidden" id="<?=$propertyName?>_hidden_id" value=""><input type="hidden" id="<?=$propertyName?>_hidden_name" value=""><span id="<?=$propertyName?>_show" main="<?=$fetchItem->getItemDescription()?>"><?=$fetchItem->getItemDescription()?></span>&nbsp;&nbsp;<input type="text" id="<?=$propertyName?>_name" onetoone="name" itemId="<?=$fetchItem ? $fetchItem->getId() : null?>" propertyName="<?=$propertyName?>" main="Введите ID или название" name="<?=$propertyName?>_name" value="Введите ID или название" class="prop-mini" style="width: 300px; color: grey;">&nbsp;&nbsp;<span id="<?=$propertyName?>_add" onetoone="add" propertyName="<?=$propertyName?>" elementHref="<?=PATH_ADMIN_BROWSE.'?module=ElementEdit&elementId='.$fetchItem->getItemName()?>." elementTitle="<?=$fetchItem->getItemDescription()?>" class="dashed hand">Добавить</span><?php }?>
-<br><br>
+<br>
 
 <?php }?>
