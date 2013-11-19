@@ -13,7 +13,7 @@ $(function() {
 	});
 });
 </script>
-<?php if(!$value) $value = Date::makeToday();?>
-<input type="hidden" id="<?=$propertyName?>" name="<?=$propertyName?>" value="<?=$value->toDate()?>">
+<?php if($fillToday && !$value) $value = Date::makeToday();?>
+<input type="hidden" id="<?=$propertyName?>" name="<?=$propertyName?>" value="<?=$value ? $value->toDate() : ''?>">
 <?=$propertyDescription?>:&nbsp;<span id="<?=$propertyName?>_show" class="dashed hand"><?=$value ? sprintf('%d %s %04d года', $value->getDay(), RussianTextUtils::getMonthInGenitiveCase($value->getMonth()), $value->getYear()) : 'не определено'?></span><br><br>
 <?php }?>

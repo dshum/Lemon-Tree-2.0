@@ -32,8 +32,8 @@
 			parent::setParameters();
 
 			$this->addParameter('maxFilesizeKb', 'integer', 'Максимальный размер файла (Кб)', 2048);
-			$this->addParameter('maxWidth', 'integer', 'Максимальная ширина изображения (пиксели)', 800);
-			$this->addParameter('maxHeight', 'integer', 'Максимальная высота изображения (пиксели)', 600);
+			$this->addParameter('maxWidth', 'integer', 'Максимальная ширина изображения (пиксели)', 1920);
+			$this->addParameter('maxHeight', 'integer', 'Максимальная высота изображения (пиксели)', 1280);
 			$this->addParameter('keepOriginalName', 'boolean', 'Не изменять название файла', false);
 			$this->addParameter('keepOriginalFile', 'boolean', 'Сохранять оригинальный файл', false);
 			$this->addParameter('resizeWidth', 'integer', 'Изменить ширину изображения до', 0);

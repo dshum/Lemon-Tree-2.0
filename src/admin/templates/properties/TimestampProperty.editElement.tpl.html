@@ -17,6 +17,7 @@ $(function() {
 	});
 });
 </script>
+<?php if($fillToday && !$value) $value = Timestamp::makeNow();?>
 <input type="hidden" id="<?=$propertyName?>" name="<?=$propertyName?>" value="<?=$value ? $value->toString() : ''?>">
 <input type="hidden" id="<?=$propertyName?>_date" name="<?=$propertyName?>_date" value="<?=$value ? $value->toDate() : ''?>">
 <?=$propertyDescription?>:&nbsp;<span id="<?=$propertyName?>_show" class="dashed hand"><?=$value ? sprintf('%d %s %04d года', $value->getDay(), RussianTextUtils::getMonthInGenitiveCase($value->getMonth()), $value->getYear()) : 'не определено'?></span>,&nbsp;

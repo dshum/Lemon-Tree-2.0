@@ -562,9 +562,6 @@
 
 			$loggedUser = LoggedUser::getUser();
 
-			$requestUri = $request->getServerVar('REQUEST_URI');
-			Session::assign('browseLastUrl', $requestUri);
-
 			$form = $this->makeEditForm();
 
 			if($form->getErrors()) {
@@ -630,6 +627,9 @@
 					return $pluginModelAndView;
 				}
 			}
+
+			$requestUri = $request->getServerVar('REQUEST_URI');
+			Session::assign('browseLastUrl', $requestUri);
 
 			# Property list
 			$propertyList = Property::dao()->getPropertyList($currentItem);

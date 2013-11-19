@@ -113,6 +113,24 @@
 				: null;
 		}
 
+		public function getEditElementView()
+		{
+			$readonly = $this->getParameterValue('readonly');
+			$fillToday = $this->getParameterValue('fillToday');
+
+			$model =
+				Model::create()->
+				set('propertyName', $this->property->getPropertyName())->
+				set('propertyDescription', $this->property->getPropertyDescription())->
+				set('readonly', $readonly)->
+				set('fillToday', $fillToday)->
+				set('value', $this->value);
+
+			$viewName = 'properties/'.get_class($this).'.editElement';
+
+			return $this->render($model, $viewName);
+		}
+
 		public function getElementSearchView(Form $form)
 		{
 			$propertyDescription = $this->property->getPropertyDescription();

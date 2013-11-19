@@ -1,3 +1,4 @@
+<?php if($fillToday && !$value) $value = Time::create(date('h:i:s'));?>
 <?php if($readonly) {?>
 <?=$propertyDescription?>:&nbsp;<?=$value ? sprintf('%02d:%02d:%02d', $value->getHour(), $value->getMinute(), $value->getSecond()) : 'не определено'?><br><br>
 <?php } else {?>
