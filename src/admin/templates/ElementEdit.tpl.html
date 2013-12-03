@@ -470,6 +470,9 @@ if(isset($pluginModelAndView) && $pluginModelAndView instanceof ModelAndView) {
 <?php }?>
 
 <?php if($currentElement->getId() && $controllerName != 'error') {?><div class="order_link"><a href="<?=$currentElement->get('href')?>" target="_blank" title="Откроется в новом окне"><img src="img/ico_popup.gif" width="14" height="11" alt="Откроется в новом окне">&nbsp;<em>Смотреть страницу на сайте</em></a></div><?php }?>
+
+<?php if($loggedUser->getGroup()->getIsDeveloper() && $currentElement->getId()) {?><div class="order_link" style="padding-right: 20px;"><a href="<?=$selfUrl?>&elementId=<?=$currentElement->getPolymorphicId()?>&action=uncache"><em>Сбросить кеш</em></a></div><?php }?>
+
 <h2 class="h2_marg" title="<?=$currentElement->getId() ? "ElementID = ".$currentElement->getId().", " : ""?>ClassName = <?=$currentItem->getItemName()?>"><?=$mode == "create" ? "Добавление" : "Редактирование"?> элемента типа <span class="grey"><?php echo $currentItem->getItemDescription();?></span></h2>
 
 <div class="record_block_top"><div><img src="img/edit01.gif" width="12" height="12" alt=""></div></div>
