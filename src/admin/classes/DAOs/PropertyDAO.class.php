@@ -327,8 +327,6 @@
 					.' CHANGE COLUMN '.$dialect->quoteField($oldColumName)
 					.' '.$columnName.'';
 
-				echo $query.'<br>';
-
 				try {
 					$db->queryRaw($query);
 				} catch (DatabaseException $e) {
