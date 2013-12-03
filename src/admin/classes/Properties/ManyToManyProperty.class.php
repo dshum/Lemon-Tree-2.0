@@ -20,6 +20,7 @@
 
 			$this->addParameter('node', 'element', 'Вершина дерева', Root::me());
 			$this->addParameter('showItems', 'itemList', 'Показывать классы элементов', array());
+			$this->addParameter('plainList', 'boolean', 'Плоский вид списка', false);
 			$this->addParameter('showList', 'boolean', 'Выводить список элементов', true);
 
 			return $this;
@@ -56,23 +57,56 @@
 			$readonly = $this->getParameterValue('readonly');
 			$node = $this->getParameterValue('node');
 			$showItemList = $this->getParameterValue('showItems');
+			$plainList = $this->getParameterValue('plainList');
 
-			if(!$readonly && $node instanceof Element) {
+			if($plainList) {
+
+				$tree = Tree::getMultilinkPlainList(
+					null,
+					$this->property->getFetchClass(),
+					$this->list
+				);
+
+			} elseif($node == 'parent' && $this->element instanceof Element) {
+
+				$node = $this->element->getParent();
+
+				$tree = Tree::getMultilinkPlainList(
+					$node,
+					$this->property->getFetchClass(),
+					$this->list
+				);
+
+			} elseif(!$readonly && $node instanceof Element) {
+
 				$openIdList = array();
+
 				foreach($this->list as $element) {
 					$parentList = $element->getParentList();
 					foreach($parentList as $parent) {
 						$openIdList[$parent->getPolymorphicId()] = 1;
 					}
 				}
+
 				$tree = Tree::getMultilinkTree(
 					$showItemList,
 					$openIdList,
 					$this->list,
 					$this->property->getFetchClass()
 				);
+
 			} else {
+
 				$tree = array();
+
+			}
+
+			$fetchClass = $this->property->getFetchClass();
+
+			try {
+				$fetchItem = Item::dao()->getItemByName($fetchClass);
+			} catch (ObjectNotFoundException $e) {
+				$fetchItem = null;
 			}
 
 			$model =
@@ -82,7 +116,9 @@
 				set('list', $this->list)->
 				set('readonly', $readonly)->
 				set('node', $node)->
-				set('tree', $tree);
+				set('plainList', $plainList)->
+				set('tree', $tree)->
+				set('fetchItem', $fetchItem);
 
 			$viewName = 'properties/'.get_class($this).'.editElement';
 

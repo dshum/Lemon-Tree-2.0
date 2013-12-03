@@ -8,6 +8,15 @@
 			$this->value = $this->value ? $this->value : null;
 		}
 
+		public function setParameters()
+		{
+			parent::setParameters();
+
+			$this->addParameter('fillToday', 'boolean', 'По умолчанию ставить текущую дату', false);
+
+			return $this;
+		}
+
 		public function getDataType()
 		{
 			return DataType::create(DataType::DATE);
@@ -131,6 +140,24 @@
 		public function printf($format = 'Y-m-d')
 		{
 			return $this->value ? date($format, $this->value->toStamp()) : null;
+		}
+
+		public function getEditElementView()
+		{
+			$readonly = $this->getParameterValue('readonly');
+			$fillToday = $this->getParameterValue('fillToday');
+
+			$model =
+				Model::create()->
+				set('propertyName', $this->property->getPropertyName())->
+				set('propertyDescription', $this->property->getPropertyDescription())->
+				set('readonly', $readonly)->
+				set('fillToday', $fillToday)->
+				set('value', $this->value);
+
+			$viewName = 'properties/'.get_class($this).'.editElement';
+
+			return $this->render($model, $viewName);
 		}
 
 		public function getElementSearchView(Form $form)

@@ -4,6 +4,7 @@
 		public function __construct()
 		{
 			$this->
+			setMethodMapping('uncache', 'uncache')->
 			setMethodMapping('drop', 'drop')->
 			setMethodMapping('restore', 'restore')->
 			setMethodMapping('add', 'add')->
@@ -19,6 +20,34 @@
 			Property::dao()->setPropertyList();
 
 			return parent::handleRequest($request);
+		}
+
+		public function uncache(HttpRequest $request)
+		{
+			$model = Model::create();
+
+			$loggedUser = LoggedUser::getUser();
+
+			$form0 = $this->makeEditForm();
+
+			if($form0->getErrors()) {
+				$model->set('form0', $form0);
+				return
+					ModelAndView::create()->
+					setModel($model)->
+					setView('request/ElementEdit');
+			}
+
+			$currentElement = $form0->getValue('elementId');
+			$permission = $currentElement->getPermission($loggedUser);
+
+			if($permission >= Permission::PERMISSION_READ_ID) {
+				$currentElement->dao()->uncacheById($currentElement->getId());
+			}
+
+			return
+				ModelAndView::create()->
+				setView('redirectBack');
 		}
 
 		public function drop(HttpRequest $request)
@@ -562,9 +591,6 @@
 
 			$loggedUser = LoggedUser::getUser();
 
-			$requestUri = $request->getServerVar('REQUEST_URI');
-			Session::assign('browseLastUrl', $requestUri);
-
 			$form = $this->makeEditForm();
 
 			if($form->getErrors()) {
@@ -630,6 +656,9 @@
 					return $pluginModelAndView;
 				}
 			}
+
+			$requestUri = $request->getServerVar('REQUEST_URI');
+			Session::assign('browseLastUrl', $requestUri);
 
 			# Property list
 			$propertyList = Property::dao()->getPropertyList($currentItem);

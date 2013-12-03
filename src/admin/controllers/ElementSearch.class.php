@@ -274,6 +274,9 @@
 			add(
 				Primitive::integer('page')
 			)->
+			add(
+				Primitive::boolean('filter')
+			)->
 			import($request->getPost());
 
 			if(!$form->getErrors()) {
@@ -282,6 +285,7 @@
 				$sortFieldName = $form->getValue('fieldName');
 				$sortDirection = $form->getValue('direction');
 				$currentPage = $form->getValue('page');
+				$isFilter = $form->getValue('filter');
 
 				$isAsc = $sortDirection == 'desc' ? false : true;
 
@@ -304,6 +308,7 @@
 				if(
 					$sortFieldName
 					|| $currentPage
+					|| $isFilter
 				) {
 
 					$form = $this->makeElementSearchForm($item);
@@ -540,6 +545,54 @@
 				$currentItem = $form0->getValue('itemId');
 				$itemClass = $currentItem->getClass();
 
+				# Plugin
+
+				$pluginModelAndView = null;
+
+				$pluginName = PluginManager::me()->getSearchPlugin(
+					$currentItem->getItemName()
+				);
+
+				if($pluginName) {
+
+					$pluginClass = new $pluginName($currentItem);
+					$pluginModelAndView = $pluginClass->handleRequest($request);
+
+					$pluginModel = $pluginModelAndView->getModel();
+					$pluginView = $pluginModelAndView->getView();
+
+					if(is_string($pluginView) && $pluginView == 'redirectBack') {
+						$href =
+							isset($_SERVER['HTTP_REFERER'])
+							? $_SERVER['HTTP_REFERER']
+							: PATH_ADMIN_BROWSE;
+						$pluginView = new RedirectView($href);
+					}
+
+					if(!$pluginView instanceof View) {
+						$pluginViewName = $pluginView;
+						$viewResolver =
+							MultiPrefixPhpViewResolver::create()->
+							setViewClassName('SimplePhpView')->
+							addPrefix(PATH_USER_PLUGIN_TEMPLATES)->
+							addPrefix(PATH_USER_TEMPLATES);
+						$pluginView = $viewResolver->resolveViewName($pluginViewName);
+						$pluginModelAndView->setView($pluginView);
+					}
+
+					$pluginModel->
+					set('item', $currentItem)->
+					set('selfUrl', PATH_ADMIN_BROWSE.'?module='.get_class($this))->
+					set('baseUrl', PATH_ADMIN_BROWSE);
+
+					if(
+						$pluginView instanceof RedirectView
+						|| $request->hasGetVar('print')
+					) {
+						return $pluginModelAndView;
+					}
+				}
+
 				$last = array($currentItem->getId());
 				foreach($search['last'] as $itemId) {
 					if(
@@ -629,6 +682,7 @@
 				$model->set('shortName', $shortName);
 				$model->set('form', $form);
 				$model->set('pager', $pager);
+				$model->set('pluginModelAndView', $pluginModelAndView);
 				$model->set('elementListModelAndView', $elementListModelAndView);
 
 			} else {

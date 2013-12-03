@@ -469,6 +469,14 @@ ID элемента:<br>
 </div>
 <!-- end of buttons block -->
 
+<!-- plugin block -->
+<?php
+if(isset($pluginModelAndView) && $pluginModelAndView instanceof ModelAndView) {
+	$pluginModelAndView->getView()->render($pluginModelAndView->getModel());
+}
+?>
+<!-- end of plugin block -->
+
 <form id="ElementListForm" name="ElementListForm" action="<?=$selfUrl?>" method="post" enctype="multipart/form-data" onsubmit="return false" onctrls="oElement.saveList()">
 <div id="item_<?=$currentItem->getId()?>">
 <?php $elementListModelAndView->getView()->render($elementListModelAndView->getModel());?>

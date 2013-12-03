@@ -31,6 +31,26 @@ LT.MultilinkTree = function() {
 		};
 	};
 
+	object.addPlainElement = function(propertyName, elementId, elementName, isActive) {
+		if(!branch[propertyName]) {
+			branch[propertyName] = new Array();
+		}
+
+		if(!elementList[propertyName]) {
+			elementList[propertyName] = new Array();
+		}
+
+		var count = branch[propertyName].length;
+
+		branch[propertyName][count] = elementId;
+
+		elementList[propertyName][elementId] = {
+			elementId: elementId,
+			elementName: elementName,
+			isActive: isActive
+		};
+	};
+
 	object.buildBranch = function(propertyName, parentId) {
 		var escapedParentId = escapeId(parentId);
 		var parentObject = $('#'+propertyName+'_branch_'+escapedParentId);
@@ -46,18 +66,18 @@ LT.MultilinkTree = function() {
 
 				if(branch[propertyName][elementId] && branch[propertyName][elementId].length) {
 					var open = element.isOpen ? 'true' : 'false';
-					var a = $('<a class="plus" elementid="'+elementId+'" open="'+open+'"></a>').appendTo(div).click(function() {
+					var a = $('<a class="plus" elementid="'+elementId+'" opened="'+open+'"></a>').appendTo(div).click(function() {
 						var elementId = $(this).attr('elementid');
 						var escapedElementId = escapeId(elementId);
-						var open = $(this).attr('open');
-						if(open == 'true') {
+						var opened = $(this).attr('opened');
+						if(opened == 'true') {
 							$('#'+propertyName+'_plus_'+escapedElementId).attr('src', 'img/ico_plus.gif');
 							$('#'+propertyName+'_branch_'+escapedElementId).slideUp('fast');
-							$(this).attr('open', 'false');
+							$(this).attr('opened', 'false');
 						} else {
 							$('#'+propertyName+'_plus_'+escapedElementId).attr('src', 'img/ico_minus.gif');
 							$('#'+propertyName+'_branch_'+escapedElementId).slideDown('fast');
-							$(this).attr('open', 'true');
+							$(this).attr('opened', 'true');
 						}
 						return false;
 					});
@@ -86,6 +106,28 @@ LT.MultilinkTree = function() {
 					LT.MultilinkTree.buildBranch(propertyName, elementId);
 				}
 
+			}
+		}
+	};
+
+	object.buildPlainList = function(propertyName, parentId) {
+		var escapedParentId = escapeId(parentId);
+		var parentObject = $('#'+propertyName+'_branch_'+escapedParentId);
+
+		if(branch[propertyName] && branch[propertyName].length) {
+			for(var i = 0; i < branch[propertyName].length; i++) {
+				var elementId = branch[propertyName][i];
+				var element = elementList[propertyName][elementId];
+				var id = getId(elementId);
+				var checked = element.isActive ? ' checked="true"' : '';
+
+				var div = $('<div></div>').appendTo(parentObject);
+
+				var img = $('<img width="11" height="11" src="img/p.gif" />').appendTo(div);
+
+				var radio = $('<input type="checkbox" id="'+propertyName+'_check_'+elementId+'" name="'+propertyName+'[]" elementname="'+element.elementName+'" value="'+id+'"'+checked+'" title="Выбрать" />').appendTo(div);
+
+				var span = $('<label for="'+propertyName+'_check_'+elementId+'">&nbsp;'+element.elementName+'</label>').appendTo(div);
 			}
 		}
 	};

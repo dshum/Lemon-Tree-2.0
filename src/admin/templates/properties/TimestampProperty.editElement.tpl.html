@@ -1,3 +1,6 @@
+<?php if($readonly) {?>
+<?=$propertyDescription?>:&nbsp;<?=$value ? sprintf('%d %s %04d года, %02d:%02d:%02d', $value->getDay(), RussianTextUtils::getMonthInGenitiveCase($value->getMonth()), $value->getYear(), $value->getHour(), $value->getMinute(), $value->getSecond()) : 'не определено'?><br><br>
+<?php } else {?>
 <script type="text/javascript">
 $(function() {
 	$('#<?=$propertyName?>_date').calendar({
@@ -6,13 +9,17 @@ $(function() {
 		selectHandler: function() {
 			$('#<?=$propertyName?>_show').html(this.date.print('%e %G %Y года'));
 			$('#<?=$propertyName?>_date').val(this.date.print(this.dateFormat));
+			if(!$('#<?=$propertyName?>_hour').val()) $('#<?=$propertyName?>_hour').val('<?=date('H')?>');
+			if(!$('#<?=$propertyName?>_minute').val()) $('#<?=$propertyName?>_minute').val('<?=date('i')?>');
+			if(!$('#<?=$propertyName?>_second').val()) $('#<?=$propertyName?>_second').val('<?=date('s')?>');
 			setTimestamp('<?=$propertyName?>');
 		}
 	});
 });
 </script>
-<?php if(!$value) $value = Timestamp::makeNow();?>
-<input type="hidden" id="<?=$propertyName?>" name="<?=$propertyName?>" value="<?=$value->toString()?>">
-<input type="hidden" id="<?=$propertyName?>_date" name="<?=$propertyName?>_date" value="<?=$value->toDate()?>">
-<?=$propertyDescription?>:&nbsp;<span id="<?=$propertyName?>_show" class="dashed" style="cursor: pointer;"><?=sprintf('%d %s %04d года', $value->getDay(), RussianTextUtils::getMonthInGenitiveCase($value->getMonth()), $value->getYear())?></span>,&nbsp;
-<input class="prop-time" type="text" id="<?=$propertyName?>_hour" name="<?=$propertyName?>_hour" property="<?=$propertyName?>" timestamp="true" max="23" value="<?=sprintf('%02d', $value->getHour())?>" maxlength="2">&nbsp;:&nbsp;<input class="prop-time" type="text" id="<?=$propertyName?>_minute" name="<?=$propertyName?>_minute" property="<?=$propertyName?>" timestamp="true" max="59" value="<?=sprintf('%02d', $value->getMinute())?>" maxlength="2">&nbsp;:&nbsp;<input class="prop-time" type="text" id="<?=$propertyName?>_second" name="<?=$propertyName?>_second" property="<?=$propertyName?>" timestamp="true" max="59" value="<?=sprintf('%02d', $value->getSecond())?>" maxlength="2"><br><br>
+<?php if($fillToday && !$value) $value = Timestamp::makeNow();?>
+<input type="hidden" id="<?=$propertyName?>" name="<?=$propertyName?>" value="<?=$value ? $value->toString() : ''?>">
+<input type="hidden" id="<?=$propertyName?>_date" name="<?=$propertyName?>_date" value="<?=$value ? $value->toDate() : ''?>">
+<?=$propertyDescription?>:&nbsp;<span id="<?=$propertyName?>_show" class="dashed hand"><?=$value ? sprintf('%d %s %04d года', $value->getDay(), RussianTextUtils::getMonthInGenitiveCase($value->getMonth()), $value->getYear()) : 'не определено'?></span>,&nbsp;
+<input class="prop-time" type="text" id="<?=$propertyName?>_hour" name="<?=$propertyName?>_hour" property="<?=$propertyName?>" timestamp="true" max="23" value="<?=$value ? sprintf('%02d', $value->getHour()) : ''?>" maxlength="2">&nbsp;:&nbsp;<input class="prop-time" type="text" id="<?=$propertyName?>_minute" name="<?=$propertyName?>_minute" property="<?=$propertyName?>" timestamp="true" max="59" value="<?=$value ? sprintf('%02d', $value->getMinute()) : ''?>" maxlength="2">&nbsp;:&nbsp;<input class="prop-time" type="text" id="<?=$propertyName?>_second" name="<?=$propertyName?>_second" property="<?=$propertyName?>" timestamp="true" max="59" value="<?=$value ? sprintf('%02d', $value->getSecond()) : ''?>" maxlength="2"><br><br>
+<?php }?>

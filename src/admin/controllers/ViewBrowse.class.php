@@ -495,6 +495,7 @@
 
 				if(
 					$pluginView instanceof RedirectView
+					|| sizeof($request->getPost())
 					|| $request->hasGetVar('print')
 				) {
 					return $pluginModelAndView;
@@ -503,8 +504,10 @@
 
 			# Set id for active element and opened folder in tree
 
-			$requestUri = $request->getServerVar('REQUEST_URI');
-			Session::assign('browseLastUrl', $requestUri);
+			$browseLastUrl =
+				PATH_ADMIN_BROWSE.'?module='.get_class($this)
+				.'&elementId='.$currentElement->getPolymorphicId();
+			Session::assign('browseLastUrl', $browseLastUrl);
 
 			if(
 				($currentItem && $currentItem->getIsFolder())

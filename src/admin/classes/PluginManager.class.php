@@ -4,6 +4,7 @@
 		private $actionList = array();
 		private $filterList = array();
 		private $browsePluginList = array();
+		private $searchPluginList = array();
 		private $editPluginList = array();
 
 		public static function me()
@@ -63,6 +64,13 @@
 		public function addBrowsePlugin($id, $pluginName)
 		{
 			$this->browsePluginList[$id] = $pluginName;
+
+			return $this;
+		}
+
+		public function addSearchPlugin($className, $pluginName)
+		{
+			$this->searchPluginList[$className] = $pluginName;
 
 			return $this;
 		}
@@ -144,6 +152,14 @@
 			return
 				isset($this->browsePluginList[$className])
 				? $this->browsePluginList[$className]
+				: null;
+		}
+
+		public function getSearchPlugin($className)
+		{
+			return
+				isset($this->searchPluginList[$className])
+				? $this->searchPluginList[$className]
 				: null;
 		}
 

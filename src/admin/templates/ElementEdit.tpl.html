@@ -189,9 +189,9 @@ $(function() {
 		$(this).autocomplete({
 			source: '<?=$baseUrl?>?module=ElementSearch&action=hint&itemId='+itemId+'&print',
 			select: function(event, ui) {
-				$('input[name='+propertyName+']').val(ui.item.id);
 				$('input[name='+propertyName+'_name]').css('color', 'black').val(ui.item.value);
 				$('#'+propertyName+'_show').css('color', 'grey').html(ui.item.value);
+				$('input[name='+propertyName+']').val(ui.item.id);
 			},
 			minLength: 0
 		});
@@ -224,8 +224,73 @@ $(function() {
 		$('input[name='+propertyName+'_name]').css('color', 'grey').val(main);
 	});
 
+	$('input[manytomany=name]').live('click', function() {
+		var main = $(this).attr('main');
+		var itemId = $(this).attr('itemId');
+		var propertyName = $(this).attr('propertyName');
+
+		if($(this).val() == main) {
+			$(this).css('color', 'black').val('');
+		}
+
+		$(this).autocomplete({
+			source: '<?=$baseUrl?>?module=ElementSearch&action=hint&itemId='+itemId+'&print',
+			select: function(event, ui) {
+				$('input[name='+propertyName+'_name]').css('color', 'black').val(ui.item.value);
+				$('#'+propertyName+'_show').css('color', 'grey').html('&nbsp;'+ui.item.value);
+				$('input[name='+propertyName+']').val(ui.item.id);
+				$('#'+propertyName+'_hidden_id').val(ui.item.id);
+				$('#'+propertyName+'_hidden_name').val(ui.item.value);
+			},
+			minLength: 0
+		});
+	}).live('focus', function() {
+		var main = $(this).attr('main');
+		if($(this).val() == main) {
+			$(this).css('color', 'black').val('');
+		}
+	}).live('change', function() {
+		var main = $(this).attr('main');
+		if($(this).val() == '') {
+			$(this).css('color', 'grey').val(main);
+		}
+	}).live('blur', function() {
+		var main = $(this).attr('main');
+		if($(this).val() == '') {
+			$(this).css('color', 'grey').val(main);
+		}
+	});
+
+	$('span[manytomany=add]').live('click', function() {
+		var propertyName = $(this).attr('propertyName');
+
+		if($('#'+propertyName+'_hidden_id').val()) {
+			var id = $('#'+propertyName+'_hidden_id').val();
+			var name = $('#'+propertyName+'_hidden_name').val();
+
+			var elementHref = $(this).attr('elementHref');
+			var elementTitle = $(this).attr('elementTitle');
+			var main = $('input[name='+propertyName+'_name]').attr('main');
+			var main2 = $('#'+propertyName+'_show').attr('main');
+
+			var html =
+				'<input type="checkbox" id="'+propertyName+'_check_'+id
+				+'" name="'+propertyName+'[]" value="'+id
+				+'" checked="true">&nbsp;<a href="'+elementHref+id
+				+'" title="'+elementTitle+'">'+name+'</a><br>';
+
+			$('input[name='+propertyName+'_name]').css('color', 'grey').val(main);
+			$('#'+propertyName+'_show').css('color', 'black').html(main2);
+			$('#'+propertyName+'_hidden_id').val('');
+			$('#'+propertyName+'_hidden_name').val('');
+			$('#'+propertyName+'_undefined').remove();
+			$('#'+propertyName+'_block').append(html);
+		}
+	});
+
 	$('input[link=name]').live('click', function() {
 		var main = $(this).attr('main');
+
 		if($(this).val() == main) {
 			$(this).css('color', 'black').val('');
 		}
@@ -405,6 +470,9 @@ if(isset($pluginModelAndView) && $pluginModelAndView instanceof ModelAndView) {
 <?php }?>
 
 <?php if($currentElement->getId() && $controllerName != 'error') {?><div class="order_link"><a href="<?=$currentElement->get('href')?>" target="_blank" title="Откроется в новом окне"><img src="img/ico_popup.gif" width="14" height="11" alt="Откроется в новом окне">&nbsp;<em>Смотреть страницу на сайте</em></a></div><?php }?>
+
+<?php if($loggedUser->getGroup()->getIsDeveloper() && $currentElement->getId()) {?><div class="order_link" style="padding-right: 20px;"><a href="<?=$selfUrl?>&elementId=<?=$currentElement->getPolymorphicId()?>&action=uncache"><em>Сбросить кеш</em></a></div><?php }?>
+
 <h2 class="h2_marg" title="<?=$currentElement->getId() ? "ElementID = ".$currentElement->getId().", " : ""?>ClassName = <?=$currentItem->getItemName()?>"><?=$mode == "create" ? "Добавление" : "Редактирование"?> элемента типа <span class="grey"><?php echo $currentItem->getItemDescription();?></span></h2>
 
 <div class="record_block_top"><div><img src="img/edit01.gif" width="12" height="12" alt=""></div></div>

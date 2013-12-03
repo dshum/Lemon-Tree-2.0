@@ -1,2 +1,7 @@
+<?php if($fillToday && !$value) $value = Time::create(date('h:i:s'));?>
+<?php if($readonly) {?>
+<?=$propertyDescription?>:&nbsp;<?=$value ? sprintf('%02d:%02d:%02d', $value->getHour(), $value->getMinute(), $value->getSecond()) : 'не определено'?><br><br>
+<?php } else {?>
 <input type="hidden" id="<?=$propertyName?>" name="<?=$propertyName?>" value="<?=$value instanceof Time ? $value->toString() : null?>">
 <?=$propertyDescription?>:&nbsp;<input class="prop-time" type="text" id="<?=$propertyName?>_hour" name="<?=$propertyName?>_hour" property="<?=$propertyName?>" time="true" max="23" value="<?=$value instanceof Time ? sprintf('%02d', $value->getHour()) : null?>" maxlength="2">&nbsp;:&nbsp;<input class="prop-time" type="text" id="<?=$propertyName?>_minute" name="<?=$propertyName?>_minute" property="<?=$propertyName?>" time="true" max="59" value="<?=$value instanceof Time ? sprintf('%02d', $value->getMinute()) : null?>" maxlength="2">&nbsp;:&nbsp;<input class="prop-time" type="text" id="<?=$propertyName?>_second" name="<?=$propertyName?>_second" property="<?=$propertyName?>" time="true" max="59" value="<?=$value instanceof Time ? sprintf('%02d', $value->getSecond()) : null?>" maxlength="2"><br><br>
+<?php }?>

@@ -3,8 +3,10 @@
 <?php if($currentElement) {?>
 <table class="element-list-header">
 <tr>
-<td><h2><span showlist="true" itemid="<?=$currentItem->getId()?>" list="<?=$openItem ? 'opened' : 'empty'?>" class="hand dashed"><?=$currentItem->getItemDescription()?></span></h2></td>
-<td><div class="order_link"><a href="<?=$baseUrl?>?module=ElementOrder&elementId=<?=$currentElement->getPolymorphicId()?>&itemId=<?=$currentItem->getId()?>" onclick="LT.Common.windowOpen(this.href, 'ElementOrder', 500, 500); return false;" title=""><img src="img/ico_order_sm.gif" width="15" height="15" alt="">&nbsp;<em><?php if($pager->getPageCount() > 1) {?>страница <?=$pager->getCurrentPage()?> из <?=$pager->getPageCount()?>; <?php }?>всего <?=$pager->getTotal()?> <?=RussianTextUtils::selectCaseForNumber($pager->getTotal(), array('элемент', 'элемента', 'элементов'))?></em></a></div></td>
+<td nowrap><h2><span showlist="true" itemid="<?=$currentItem->getId()?>" list="<?=$openItem ? 'opened' : 'empty'?>" class="hand dashed"><?=$currentItem->getItemDescription()?></span></h2></td>
+<td nowrap><div class="order_link"><a href="<?=$baseUrl?>?module=ElementOrder&elementId=<?=$currentElement->getPolymorphicId()?>&itemId=<?=$currentItem->getId()?>" onclick="LT.Common.windowOpen(this.href, 'ElementOrder', 500, 500); return false;" title=""><img src="img/ico_order_sm.gif" width="15" height="15" alt="">&nbsp;<em><?php if($pager->getPageCount() > 1) {?>страница <?=$pager->getCurrentPage()?> из <?=$pager->getPageCount()?>; <?php }?>всего <?=$pager->getTotal()?> <?=RussianTextUtils::selectCaseForNumber($pager->getTotal(), array('элемент', 'элемента', 'элементов'))?></em></a></div></td>
+<td width="90%"></td>
+<?php if($currentItem->getIsSearch()) {?><td nowrap><a href="<?=$baseUrl?>?module=ElementSearch&itemId=<?=$currentItem->getId()?>"><small>Поиск элементов</small></td><?php }?>
 </tr>
 </table>
 <?php } else {?>
