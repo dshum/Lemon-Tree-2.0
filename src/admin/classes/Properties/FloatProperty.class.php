@@ -22,13 +22,26 @@
 
 		public function add2form(Form $form)
 		{
-			return $form->add(Primitive::float($this->property->getPropertyName()));
+			return $form->add(
+				Primitive::float($this->property->getPropertyName())->
+				addImportFilter(Filter::replaceSymbols(
+					array(',', ' '),
+					array('.', '')
+				))
+			);
 		}
 
 		public function add2multiform(Form $form)
 		{
 			$primitiveName = 'edit_'.$this->element->getClass().'_'.$this->element->getId().'_'.$this->property->getPropertyName().'';
-			return $form->add(Primitive::float($primitiveName));
+
+			return $form->add(
+				Primitive::float($primitiveName)->
+				addImportFilter(Filter::replaceSymbols(
+					array(',', ' '),
+					array('.', '')
+				))
+			);
 		}
 
 		public function add2search(Form $form)

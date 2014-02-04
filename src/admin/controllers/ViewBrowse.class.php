@@ -151,25 +151,13 @@
 			$originalMap = array();
 			$changed = array();
 			$saved = array();
+			$message = array();
 
 			foreach($edited as $elementId => $propertyList) {
 				$element = Element::getByPolymorphicId($elementId);
 				if($element instanceof Element) {
 					$original = clone $element;
 					$item = $element->getItem();
-
-					# Before update action
-					try {
-						$actionName = PluginManager::me()->getBeforeUpdateAction(
-							$item->getItemName()
-						);
-						if($actionName && ClassUtils::isClassName($actionName)) {
-							$action = new $actionName($original);
-						}
-					} catch (BaseException $e) {
-						ErrorMessageUtils::sendMessage($e);
-					}
-
 					$elementMap[$elementId] = $element;
 					$originalMap[$elementId] = $original;
 				}
@@ -204,37 +192,53 @@
 						}
 					}
 
-					if(isset($changed[$elementId])) {
+					# Before update action
+					$actionName = PluginManager::me()->getBeforeUpdateAction(
+						$item->getItemName()
+					);
+
+					if($actionName && ClassUtils::isClassName($actionName)) {
 						try {
-							$element = $element->dao()->save($element);
-							$saved[] = $element->getPolymorphicId();
+							$action = new $actionName($element, $original);
+							if(method_exists($action, 'getError') && $action->getError()) {
+								unset($changed[$elementId]);
+								$message[] = $action->getError();
+							}
 						} catch (BaseException $e) {
 							ErrorMessageUtils::sendMessage($e);
 						}
 					}
-				}
-			}
 
-			foreach($edited as $elementId => $propertyList) {
-				if(isset($elementMap[$elementId])) {
+					if(isset($changed[$elementId])) {
+						try {
+							$element = $element->dao()->save($element);
+							$saved[$elementId] = $element->getPolymorphicId();
+						} catch (BaseException $e) {
+							ErrorMessageUtils::sendMessage($e);
+						}
+					}
 
-					$element = $elementMap[$elementId];
-					$original = $originalMap[$elementId];
-					$item = $element->getItem();
-
-					# After update action
-					try {
+					if(isset($saved[$elementId])) {
+						# After update action
 						$actionName = PluginManager::me()->getAfterUpdateAction(
 							$item->getItemName()
 						);
+
 						if($actionName && ClassUtils::isClassName($actionName)) {
-							$action = new $actionName($element, $original);
+							try {
+								$action = new $actionName($element, $original);
+								if(method_exists($action, 'getError') && $action->getError()) {
+									$message[] = $action->getError();
+								}
+							} catch (BaseException $e) {
+								ErrorMessageUtils::sendMessage($e);
+							}
 						}
-					} catch (BaseException $e) {
-						ErrorMessageUtils::sendMessage($e);
 					}
 				}
 			}
+
+			$model->set('message', $message);
 
 			# User log
 			UserLog::me()->log(

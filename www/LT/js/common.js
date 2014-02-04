@@ -116,6 +116,28 @@ LT.Common = function() {
 		}
 	};
 
+	object.refreshElementList = function(elementId, itemId) {
+		object.showIndicator();
+		$.post(
+			object.selfUrl+'&action=show',
+			{
+				elementId: elementId,
+				itemId: itemId,
+				filter: true
+			},
+			function(data) {
+				var itemId = data.itemId;
+				var elementListContent = data.elementListContent;
+				if(itemId && elementListContent) {
+					elementListContent = elementListContent.replace(/\[\[\[/g, '<').replace(/\]\]\]/g, '>');
+					$('#item_'+itemId).html(elementListContent);
+				}
+				object.hideIndicator();
+			},
+			'json'
+		);
+	};
+
 	object.unlock = function() {
 		object.hideIndicator();
 		$('save_button').each(function() {this.disabled = false;});

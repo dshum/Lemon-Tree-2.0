@@ -290,15 +290,22 @@
 				}
 
 				# Before insert action
-				try {
-					$actionName = PluginManager::me()->getBeforeInsertAction(
-						$currentItem->getItemName()
-					);
-					if($actionName && ClassUtils::isClassName($actionName)) {
+				$actionName = PluginManager::me()->getBeforeInsertAction(
+					$currentItem->getItemName()
+				);
+				if($actionName && ClassUtils::isClassName($actionName)) {
+					try {
 						$action = new $actionName($currentElement);
+						if(method_exists($action, 'getError') && $action->getError()) {
+							$model->set('message', $action->getError());
+							return
+								ModelAndView::create()->
+								setModel($model)->
+								setView('request/ElementEdit');
+						}
+					} catch (BaseException $e) {
+						ErrorMessageUtils::sendMessage($e);
 					}
-				} catch (BaseException $e) {
-					ErrorMessageUtils::sendMessage($e);
 				}
 
 				# Add element
@@ -311,15 +318,23 @@
 				}
 
 				# After insert action
-				try {
-					$actionName = PluginManager::me()->getAfterInsertAction(
-						$currentItem->getItemName()
-					);
-					if($actionName && ClassUtils::isClassName($actionName)) {
+				$actionName = PluginManager::me()->getAfterInsertAction(
+					$currentItem->getItemName()
+				);
+
+				if($actionName && ClassUtils::isClassName($actionName)) {
+					try {
 						$action = new $actionName($currentElement);
+						if(method_exists($action, 'getError') && $action->getError()) {
+							$model->set('message', $action->getError());
+							return
+								ModelAndView::create()->
+								setModel($model)->
+								setView('request/ElementEdit');
+						}
+					} catch (BaseException $e) {
+						ErrorMessageUtils::sendMessage($e);
 					}
-				} catch (BaseException $e) {
-					ErrorMessageUtils::sendMessage($e);
 				}
 
 				# Refresh tree
@@ -370,6 +385,8 @@
 			$currentElement = $form0->getValue('elementId');
 			$currentItem = $currentElement->getItem();
 
+			$originalElement = clone $currentElement;
+
 			$permission = $currentElement->getPermission($loggedUser);
 
 			if($permission < Permission::PERMISSION_WRITE_ID) {
@@ -395,20 +412,6 @@
 
 			try {
 
-				$originalElement = clone $currentElement;
-
-				# Before update action
-				try {
-					$actionName = PluginManager::me()->getBeforeUpdateAction(
-						$currentItem->getItemName()
-					);
-					if($actionName && ClassUtils::isClassName($actionName)) {
-						$action = new $actionName($originalElement);
-					}
-				} catch (BaseException $e) {
-					ErrorMessageUtils::sendMessage($e);
-				}
-
 				$currentElement->
 				setElementName($form->getValue('elementName'))->
 				setShortName($form->getValue('shortName'));
@@ -418,21 +421,49 @@
 					$propertyClass->set($form);
 				}
 
+				# Before update action
+				$actionName = PluginManager::me()->getBeforeUpdateAction(
+					$currentItem->getItemName()
+				);
+
+				if($actionName && ClassUtils::isClassName($actionName)) {
+					try {
+						$action = new $actionName($currentElement, $originalElement);
+						if(method_exists($action, 'getError') && $action->getError()) {
+							$model->set('message', $action->getError());
+							return
+								ModelAndView::create()->
+								setModel($model)->
+								setView('request/ElementEdit');
+						}
+					} catch (BaseException $e) {
+						ErrorMessageUtils::sendMessage($e);
+					}
+				}
+
 				# Save element
 				$currentElement =
 					$currentItem->getClass()->dao()->
 					saveElement($currentElement);
 
 				# After update action
-				try {
-					$actionName = PluginManager::me()->getAfterUpdateAction(
-						$currentItem->getItemName()
-					);
-					if($actionName && ClassUtils::isClassName($actionName)) {
+				$actionName = PluginManager::me()->getAfterUpdateAction(
+					$currentItem->getItemName()
+				);
+
+				if($actionName && ClassUtils::isClassName($actionName)) {
+					try {
 						$action = new $actionName($currentElement, $originalElement);
+						if(method_exists($action, 'getError') && $action->getError()) {
+							$model->set('message', $action->getError());
+							return
+								ModelAndView::create()->
+								setModel($model)->
+								setView('request/ElementEdit');
+						}
+					} catch (BaseException $e) {
+						ErrorMessageUtils::sendMessage($e);
 					}
-				} catch (BaseException $e) {
-					ErrorMessageUtils::sendMessage($e);
 				}
 
 				$propertyContent = array();
@@ -779,7 +810,6 @@
 			$form->
 			add(
 				Primitive::string('elementName')->
-				required()->
 				setMax(255)->
 				addImportFilter(Filter::trim())->
 				addImportFilter(Filter::stripTags())->

@@ -101,7 +101,7 @@
 				$itemClass = $item->getClass();
 				$elementList =
 					$itemClass->dao()->getChildren($parent)->
-					addOrder($item->getOrderBy())->
+					addOrder(DBField::create('element_order', $itemClass->dao()->getTable()))->
 					getList();
 
 				$model->set("parentElement", $parent);

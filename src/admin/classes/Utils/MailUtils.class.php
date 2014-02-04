@@ -143,14 +143,14 @@
 					.base64_encode(
 						iconv(
 							$siteEncoding,
-							$encoding.'//TRANSLIT',
+							$encoding.'//IGNORE',
 							$this->header['Subject']
 						)
 					)."?=";
 
 				$body = iconv(
 					$siteEncoding,
-					$encoding.'//TRANSLIT',
+					$encoding.'//IGNORE',
 					$body
 				);
 			}

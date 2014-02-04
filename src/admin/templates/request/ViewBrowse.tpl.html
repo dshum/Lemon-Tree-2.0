@@ -10,6 +10,13 @@
 		$error[] = 'Произошла ошибка при удалении элемента.';
 	}
 
+	if(isset($message) && $message) {
+		if(is_array($message)) {
+			$message = implode('<br>', $message);
+		}
+		$error[] = $message;
+	}
+
 	$json['error'] = $error;
 
 	if(

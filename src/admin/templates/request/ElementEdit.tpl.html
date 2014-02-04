@@ -49,23 +49,17 @@
 	}
 
 	if(isset($addElement) && $addElement == 'error' && isset($message)) {
-		$error[] = 'Произошла ошибка при создании элемента.<br><br>'.$error;
-	}
-
-	if(isset($saveElement) && $saveElement == 'error' && isset($message)) {
+		$error[] = 'Произошла ошибка при создании элемента.<br><br>'.$message;
+	} elseif(isset($saveElement) && $saveElement == 'error' && isset($message)) {
 		$error[] = 'Произошла ошибка при сохранении элемента.<br><br>'.$message;
-	}
-
-	if(isset($restrict) && $restrict == 'error') {
+	} elseif(isset($restrict) && $restrict == 'error') {
 		$error[] = 'Невозможно удалить этот элемент, пока существуют связанные с ним элементы.';
-	}
-
-	if(isset($denied) && $denied == 'drop') {
+	} elseif(isset($denied) && $denied == 'drop') {
 		$error[] = 'Нет прав для удаления этого элемента.';
-	}
-
-	if(isset($denied) && $denied == 'save') {
+	} elseif(isset($denied) && $denied == 'save') {
 		$error[] = 'Нет прав для редактирования этого элемента.';
+	} elseif(isset($message)) {
+		$error[] = $message;
 	}
 
 	$json['error'] = $error;
