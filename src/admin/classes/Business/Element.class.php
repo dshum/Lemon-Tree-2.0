@@ -35,8 +35,6 @@
 
 		public static function getListByIds(ElementDAO $dao, $ids = array())
 		{
-			if(empty($ids)) return array();
-
 			$elementList = array();
 
 			foreach($ids as $id) {
@@ -51,10 +49,7 @@
 
 		public static function getListByPolymorphicIds($elementIds = array())
 		{
-			$classElementList = array();
 			$elementList = array();
-
-			if(empty($elementIds)) return $elementList;
 
 			foreach($elementIds as $elementId) {
 				if(
@@ -74,24 +69,12 @@
 						&& ClassUtils::isInstanceOf($className, 'Element')
 						&& (int)$id
 					) {
-						$classElementList[$className][] = $id;
+						try {
+							$class = new $className();
+							$element = $class->dao()->getById($id);
+							$elementList[] = $element;
+						} catch (ObjectNotFoundException $e) {}
 					}
-				}
-			}
-
-			foreach($classElementList as $className => $idList) {
-				$class = new $className();
-				if(sizeof($idList)) {
-					$list =
-						Criteria::create($class->dao())->
-						add(
-							Expression::in(
-								new DBField('id', $class->dao()->getTable()),
-								$idList
-							)
-						)->
-						getList();
-					$elementList = array_merge($elementList, $list);
 				}
 			}
 
