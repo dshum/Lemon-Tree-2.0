@@ -800,7 +800,7 @@
 			return $currentElement;
 		}
 
-		private function dropOnlyElement(Element $element)
+		public function dropOnlyElement(Element $element)
 		{
 			# Drop from element_permission
 			ElementPermission::dao()->dropByElement($element);

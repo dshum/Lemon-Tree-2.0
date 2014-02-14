@@ -49,6 +49,7 @@
 				$itemList = Item::dao()->getItemList();
 
 				$moved = array();
+				$message = array();
 				$refreshTree = false;
 
 				# Move element list
@@ -59,43 +60,53 @@
 					$item = $element->getItem();
 					$original = clone $element;
 
+					$elementId = $element->getPolymorphicId();
+
 					# Before move action
-					try {
-						$actionName = PluginManager::me()->getBeforeUpdateAction(
-							$item->getItemName()
-						);
-						if($actionName && ClassUtils::isClassName($actionName)) {
-							$action = new $actionName($original);
-						}
-					} catch (BaseException $e) {
-						ErrorMessageUtils::sendMessage($e);
-					}
+					$actionName = PluginManager::me()->getBeforeUpdateAction(
+						$item->getItemName()
+					);
 
-					try {
-
-						$element = $element->dao()->moveElement($element, $target);
-
-						# After move action
+					if($actionName && ClassUtils::isClassName($actionName)) {
 						try {
-							$actionName = PluginManager::me()->getAfterUpdateAction(
-								$item->getItemName()
-							);
-							if($actionName && ClassUtils::isClassName($actionName)) {
-								$action = new $actionName($element, $original);
+							$action = new $actionName($element, $original);
+							if(method_exists($action, 'getError') && $action->getError()) {
+								unset($changed[$elementId]);
+								$message[] = $action->getError();
 							}
 						} catch (BaseException $e) {
 							ErrorMessageUtils::sendMessage($e);
 						}
+					}
 
-						if($item->getIsFolder()) {
-							$refreshTree = true;
-						}
-						$moved[] = $element->getPolymorphicId();
-
+					try {
+						$element = $element->dao()->moveElement($element, $target);
+						$moved[$elementId] = $elementId;
+						if($item->getIsFolder()) $refreshTree = true;
 					} catch (BaseException $e) {
 						ErrorMessageUtils::sendMessage($e);
 					}
+
+					if(isset($moved[$elementId])) {
+						# After update action
+						$actionName = PluginManager::me()->getAfterUpdateAction(
+							$item->getItemName()
+						);
+
+						if($actionName && ClassUtils::isClassName($actionName)) {
+							try {
+								$action = new $actionName($element, $original);
+								if(method_exists($action, 'getError') && $action->getError()) {
+									$message[] = $action->getError();
+								}
+							} catch (BaseException $e) {
+								ErrorMessageUtils::sendMessage($e);
+							}
+						}
+					}
 				}
+
+				$model->set('message', $message);
 
 				# User log
 				UserLog::me()->log(

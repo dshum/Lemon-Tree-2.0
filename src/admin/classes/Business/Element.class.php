@@ -33,6 +33,22 @@
 			return null;
 		}
 
+		public static function getListByIds(ElementDAO $dao, $ids = array())
+		{
+			if(empty($ids)) return array();
+
+			$elementList = array();
+
+			foreach($ids as $id) {
+				try {
+					$element = $dao->getById($id);
+					$elementList[] = $element;
+				} catch (ObjectNotFoundException $e) {}
+			}
+
+			return $elementList;
+		}
+
 		public static function getListByPolymorphicIds($elementIds = array())
 		{
 			$classElementList = array();
