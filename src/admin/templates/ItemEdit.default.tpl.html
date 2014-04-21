@@ -35,6 +35,7 @@
 <tr>
 	<td><select name="orderField" style="width: 65%;">
 <option value="elementOrder"<?=$currentItem->getOrderField() == 'elementOrder' ? ' selected' : '';?>>В порядке добавления</option>
+<option value="id"<?=$currentItem->getOrderField() == 'id' ? ' selected' : '';?>>Идентификатор</option>
 <option value="elementName"<?=$currentItem->getOrderField() == 'elementName' ? ' selected' : '';?>><?=$mode == 'edit' ? $currentItem->getMainPropertyDescription() : 'Название'?></option>
 <?php foreach($propertyList as $property) { ?>
 <option value="<?=$property->getPropertyName()?>"<?=$currentItem->getOrderField() == $property->getPropertyName() ? ' selected' : '';?>><?=$property->getPropertyDescription();?></option>

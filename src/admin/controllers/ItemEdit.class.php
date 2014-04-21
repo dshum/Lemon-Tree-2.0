@@ -434,6 +434,7 @@
 			$orderFieldList = array(
 				'elementOrder' => 'elementOrder',
 				'elementName' => 'elementName',
+				'id' => 'id',
 			);
 			foreach($propertyList as $property) {
 				$orderFieldList[$property->getPropertyName()] = $property->getPropertyName();

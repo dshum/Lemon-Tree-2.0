@@ -246,6 +246,10 @@
 				? nl2br($e->getTraceAsString())
 				: null;
 
+			$get = var_export($_GET, true);
+			$post = var_export($_POST, true);
+			$cookie = var_export($_COOKIE, true);
+
 			$str = <<<HTML
 Class: $exception<br>
 Message: {$e->getMessage()}<br>
@@ -259,6 +263,9 @@ IP: $ip<br>
 UserAgent: $useragent<br>
 Referer: $referer<br>
 Request method: $method<br>
+GET: <pre>$get</pre><br>
+POST: <pre>$post</pre><br>
+COOKIE: <pre>$cookie</pre><br>
 HTML;
 
 			return $str;

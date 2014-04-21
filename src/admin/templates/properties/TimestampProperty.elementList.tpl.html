@@ -2,20 +2,22 @@
 if($value) {
 	if($value->getYear() == Date::makeToday()->getYear()) {
 		echo sprintf(
-			'%d&nbsp;%s<br>%d:%02d',
+			'%d&nbsp;%s<br>%d:%02d:%02d',
 			$value->getDay(),
 			RussianTextUtils::getMonthInGenitiveCase($value->getMonth()),
 			$value->getHour(),
-			$value->getMinute()
+			$value->getMinute(),
+			$value->getSecond()
 		);
 	} else {
 		echo sprintf(
-			'%d&nbsp;%s %04d года<br>%d:%02d',
+			'%d&nbsp;%s %04d года<br>%d:%02d:%02d',
 			$value->getDay(),
 			RussianTextUtils::getMonthInGenitiveCase($value->getMonth()),
 			$value->getYear(),
 			$value->getHour(),
-			$value->getMinute()
+			$value->getMinute(),
+			$value->getSecond()
 		);
 	}
 }

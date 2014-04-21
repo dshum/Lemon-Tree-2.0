@@ -81,8 +81,16 @@
 
 				$this->pageCount = ceil($this->total / $this->perpage);
 
+				if($this->offset) {
+					$correction =
+						$this->offset > 0
+						? ceil($this->offset / $this->perpage)
+						: floor($this->offset / $this->perpage);
+					$this->pageCount -= $correction;
+				}
+
 				if($this->currentPage > $this->pageCount) {
-					$this->currentPage = 1;
+					$this->currentPage = $this->pageCount;
 				}
 
 				for($i = 1; $i <= $this->pageCount; $i++) {
@@ -105,8 +113,8 @@
 					? ($this->currentPage - 1) * $this->perpage
 					: 0;
 
-				if($this->getOffset() + $offset > 0) {
-					$offset += $this->getOffset();
+				if($this->offset + $offset > 0) {
+					$offset += $this->offset;
 				}
 
 				$this->query->limit($this->perpage, $offset);

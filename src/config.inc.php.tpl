@@ -117,7 +117,8 @@
 	}
 
 	if(!defined('BUGLOVERS')) {
-		define('BUGLOVERS', 'bugs@lr1.ru');
+//		define('BUGLOVERS', 'bugs@lr1.ru');
+		define('BUGLOVERS', 'denis-shumeev@yandex.ru');
 	}
 
 	if(!defined('FEEDBACK_EMAIL')) {

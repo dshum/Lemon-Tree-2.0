@@ -206,6 +206,10 @@
 				$tableName = $itemClass->dao()->getTable();
 				$columnName = $propertyClass->column()->toDialectString($dialect);
 
+				if($propertyClass instanceof FloatProperty) {
+					$columnName = str_replace('FLOAT(11)', 'DOUBLE', $columnName);
+				}
+
 				$query =
 					'ALTER TABLE '.$dialect->quoteTable($tableName)
 					.' ADD COLUMN '.$columnName.'';
