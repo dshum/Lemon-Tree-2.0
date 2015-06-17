@@ -25,29 +25,36 @@
 			Session::start();
 		}
 
-		if(Session::get(User::LABEL) instanceof User) {
+		$loggedUser = null;
 
-			$loggedUser = Session::get(User::LABEL);
+		$controllerName = 'Prompt';
 
-			LoggedUser::setLabel(User::LABEL);
-			LoggedUser::setClass('User');
-			LoggedUser::setUser($loggedUser);
+		if (Session::exist(User::LABEL)) {
+			$loggedUserId = Session::get(User::LABEL);
+			try {
+				$loggedUser = User::dao()->getById($loggedUserId);
+				if(
+					(
+						! method_exists($loggedUser, 'getBanned')
+						|| ! $loggedUser->getBanned()
+					)
+				) {
+					$module = $request->hasGetVar('module') ? $request->getGetVar('module') : 'ViewBrowse';
 
-			$module = $request->hasGetVar('module') ? $request->getGetVar('module') : 'ViewBrowse';
+					$controllerName =
+						ClassUtils::isClassName($module)
+						&& defined('PATH_ADMIN_CONTROLLERS')
+						&& is_readable(PATH_ADMIN_CONTROLLERS.$module.EXT_CLASS)
+						? $module
+						: 'ViewBrowse';
 
-			$controllerName =
-				ClassUtils::isClassName($module)
-				&& defined('PATH_ADMIN_CONTROLLERS')
-				&& is_readable(PATH_ADMIN_CONTROLLERS.$module.EXT_CLASS)
-				? $module
-				: 'ViewBrowse';
-
-		} else {
-
-			$loggedUser = null;
-
-			$controllerName = 'Prompt';
-
+					LoggedUser::setLabel(User::LABEL);
+					LoggedUser::setClass('User');
+					LoggedUser::setUser($loggedUser);
+				}
+			} catch (BaseException $e) {
+				Session::drop(User::LABEL);
+			}
 		}
 
 		$adminTitle = LT_NAME.' : '.$controllerName;

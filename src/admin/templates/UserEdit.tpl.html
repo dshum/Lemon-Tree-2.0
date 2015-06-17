@@ -70,6 +70,10 @@ E-mail:<br>
 
 Дата последнего входа: <?=date('d.m.Y H:i', $currentUser->getLoginDate()->toStamp())?><br><br>
 
+<?php if($loggedUser->getId() != $currentUser->getId()) {?>
+<input type="checkbox" id="banned" name="banned" value="1"<?=$currentUser->getBanned() ? ' checked' : ''?>> <label for="banned">Доступ закрыт</label><br><br>
+<?php }?>
+
 </div>
 
 <div class="record_block_bottom"><div><img src="img/edit04.gif" width="12" height="12" alt=""></div></div>

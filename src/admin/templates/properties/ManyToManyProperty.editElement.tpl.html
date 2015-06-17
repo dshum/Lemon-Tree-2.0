@@ -30,7 +30,7 @@ $(function() {
 <div id="<?=$propertyName?>_block" class="prop_block" style="overflow-y: scroll; display: block;" overflow="true">
 <?php 	if(sizeof($list)) {?>
 <?php 		foreach($list as $element) {?>
-<?php if(!$readonly) {?><input type="checkbox" id="<?=$propertyName?>_check_<?=$element->getId()?>" name="<?=$propertyName?>[]" value="<?=$element->getId()?>" checked="true">&nbsp;<?php }?><a href="<?=PATH_ADMIN_BROWSE.'?module=ElementEdit&elementId='.$element->getPolymorphicId()?>" title="<?=$fetchItem->getItemDescription()?>"><?=$element->getElementName()?></a><br>
+<?php if(!$readonly) {?><input type="checkbox" id="<?=$propertyName?>_check_<?=$element->getId()?>" name="<?=$propertyName?>[]" value="<?=$element->getId()?>" checked="true">&nbsp;<?php }?><a href="<?=PATH_ADMIN_BROWSE.'?module=ElementEdit&elementId='.$element->getPolymorphicId()?>" title="<?=$fetchItem->getItemDescription()?>"><?=$element->getAlterName()?></a><br>
 <?php 		}?>
 <?php 	} else {?>
 <span id="<?=$propertyName?>_undefined">Не задано</span>

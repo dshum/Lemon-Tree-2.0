@@ -120,10 +120,13 @@
 
 		public function getEditElementView()
 		{
+			$readonly = $this->getParameterValue('readonly');
+
 			$model =
 				Model::create()->
 				set('propertyName', $this->property->getPropertyName())->
 				set('propertyDescription', $this->property->getPropertyDescription())->
+				set('readonly', $readonly)->
 				set('value', $this->value)->
 				set('exists', $this->exists())->
 				set('path', $this->path())->

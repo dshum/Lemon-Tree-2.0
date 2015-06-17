@@ -12,7 +12,9 @@ $(function() {
 	});
 });
 </script>
+<?php if(!$readonly) {?>
 <input type="file" name="<?=$propertyName?>" value="<?=$value?>" class="file-field"><br>
 <?php if($maxFilesizeKb > 0) {?><small class="red">Максимальный размер файла <?=$maxFilesizeKb?> Кб</small><br><?php }?>
 <?php if($exists) {?><div class="file_del_check"><input type="checkbox" id="<?=$propertyName?>_drop" name="<?=$propertyName?>_drop" value="1" title="Удалить"><label for="<?=$propertyName?>_drop">Удалить</label></div><?php }?>
+<?php }?>
 <br>

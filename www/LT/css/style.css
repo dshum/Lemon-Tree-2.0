@@ -52,7 +52,7 @@ small, .mini {font-size: 11px; color: #666;}
 .browse-control img {vertical-align: middle;}
 
 .tree {margin-left: 10px;}
-.tree ul {margin: 0; padding: 0; font: 11px arial, sans-serif; background: url(../img/tree_line.gif) repeat-y;}
+.tree ul {margin: 0; padding: 0; font: 14px arial, sans-serif; background: url(../img/tree_line.gif) repeat-y;}
 .tree ul li {list-style: none; padding: 0 0 0 20px; background: url(../img/tree_corner_line.gif) no-repeat 0 0; white-space: nowrap;}
 .tree ul li img {vertical-align: middle; width: 20px; height: 19px;}
 .tree ul li.l {background: #fff url(../img/tree_corner.gif) no-repeat;}

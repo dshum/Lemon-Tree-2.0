@@ -23,23 +23,32 @@
 			Session::start();
 		}
 
-		if(Session::get(User::LABEL) instanceof User) {
+		$loggedUser = null;
 
-			$loggedUser = Session::get(User::LABEL);
+		$controllerName = 'Prompt';
 
-			LoggedUser::setLabel(User::LABEL);
-			LoggedUser::setClass('User');
-			LoggedUser::setUser($loggedUser);
+		if (Session::exist(User::LABEL)) {
+			$loggedUserId = Session::get(User::LABEL);
+			try {
+				$loggedUser = User::dao()->getById($loggedUserId);
+				if(
+					(
+						! method_exists($loggedUser, 'getBanned')
+						|| ! $loggedUser->getBanned()
+					)
+				) {
+					$controllerName = 'ViewTree';
 
-			$controllerName = 'ViewTree';
-
-		} else {
-
-			$loggedUser = null;
-
-			$controllerName = 'Prompt';
-
+					LoggedUser::setLabel(User::LABEL);
+					LoggedUser::setClass('User');
+					LoggedUser::setUser($loggedUser);
+				}
+			} catch (BaseException $e) {
+				Session::drop(User::LABEL);
+			}
 		}
+
+		$loggedUser = Session::get(User::LABEL);
 
 		$controller = new $controllerName;
 

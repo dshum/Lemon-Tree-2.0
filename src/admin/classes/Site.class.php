@@ -470,6 +470,7 @@
 				<property name="userParameters" type="String" required="false" />
 				<property name="registrationDate" type="Timestamp" required="true" />
 				<property name="loginDate" type="Timestamp" required="true" />
+				<property name="banned" type="Boolean" default="false" required="true" />
 			</properties>
 			<pattern name="DictionaryClass" />
 		</class>

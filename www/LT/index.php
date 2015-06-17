@@ -23,19 +23,34 @@
 			Session::start();
 		}
 
-		LoggedUser::setLabel(User::LABEL);
-		LoggedUser::setClass('User');
-
 		Session::assign('showSQLReport', isset($_GET['sqlreport']));
 
 		$module = $request->hasGetVar('module') ? $request->getGetVar('module') : 'Prompt';
 
-		if(
-			Session::get(User::LABEL) instanceof User
-		) {
-			$controllerName = 'Main';
-		} else {
-			$controllerName = $module == 'Restore' ? 'Restore' : 'Prompt';
+		LoggedUser::setLabel(User::LABEL);
+		LoggedUser::setClass('User');
+
+		$loggedUser = null;
+
+		$controllerName = $module == 'Restore' ? 'Restore' : 'Prompt';
+
+		if (Session::exist(User::LABEL)) {
+			$loggedUserId = Session::get(User::LABEL);
+			try {
+				$loggedUser = User::dao()->getById($loggedUserId);
+				if(
+					(
+						! method_exists($loggedUser, 'getBanned')
+						|| ! $loggedUser->getBanned()
+					)
+				) {
+					$controllerName = 'Main';
+
+					LoggedUser::setUser($loggedUser);
+				}
+			} catch (BaseException $e) {
+				Session::drop(User::LABEL);
+			}
 		}
 
 		$controller = new $controllerName;

@@ -7,6 +7,12 @@
 
 		Site::initMicroTime();
 
+		/*
+		Site::generateAutoAdmin();
+		echo 'Generate admin classes OK<br>';
+		die();
+		*/
+
 		Item::dao()->uncacheLists();
 		Property::dao()->uncacheLists();
 

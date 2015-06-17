@@ -82,7 +82,7 @@
 
 				foreach($elementList as $element) {
 					$id = $element->getId();
-					$name = $element->getElementName();
+					$name = $element->getAlterName();
 					$name = str_replace('&nbsp;', ' ', $name);
 					if($prev == $name) {
 						$name = $name.' '.$k;
@@ -95,7 +95,7 @@
 						'id' => $id,
 						'value' => $name,
 					);
-					$prev = $element->getElementName();
+					$prev = $element->getAlterName();
 				}
 
 				$model->set('hint', $hint);

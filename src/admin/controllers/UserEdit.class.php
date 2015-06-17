@@ -86,6 +86,10 @@
 						setRegistrationDate(Timestamp::makeNow())->
 						setLoginDate(Timestamp::makeNow());
 
+					if($loggedUser->getId() != $currentUser->getId()) {
+						$currentUser->setBanned($form->getValue('banned'));
+					}
+
 					try {
 						$currentUser = User::dao()->add($currentUser);
 						$model->set('groupId', $currentGroup->getId());
@@ -138,6 +142,10 @@
 
 					if($form->getValue('userPassword')) {
 						$currentUser->setUserPassword($userPassword);
+					}
+
+					if($loggedUser->getId() != $currentUser->getId()) {
+						$currentUser->setBanned($form->getValue('banned'));
 					}
 
 					try {
@@ -296,6 +304,9 @@
 				setMax(255)->
 				addImportFilter(Filter::trim())
 			)->
+			add(
+				Primitive::boolean('banned')
+			)->
 			import($request->getPost());
 
 			return $form;
@@ -337,6 +348,9 @@
 				optional()->
 				setMax(255)->
 				addImportFilter(Filter::trim())
+			)->
+			add(
+				Primitive::boolean('banned')
 			)->
 			import($request->getPost());
 

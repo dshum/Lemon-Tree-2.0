@@ -41,7 +41,7 @@
 							$user->getUserName()
 						);
 
-						Session::assign(User::LABEL, $user);
+						Session::assign(User::LABEL, $user->getId());
 
 						Cookie::create('UserName')->
 						setValue($user->getUserName())->

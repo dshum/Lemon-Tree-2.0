@@ -102,6 +102,7 @@ if($sizeofUserList > 0) {
 <th>Имя</th>
 <th>E-mail</th>
 <th>Дата регистрации</th>
+<th>Доступ закрыт</th>
 <th class="width-25"></th>
 </tr>
 <?php foreach($userList as $user) {?>
@@ -114,6 +115,7 @@ if($sizeofUserList > 0) {
 <td><?=$user->getUserDescription()?></td>
 <td><?=$user->getUserEmail()?></td>
 <td><?=date('d.m.Y H:i', $user->getRegistrationDate()->toStamp())?></td>
+<td><?=$user->getBanned() ? 'Да' : 'Нет'?></td>
 <td><?php if($user->getId() != $loggedUser->getId()) {?><a href="<?=$selfUrl?>&groupId=<?=$currentGroup->getId()?>" drop="user" userid="<?=$user->getId()?>" title="Удалить"><img src="img/ico_del.png" width="18" height="18" alt="Удалить" title="Удалить"></a><?php }?></td>
 </tr>
 <?php }?>

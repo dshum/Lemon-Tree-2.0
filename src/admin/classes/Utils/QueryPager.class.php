@@ -79,19 +79,39 @@
 
 			if($this->perpage) {
 
-				$this->pageCount = ceil($this->total / $this->perpage);
-
-				if($this->offset) {
-					$correction =
-						$this->offset > 0
-						? ceil($this->offset / $this->perpage)
-						: floor($this->offset / $this->perpage);
-					$this->pageCount -= $correction;
-				}
+				$this->pageCount =
+					$this->firstPageLimit > 0
+					&& $this->firstPageLimit < $this->total
+					? ceil($this->total / $this->perpage)
+						+ ceil(1 - $this->firstPageLimit / $this->perpage)
+					: ceil($this->total / $this->perpage);
 
 				if($this->currentPage > $this->pageCount) {
 					$this->currentPage = $this->pageCount;
 				}
+
+				if (
+					$this->firstPageLimit > 0
+				) {
+					if ($this->currentPage == 1) {
+						$limit = $this->firstPageLimit;
+						$offset = 0;
+					} else {
+						$limit = $this->perpage;
+						$offset =
+							($this->currentPage - 1) * $this->perpage
+							- $this->perpage + $this->firstPageLimit;
+					}
+				} else {
+					$limit = $this->perpage;
+					$offset = ($this->currentPage - 1) * $this->perpage;
+				}
+
+				if($this->offset > 0) {
+					$offset += $this->offset;
+				}
+
+				if ($offset < 0) $offset = 0;
 
 				for($i = 1; $i <= $this->pageCount; $i++) {
 					$this->pageList[] = $i;
@@ -108,16 +128,7 @@
 
 				$this->hasNextPage = $this->currentPage < $this->pageCount ? true : false;
 
-				$offset =
-					$this->currentPage > 1
-					? ($this->currentPage - 1) * $this->perpage
-					: 0;
-
-				if($this->offset + $offset > 0) {
-					$offset += $this->offset;
-				}
-
-				$this->query->limit($this->perpage, $offset);
+				$this->query->limit($limit, $offset);
 			}
 		}
 	}
